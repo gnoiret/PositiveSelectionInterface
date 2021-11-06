@@ -13,8 +13,6 @@ Projet : développement d'une interface web pour la sélection positive
 	- docopt
 - [Node.js](https://nodejs.org/fr/)
 
-`pip3 install Bio ete3 lxml docopt`
-
 ### Cloner le dépôt
 
 `git clone https://github.com/gnoiret/Projet_S1.git`
