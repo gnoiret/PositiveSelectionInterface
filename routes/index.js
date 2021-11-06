@@ -52,8 +52,8 @@ router.get('/display', function(req, res, next) {
         return
       }
       var JSONtree = JSON.stringify(results);
-      var JSONpattern = JSON.stringify("0:DELAS_1.PE4738"); // séquence d'intérêt à mettre en valeur
-      JSONpattern = JSON.stringify("0:XM_001090497dot3_mac_Mul_SAMD9");
+      // Séquence d'intérêt à mettre en valeur :
+      var JSONpattern = JSON.stringify("0:NM_001193307dot1_hom_Sap_SAMD9");
       res.render('displaytree.ejs', {arbre:JSONtree,pattern:JSONpattern});
     });
   });
