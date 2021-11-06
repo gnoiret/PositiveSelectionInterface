@@ -19,7 +19,7 @@ Projet : développement d'une interface web pour la sélection positive
 
 ## Utilisation
 
-Le script `example.sh` construira l'arbre XML correspondant aux données fournies.
+Le script *example.sh* construira l'arbre XML correspondant aux données fournies.
 
 ### Générer l'arbre à partir de l'exemple
 
@@ -30,7 +30,7 @@ Le script `example.sh` construira l'arbre XML correspondant aux données fournie
 
 `npm start`
 
-Par défaut, l'interface sera accessible à l'adresse [http://localhost:8888/](http://localhost:8888/), définie dans le fichier `selpos.js` :
+Par défaut, l'interface sera accessible à l'adresse [http://localhost:8888/](http://localhost:8888/), définie dans le fichier *selpos.js* :
 
 ```
 const PORT = 8888;
