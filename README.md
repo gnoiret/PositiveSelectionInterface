@@ -11,7 +11,7 @@ Projet : développement d'une interface web pour la sélection positive
 	- ete3
 	- lxml
 	- docopt
-		    pip3 install Bio ete3 lxml docopt
+			pip3 install Bio ete3 lxml docopt
 - [Node.js](https://nodejs.org/fr/)
 
 ### Cloner le dépôt
