@@ -24,8 +24,8 @@ Le script `example.sh` construira l'arbre XML correspondant aux données fournie
 
 ### Générer l'arbre à partir de l'exemple
 
-`python3 genere_xml.py data/tree_example.tree data/alignment_example.fasta data/results_example.info`
-`cp data/tree_example.tree.xml input_tree.xml`
+`python3 genere_xml.py data/example_tree.tree data/example_alignment.fasta data/example_results.info`
+`cp data/example_tree.tree.xml input_tree.xml`
 
 ### Lancer le serveur
 
