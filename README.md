@@ -37,6 +37,3 @@ Par défaut, l'interface sera accessible à l'adresse [http://localhost:8888/](h
 const PORT = 8888;
 const HOST = '127.0.0.1';
 ```
-
-coucou
-
