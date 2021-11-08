@@ -200,7 +200,7 @@
 
       <!-- Champs Seuils sup. et inf. -->
       <label for="ps-threshold-high">Upper threshold:</label><input type="number" id="ps-threshold-high" min="0.0" step="0.05" placeholder="PS Threshold" value="1.0"/>
-      <label for="ps-threshold-low">Lower threshold:</label><input type="number" id="ps-threshold-low" min="0.0" step="0.05" placeholder="PS Threshold" value="0.3"/>
+      <label for="ps-threshold-low">Lower threshold:</label><input type="number" id="ps-threshold-low" min="0.0" step="0.05" placeholder="PS Threshold" value="0.9"/>
 
       <!-- Bouton Rafaîchir -->
       <button type="button" class="btn btn-default btn-sm" aria-label="OK threshold" id="refresh" data-toggle="tooltip" data-placement="top" title="Recalculate with this threshold">
@@ -426,8 +426,15 @@ function  main_display() {
 // Fonction de mise a jour de l'affichage
 // ---------------------------------------
 function updateLayout(cRoot,firstLoad=0) {
+
+
+
+  d3.selectAll('#ps-graph, #tooltip-p').remove();
+
+
+
   var treeRoot = d3.hierarchy(cRoot, function(d) {
-    // console.log(cRoot); *mod*
+    console.log(d);
     return d.clade;
   });
   treeRoot.each(function (d) {
@@ -464,6 +471,47 @@ function updateLayout(cRoot,firstLoad=0) {
 // ----------------------------------------
 function updateSvg(treeRoot,firstLoad ,config = {}) {
 
+  // ==============================================================
+  // Début modif : variables pour graphe et séquences
+  // ==============================================================
+
+  var seqblocks = d3.selectAll('.seqblock');
+
+  var results = xmlparser.flatTree(recTree.phyloxml.phylogeny.statistics.results);
+  results = results.split(' ');
+
+  var psResultsDataset = [];
+  var site = 0;
+  var stat = 0.0;
+  results.forEach(function(d,i) {
+    d = d.split(':');
+    result = {site:d[0], stat:d[1]};
+    psResultsDataset.push(result);
+  });
+
+  var psGraphMargins = {top: 50, right: 50, bottom: 50, left: 50};
+  var psGraphWidth = psResultsDataset.length*hStep;
+  // var psGraphWidth = psResultsDataset.length;
+  var psGraphHeight = 120;
+
+  // ==============================================================
+  // Fin modif : variables pour graphe et séquences
+  // ==============================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   var scrollref=0;
   var configLayout = {
     layout : config.layout || "cladogramSpecial",
@@ -499,6 +547,9 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     }
   }
   var nodes = treeRoot.descendants();
+
+  console.log(nodes); // *s*
+  
   var links = treeRoot.links();
   // Coloration du pattern si il existe
   if ((pattern != "none") && (pattern !== ' ') && (pattern !== undefined)) {
@@ -523,12 +574,12 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     return d.y;
   });
   var heightSVG = maxY - minY;
-  var longueurPersoAjouteeSvgX = 45000;
-  var longueurPersoAjouteeSvgY = -200;
-  var decalagePersoSvgY = -80;
-  svg.attr("width", widthSVG + margin.right + margin.left+1600     + longueurPersoAjouteeSvgX);
-  svg.attr("height", heightSVG + margin.top + margin.down+400      + longueurPersoAjouteeSvgY);
-  g.attr("transform", "translate(" + (margin.right - minX - 250) + "," + (margin.top - minY + 200     + decalagePersoSvgY) + ")")
+  var longueurProjAjouteeSvgX = psResultsDataset.length*hStep;
+  var longueurProjAjouteeSvgY = -200;
+  var decalageProjSvgY = -80;
+  svg.attr("width", widthSVG + margin.right + margin.left+1600     + longueurProjAjouteeSvgX);
+  svg.attr("height", heightSVG + margin.top + margin.down+400      + longueurProjAjouteeSvgY);
+  g.attr("transform", "translate(" + (margin.right - minX - 250) + "," + (margin.top - minY + 200     + decalageProjSvgY) + ")")
   // ====================
   //  D3: Objets LINK
   // ====================
@@ -883,25 +934,6 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // Début modif : graphe des résultats de sélection positive
   // ==============================================================
 
-  var seqblocks = d3.selectAll('.seqblock');
-
-  var results = xmlparser.flatTree(recTree.phyloxml.phylogeny.statistics.results);
-  results = results.split(' ');
-
-  var psResultsDataset = [];
-  var site = 0;
-  var stat = 0.0;
-  results.forEach(function(d,i) {
-    d = d.split(':');
-    result = {site:d[0], stat:d[1]};
-    psResultsDataset.push(result);
-  });
-
-  var psGraphMargins = {top: 50, right: 50, bottom: 50, left: 50};
-  var psGraphWidth = psResultsDataset.length*(hStep);
-  // var psGraphWidth = psResultsDataset.length;
-  var psGraphHeight = 120;
-
   // Fonction de calcul du y maximum
   function max_stat(results) {
     // console.log(results);
@@ -927,9 +959,9 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // Ajout du graphe des résultats au SVG
   var psGraph = svg.append("g")
     .attr("id", "ps-graph")
-    .attr("class", "node")
-    .attr("width", psGraphWidth + psGraphMargins.left + psGraphMargins.right)
-    .attr("height", psGraphHeight + psGraphMargins.top + psGraphMargins.bottom)
+    // .attr("class", "node")
+    // .attr("width", psGraphWidth + psGraphMargins.left + psGraphMargins.right)
+    // .attr("height", psGraphHeight + psGraphMargins.top + psGraphMargins.bottom)
     .attr("transform", "translate("+(psGraphMargins.left+projOffsetLeft)+", "+psGraphMargins.top+")");
     // .attr("transform", "translate(" + (psGraphMargins.left)+"px" + "," + psGraphMargins.top + "px"+")");
 
@@ -944,18 +976,18 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
 
   // Ajout du seuil supérieur au graphe (à y = 1)
   psGraph.append("line")
-    .attr("x1", x(0))
+    .attr("x1", x(1))
     .attr("y1", y(psThresholdHigh))
-    .attr("x2", x(psResultsDataset.length))
+    .attr("x2", x(psResultsDataset.length+1))
     .attr("y2", y(psThresholdHigh))
     .style("stroke", "grey")
     .style("stroke-width", 2+"px")
     .style("stroke-dasharray", ("4, 4"));
   // Ajout du seuil inférieur au graphe (à y = 0.3)
   psGraph.append("line")
-    .attr("x1", x(0))
+    .attr("x1", x(1))
     .attr("y1", y(psThresholdLow))
-    .attr("x2", x(psResultsDataset.length))
+    .attr("x2", x(psResultsDataset.length+1))
     .attr("y2", y(psThresholdLow))
     .style("stroke", "grey")
     .style("stroke-width", 2+"px")
@@ -1001,7 +1033,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   psGraph.on("click", function() {
     var coords = d3.mouse(this);
     // console.log(coords);
-    console.log(psResultsDataset[coords[0]]);
+    // console.log(psResultsDataset[coords[0]]);
     // const dnaSequencesNodes = d3.selectAll(".seqblock .dna-sequence")._groups[0];
     // console.log(children);
 
@@ -1030,8 +1062,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
 
   var seqDiv = d3.select('#treeAlign')
     .append('g')
-    .attr('id', 'seqs-container');
-  console.log(seqDiv);
+    .attr('id', 'sequences-container');
 
   // Association des données aux futurs blocs de séquences
   var seqblocks = seqDiv.selectAll('.seqblock')
@@ -1117,6 +1148,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
 
   var mon_tooltip = d3.select('svg')
     .append('div')
+      .attr('id', 'tooltip-p')
       .style('position', 'absolute')
       .style('visibility', 'hidden')
       .text('coucou !');
@@ -1384,105 +1416,105 @@ function phylogeny_setloss(treeRoot,offset) {
   });
 }
 
-// // Fonction qui collapse les noeuds d'une certaine profondeur
-// // ----------------------------------------------------------
-// function expandTree(treeRoot) {
-//   treeRoot.each(function (d) {
-//     if (d.data.nodeinfo) {
-//       if (d.data.nodeinfo.status === "collapsed") {
-//         if (d.data._clade) {
-//           d.data.clade = d.data._clade;
-//           d.data._clade = null;
-//           d.data.nodeinfo = {status : "extended"};
-//         }
-//       }
-//     }
-//   });
-// }
+// Fonction qui collapse les noeuds d'une certaine profondeur
+// ----------------------------------------------------------
+function expandTree(treeRoot) {
+  treeRoot.each(function (d) {
+    if (d.data.nodeinfo) {
+      if (d.data.nodeinfo.status === "collapsed") {
+        if (d.data._clade) {
+          d.data.clade = d.data._clade;
+          d.data._clade = null;
+          d.data.nodeinfo = {status : "extended"};
+        }
+      }
+    }
+  });
+}
 
-// // Fonction qui collapse les noeuds d'une certaine profondeur
-// // ----------------------------------------------------------
-// function collapseVeryBigTree(treeRoot,patterns) {
-//   var acolapser = [];
-//   var aouvrir = [];
-//   if (patterns.length > 0)  {
-//     //Ecrase tous les noeuds
-//     treeRoot.each(function (d) {
-//       if ((d.depth == 5) || (d.depth == 10) ||(d.depth == 20)|| (d.depth == 30)|| (d.depth == 40) ) {
-//       acolapser.push(d)
-//       }
-//     });
-//     // Boucle sur les patterns
-//     patterns.forEach(function(p) {
-//       // Selection des feuilles de la pattern
-//       p.forEach(function(d,i) {
-//         var nomPattern= d.replace(/[\n\r]/g, '');
-//         var focusNode = null;
-//         // Recupere la feuille focus
-//         treeRoot.each(function (d,i ){
-//           if (d.data.name){
-//             var nomFeuille = d.data.name;
-//             if (nomFeuille === nomPattern) {
-//               focusNode = d;
-//             }
-//           }
-//           // cas des crossref
-//           if (d.data.eventsRec) {
-//             if (d.data.eventsRec[0].crossref) {
-//               // Si la balise crossref est presente on
-//               // l'utilise plutot que le nom du gene
-//               var cross=d.data.eventsRec[0].crossref;
-//               for(var exKey in cross) {
-//                 var nomFeuille = cross[exKey];
-//                 if (nomFeuille === nomPattern){
-//                   console.log("FIND PATTERN "+nomFeuille);
-//                   focusNode = d;
-//                 }
-//               }
-//             }
-//           }
-//         });
-//         if (focusNode) {
-//           var parent = focusNode.parent;
-//           //Ouvre les freres de la feuille
-//           parent.each(function (d) {
-//             // aouvrir.push(d)
-//           });
-//           //ouvre les noeuds entre la feuille et la racine
-//           while (parent != null) {
-//             aouvrir.push(parent)
-//             parent = parent.parent;
-//           }
-//         }
-//         else {
-//           console.log("PATTERN NOT FOUND : "+nomPattern);
-//         }
-//       });
-//     });
-//   }
-//   else {
-//     console.log("NO PATTERN")
-//     treeRoot.each(function (d) {
-//       if ((d.depth == 5) || (d.depth == 10) ||(d.depth == 30)|| (d.depth == 60)|| (d.depth == 90) ) {
-//         acolapser.push(d)
-//       }
-//     });
-//   }
-//   acolapser.forEach(function (d) {
-//     if   (d.data.clade) {
-//       d.data._clade = d.data.clade;
-//       d.data.clade = null;
-//       d.data.nodeinfo = {status : "collapsed"};
-//     }
-//   });
-//   aouvrir.forEach(function (d) {
-//     if   (d.data._clade) {
-//       d.data.clade = d.data._clade;
-//       d.data._clade = null;
-//       d.data.nodeinfo = {status : "extended"};
-//     }
-//   });
-// }
+// Fonction qui collapse les noeuds d'une certaine profondeur
+// ----------------------------------------------------------
+function collapseVeryBigTree(treeRoot,patterns) {
+  var acolapser = [];
+  var aouvrir = [];
+  if (patterns.length > 0)  {
+    //Ecrase tous les noeuds
+    treeRoot.each(function (d) {
+      if ((d.depth == 5) || (d.depth == 10) ||(d.depth == 20)|| (d.depth == 30)|| (d.depth == 40) ) {
+      acolapser.push(d)
+      }
+    });
+    // Boucle sur les patterns
+    patterns.forEach(function(p) {
+      // Selection des feuilles de la pattern
+      p.forEach(function(d,i) {
+        var nomPattern= d.replace(/[\n\r]/g, '');
+        var focusNode = null;
+        // Recupere la feuille focus
+        treeRoot.each(function (d,i ){
+          if (d.data.name){
+            var nomFeuille = d.data.name;
+            if (nomFeuille === nomPattern) {
+              focusNode = d;
+            }
+          }
+          // cas des crossref
+          if (d.data.eventsRec) {
+            if (d.data.eventsRec[0].crossref) {
+              // Si la balise crossref est presente on
+              // l'utilise plutot que le nom du gene
+              var cross=d.data.eventsRec[0].crossref;
+              for(var exKey in cross) {
+                var nomFeuille = cross[exKey];
+                if (nomFeuille === nomPattern){
+                  console.log("FIND PATTERN "+nomFeuille);
+                  focusNode = d;
+                }
+              }
+            }
+          }
+        });
+        if (focusNode) {
+          var parent = focusNode.parent;
+          //Ouvre les freres de la feuille
+          parent.each(function (d) {
+            // aouvrir.push(d)
+          });
+          //ouvre les noeuds entre la feuille et la racine
+          while (parent != null) {
+            aouvrir.push(parent)
+            parent = parent.parent;
+          }
+        }
+        else {
+          console.log("PATTERN NOT FOUND : "+nomPattern);
+        }
+      });
+    });
+  }
+  else {
+    console.log("NO PATTERN")
+    treeRoot.each(function (d) {
+      if ((d.depth == 5) || (d.depth == 10) ||(d.depth == 30)|| (d.depth == 60)|| (d.depth == 90) ) {
+        acolapser.push(d)
+      }
+    });
+  }
+  acolapser.forEach(function (d) {
+    if   (d.data.clade) {
+      d.data._clade = d.data.clade;
+      d.data.clade = null;
+      d.data.nodeinfo = {status : "collapsed"};
+    }
+  });
+  aouvrir.forEach(function (d) {
+    if   (d.data._clade) {
+      d.data.clade = d.data._clade;
+      d.data._clade = null;
+      d.data.nodeinfo = {status : "extended"};
+    }
+  });
+}
 
   // Fonction  suppression d'un element unique dans un tableau
   // ----------------------------------------------------------
@@ -1663,7 +1695,7 @@ function phylogeny_setloss(treeRoot,offset) {
     updateLayout(cladeRoot);
   });
 
-  var step = 10;
+  var step = 5;
 
   $('#moreWidth').on('click', function(event, dropdownData) {
     nodeWidth += step;
@@ -1747,11 +1779,15 @@ $("#toggle-seqtype").on("click", function() {
     $(".aa-sequence").css("display", "none");
     $(".dna-sequence").css("display", "block");
     $("#toggle-seqtype").html("Current display: "+displaySeqType);
+    hStep = Math.floor(hStep*3);
+    updateLayout(cladeRoot);
   } else {
     displaySeqType = "AA";
     console.log("current display: Nuc, switching to AA");
     $(".dna-sequence").css("display", "none");
     $(".aa-sequence").css("display", "block");
+    hStep = Math.floor(hStep/3);
+    updateLayout(cladeRoot);
   }
   $("#toggle-seqtype").html("Current display: "+displaySeqType);
 });
@@ -1775,10 +1811,7 @@ $('#ps-threshold-high').on('change', function() {
   psThresholdHigh = psHighVal;
   if (psLowVal < psHighVal) {
     psThresholdHigh = psHighVal;
-  } else {
-    console.log('incohérence h');
   }
-  // console.log(psThresholdHigh);
 });
 
 // Modification du seuil inférieur
@@ -1786,19 +1819,24 @@ $('#ps-threshold-low').on('change', function() {
   var psHighVal = $('#ps-threshold-high').val();
   var psLowVal = $('#ps-threshold-low').val();
   psThresholdLow = psLowVal;
-  // if (psLowVal < psHighVal) {
-  //   psThresholdLow = psLowVal;
-  // } else {
-  //   console.log('incohérence b');
-  // }
-  // console.log(psThresholdLow);
+  if (psLowVal < psHighVal) {
+    psThresholdLow = psLowVal;
+  }
 });
 
 $('#refresh').click(function() {
-  d3.selectAll('#ps-graph').remove();
+  // d3.selectAll('#ps-graph').remove();
   console.log('Mise à jour avec seuil inf. = '+psThresholdLow+' et seuil sup. = '+psThresholdHigh);
   updateLayout(cladeRoot);
 });
+
+$('g#ps-graph g#sequences-container').css({
+    'width': '500px',
+    'overflow-x': 'scroll',
+  });
+
+d3.select('#ps-graph').style('width', '500px').style('overflow-x', 'scroll');
+d3.select('#sequences-container').style('width', '500px').style('overflow-x', 'scroll');
 
 // ==============================================================
 // Fin modif : jQuery
