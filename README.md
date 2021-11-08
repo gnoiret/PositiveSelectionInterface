@@ -24,6 +24,7 @@ Projet : développement d'une interface web pour la sélection positive
 Le script *example.sh* construira l'arbre XML correspondant aux données d'exemple fournies.
 
 `python3 genere_xml.py <fichier_arbre> <fichier_alignement> <fichier_résultats>`
+
 `cp <fichier_arbre>.xml input_tree.xml`
 
 ### Lancer le serveur
