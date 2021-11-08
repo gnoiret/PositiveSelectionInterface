@@ -38,5 +38,5 @@ const PORT = 8888;
 const HOST = '127.0.0.1';
 ```
 
-coucou !
+coucou
 
