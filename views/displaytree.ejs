@@ -638,7 +638,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .merge(node)
     .attr("transform", function(d) {
       if (d.data.lastEvent.eventType === "loss") {
-        return "translate(" + [d.x, d.y] + ")";
+        return "translate(" + [d.x, d.y] + ")"; // *i*
       }
       else {
         return "translate(" + [d.x, d.y] + ")";
