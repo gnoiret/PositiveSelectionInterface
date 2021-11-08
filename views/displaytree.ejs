@@ -1132,14 +1132,14 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   seqblocks.exit()
     .remove();
 
-  d3.select('svg').selectAll('a.ps-tH')
+  d3.select('svg').selectAll('.ps-tH')
     .style('stroke', psThresholdHighColor);
   // console.log(d3.select('svg').selectAll('a.ps-tH'));
 
-  d3.select('svg').selectAll('a.ps-tL')
+  d3.select('svg').selectAll('.ps-tL')
     .style('stroke', psThresholdLowColor);
 
-  d3.select('svg').selectAll('a.ps-tB')
+  d3.select('svg').selectAll('.ps-tB')
     .style('stroke', psBelowThresholdColor);
 
   // ==============================================================

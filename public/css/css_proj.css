@@ -11,3 +11,8 @@ nav label {
 input[type=number] {
       width: 80px;
 }
+form {
+      border: 1px solid black;
+      padding: 1rem;
+      /*color: red;*/
+}
