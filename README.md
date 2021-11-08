@@ -12,6 +12,7 @@ Projet : développement d'une interface web pour la sélection positive
 	- lxml
 	- docopt
 - [Node.js](https://nodejs.org/fr/)
+	- npm
 
 ### Cloner le dépôt
 
