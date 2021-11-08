@@ -638,10 +638,10 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .merge(node)
     .attr("transform", function(d) {
       if (d.data.lastEvent.eventType === "loss") {
-        return "translate(" + [d.x, d.y-20] + ")";
+        return "translate(" + [d.x, d.y] + ")";
       }
       else {
-        return "translate(" + [d.x, d.y-20] + ")";
+        return "translate(" + [d.x, d.y] + ")";
       }
     })
     .on("click",action);
