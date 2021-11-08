@@ -9,8 +9,12 @@
   <!-- Optional theme -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 
+
+
   <!-- Page CSS personnalisée -->
-  <link rel="stylesheet" href="/css/css_perso.css">
+  <link rel="stylesheet" href="/css/css_proj.css">
+
+
 
   <!-- Latest compiled and minified JavaScript -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
@@ -187,24 +191,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       <!-- Début modif -->
 
       <!-- Bouton Type de séquence -->
@@ -226,10 +212,6 @@
 
 
 
-
-
-
-
   </nav>
   <!-- <div  class="testnav" id="testnav" ></div> -->
     <div id="svg-container">
@@ -245,43 +227,6 @@
 <!-- <script src='./speciestree/palette.js' charset="utf-8"></script> -->
 <!-- Code JS pour l'affichage de l'arbre  -->
 <script type="text/javascript">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
 
   // Recuperation des variables envoyee via Express
   // ----------------------------------------------
@@ -322,12 +267,8 @@
 
 
 
-
-
-
-
   // ==============================================================
-  // Début modif : variables
+  // Début modif : variables globales
   // ==============================================================
 
   var hStep = 1; // /!\ clic sur la barre x affiche la position x*hStep (console)
@@ -344,23 +285,8 @@
   var displaySeqType = "AA";
 
   // ==============================================================
-  // Fin modif : variables
+  // Fin modif : variables globales
   // ==============================================================
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -378,208 +304,6 @@
   else {
     main_display();
   }
-
-  d3.select('#refresh').on('click', function() {
-    console.log('Mise à jour avec seuil inf. = '+psThresholdLow+' et seuil sup. = '+psThresholdHigh);
-    // d3.selectAll('#ps-graph').remove();
-
-    // // ==============================================================
-    // // Début modif : variables
-    // // ==============================================================
-
-    // var hStep = 1; // /!\ clic sur la barre x affiche la position x*hStep (console)
-    // var vStep = 30;
-
-    // var psThresholdHigh = $('#ps-threshold-high').val() || 1.0;
-    // var psThresholdLow = $('#ps-threshold-low').val() || 0.3;
-
-    // var psThresholdHighColor = "#00f";
-    // var psThresholdLowColor = "#777";
-    // var psBelowThresholdColor = "#ddd";
-    // var psMissingColor = "#fff";
-
-    // // ==============================================================
-    // // Fin modif : variables
-    // // ==============================================================
-
-    // // ==============================================================
-    // // Début modif : graphe des résultats de sélection positive
-    // // ==============================================================
-
-    // var seqblocks = d3.selectAll('.seqblock');
-
-    // var results = xmlparser.flatTree(recTree.phyloxml.phylogeny.statistics.results);
-    // results = results.split(' ');
-
-    // var psResultsDataset = [];
-    // var site = 0;
-    // var stat = 0.0;
-    // results.forEach(function(d,i) {
-    //   d = d.split(':');
-    //   result = {site:d[0], stat:d[1]};
-    //   psResultsDataset.push(result);
-    // });
-
-    // var psGraphMargins = {top: 20, right: 50, bottom: 50, left: 50};
-    // var psGraphWidth = psResultsDataset.length*(hStep);
-    // // var psGraphWidth = psResultsDataset.length;
-    // var psGraphHeight = 120;
-
-    // // Fonction de calcul du y maximum
-    // function max_stat(results) {
-    //   // console.log(results);
-    //   var currentmax = results[0].stat;
-    //   results.forEach(function(res) {
-    //     // console.log(currentmax);
-    //     if (res.stat > currentmax) {
-    //       currentmax = res.stat;
-    //     }
-    //   });
-    //   return currentmax;
-    // }
-
-    // // Définition de l'échelle pour l'axe x
-    // var x = d3.scaleLinear()
-    //   .domain([0, psResultsDataset.length])
-    //   .range([0, psGraphWidth]);
-    // // Définition de l'échelle pour l'axe y
-    // var y = d3.scaleLinear()
-    //   .domain([0, max_stat(psResultsDataset)])
-    //   .range([psGraphHeight, 0]);
-
-    // // Ajout du graphe des résultats au SVG
-    // var psGraph = svg.append("g")
-    //   .attr("id", "ps-graph")
-    //   .attr("class", "node")
-    //   .attr("width", psGraphWidth + psGraphMargins.left + psGraphMargins.right)
-    //   .attr("height", psGraphHeight + psGraphMargins.top + psGraphMargins.bottom)
-    //   .attr("transform", "translate(" + psGraphMargins.left + "," + psGraphMargins.top + ")");
-
-    // // Ajout de l'axe x au graphe
-    // psGraph.append("g")
-    //   .attr("transform", "translate(0," + psGraphHeight + ")")
-    //   .call(d3.axisBottom(x).ticks(psResultsDataset.length, "f"))
-    //   .call(d3.axisBottom(x));
-    // // Ajout de l'axe y au graphe
-    // psGraph.append("g")
-    //   .call(d3.axisLeft(y));
-
-    // // Ajout du seuil supérieur au graphe (à y = 1)
-    // psGraph.append("line")
-    //   .attr("x1", x(0))
-    //   .attr("y1", y(psThresholdHigh))
-    //   .attr("x2", x(psResultsDataset.length))
-    //   .attr("y2", y(psThresholdHigh))
-    //   .style("stroke", "grey")
-    //   .style("stroke-width", 2+"px")
-    //   .style("stroke-dasharray", ("4, 4"));
-    // // Ajout du seuil inférieur au graphe (à y = 0.3)
-    // psGraph.append("line")
-    //   .attr("x1", x(0))
-    //   .attr("y1", y(psThresholdLow))
-    //   .attr("x2", x(psResultsDataset.length))
-    //   .attr("y2", y(psThresholdLow))
-    //   .style("stroke", "grey")
-    //   .style("stroke-width", 2+"px")
-    //   .style("stroke-dasharray", ("4, 4"));
-
-    // // Suppression du graphe
-    // psGraph.exit().remove();
-
-    // // Association des données aux futurs rectangles
-    // var rects = psGraph.selectAll(".psrects")
-    //   .data(psResultsDataset);
-    // // Affichage des rectangles
-    // rects.enter().append("rect")
-    //   .attr("class", ".psrects")
-    //   .attr("width", function(d) { return hStep; })
-    //   .attr("height", function(d) { return y(0)-y(d.stat); })
-    //   .attr("x", function(d) { return x(d.site)-1; })
-    //   .attr("y", function(d) { return y(d.stat); })
-    //   .style("fill", function(d) {
-    //     var col = undefined;
-    //     if (d.stat > psThresholdHigh) {
-    //       col = psThresholdHighColor;
-    //     } else if (d.stat > psThresholdLow) {
-    //       col = psThresholdLowColor;
-    //     } else if (d.stat > -0.0001) {
-    //       col = psBelowThresholdColor;
-    //     } else {
-    //       col = psMissingColor;
-    //     }
-    //     return col;
-    //   })
-    //   .style("stroke", "black")
-    //   .style("stroke-width", 0+"px");
-
-    // // Suppression des rectangles
-    // rects.exit().remove();
-
-    // // // Transition d'affichage
-    // // psGraph.style("opacity", 0)
-    // //   .transition()
-    // //   .duration(1000)
-    // //   .style("opacity", 1);
-
-    // psGraph.on("click", function() {
-    //   var coords = d3.mouse(this);
-    //   // console.log(coords);
-    //   console.log(psResultsDataset[coords[0]]);
-    //   // const dnaSequencesNodes = d3.selectAll(".seqblock .dna-sequence")._groups[0];
-    //   // console.log(children);
-
-    //   // Array.prototype.forEach.call(children, child => {
-    //   //   console.log(child.text);
-    //   // });
-    // });
-
-    // // ==============================================================
-    // // Fin modif : graphe des résultats de sélection positive
-    // // ==============================================================
-  });
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // Fonction d'affichage principale
 // ---------------------------------------
@@ -737,50 +461,6 @@ function updateLayout(cRoot,firstLoad=0) {
 // Fonction principale : mise a jour du svg
 // ----------------------------------------
 function updateSvg(treeRoot,firstLoad ,config = {}) {
-
-
-
-
-
-
-
-
-
-
-  // // ==============================================================
-  // // Début modif : variables
-  // // ==============================================================
-
-  // var hStep = 1; // /!\ clic sur la barre x affiche la position x*hStep (console)
-  // var vStep = 30;
-
-  // var psThresholdHigh = $('#ps-threshold-high').val() || 1.0;
-  // var psThresholdLow = $('#ps-threshold-low').val() || 0.3;
-
-  // var psThresholdHighColor = "#00b";
-  // var psThresholdLowColor = "#999";
-  // var psBelowThresholdColor = "#ddd";
-  // var psMissingColor = "#fff";
-
-  // // ==============================================================
-  // // Fin modif : variables
-  // // ==============================================================
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   var scrollref=0;
   var configLayout = {
@@ -1197,22 +877,6 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   // ==============================================================
   // Début modif : graphe des résultats de sélection positive
   // ==============================================================
@@ -1455,10 +1119,6 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // ==============================================================
 
   
-
-
-
-
 
 
 
@@ -2121,6 +1781,7 @@ $('#ps-threshold-low').on('change', function() {
 
 $('#refresh').click(function() {
   d3.selectAll('#ps-graph').remove();
+  console.log('Mise à jour avec seuil inf. = '+psThresholdLow+' et seuil sup. = '+psThresholdHigh);
   updateLayout(cladeRoot);
 });
 
