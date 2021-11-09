@@ -271,7 +271,7 @@
   // Début modif : variables globales
   // ==============================================================
 
-  var hStep = 10; // /!\ clic sur la barre x affiche la position x*hStep (console)
+  var hStep = 12; // /!\ clic sur la barre x affiche la position x*hStep (console)
   var vStep = 30;
 
   var psThresholdHigh = $('#ps-threshold-high').val() || 1.0;
@@ -434,7 +434,7 @@ function updateLayout(cRoot,firstLoad=0) {
 
 
   var treeRoot = d3.hierarchy(cRoot, function(d) {
-    console.log(d);
+    // console.log(d);
     return d.clade;
   });
   treeRoot.each(function (d) {
@@ -548,7 +548,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   }
   var nodes = treeRoot.descendants();
 
-  console.log(nodes); // *s*
+  // console.log(nodes); // *s*
   
   var links = treeRoot.links();
   // Coloration du pattern si il existe
@@ -935,7 +935,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // ==============================================================
 
   // Fonction de calcul du y maximum
-  function max_stat(results) {
+  function maxStat(results) {
     // console.log(results);
     var currentmax = results[0].stat;
     results.forEach(function(res) {
@@ -953,7 +953,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .range([1, psGraphWidth+1]);
   // Définition de l'échelle pour l'axe y
   var y = d3.scaleLinear()
-    .domain([0, max_stat(psResultsDataset)])
+    .domain([0, maxStat(psResultsDataset)])
     .range([psGraphHeight, 0]);
 
   // Ajout du graphe des résultats au SVG
@@ -1056,9 +1056,41 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     var leaf_name = d.data.lastEvent.name;
     var dna_sequence = d.data.lastEvent.dnaAlign;
     var aa_sequence = d.data.lastEvent.aaAlign;
-    var locnode = {y: d.y, dna:dna_sequence, aa:aa_sequence};
+    var locnode = {
+      name:d.data.name,
+      y:d.y,
+      dna:d.data.lastEvent.dnaAlign,
+      aa:d.data.lastEvent.aaAlign
+    };
     seq_dataset.push(locnode);
   });
+
+  console.log('seq_dataset:');
+  console.log(seq_dataset);
+
+  seq_dataset.sort((a,b) => a.y - b.y);
+
+  console.log('seq_dataset sorted by y:');
+  console.log(seq_dataset);
+
+  console.log(seq_dataset[0].y);
+  seq_dataset.forEach(function(d,i) {
+    console.log(i, d.name, d.x, d.y);
+  });
+
+  seq_dataset.forEach(function(d,i) {
+    d.y = seq_dataset[0].y + i*20;
+  });
+
+  // Fonction de calcul du y maximum
+  function maxNameLength(seqDataset) {
+    var currentmax = seqDataset[0].name.length;
+    seqDataset.forEach(function(seq) {
+      currentmax = seq.name.length > currentmax ? seq.name.length : currentmax;
+    });
+    return currentmax;
+  }
+  var maxNameLgt = maxNameLength(seq_dataset);
 
   var seqDiv = d3.select('#treeAlign')
     .append('g')
@@ -1076,6 +1108,12 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       return 'translate('+transx+', '+transy+')';
     });
   // Seq AA
+  seqblocksEnter.append("text")
+    .attr('class', 'sequence-name')
+    .text(function(d) {
+      return d.name;
+    })
+    .attr('transform', 'translate('+'-'+(10*maxNameLgt + hStep)+','+0+')');
   seqblocksEnter.append("text") // OK, 1592/1592 AA affichés
       .attr("class", "aa-sequence")
       .html(function(d) {
@@ -1097,6 +1135,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
 
         // return d.aa;
       })
+      .style('font-size', (hStep/6)+'rem')
       // .style("display", "block");
       .style("display", function() {
         return displaySeqType == "AA" ? "block" : "none";
@@ -1155,7 +1194,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
 
   d3.selectAll('.psrects')
     .on('mouseover', function(d) {
-      console.log('mouseover: '+d.site);
+      // console.log('mouseover: '+d.site);
       return mon_tooltip.style('visibility', 'visible').text(d.site);
     })
     .on('mousemove', function() {
@@ -1214,6 +1253,7 @@ function saveSVG(){
   var style = "\n";
   var requiredSheets = ['phylogram_d3.css', 'open_sans.css'];
 
+  console.log('requiredSheets:');
   console.log(requiredSheets);
 
   var img = new Image();
@@ -1731,13 +1771,11 @@ function collapseVeryBigTree(treeRoot,patterns) {
   $('#goLeft').on('click', function(event, dropdownData) {
     x0Align -= 100;
     updateLayout(cladeRoot);
-    // console.log('bouton commenté');
   });
 
   $('#goRight').on('click', function(event, dropdownData) {
     x0Align += 100;
     updateLayout(cladeRoot);
-    // console.log('bouton commenté');
   });
 
   $('#export').on('click', function() {
