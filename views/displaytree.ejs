@@ -239,7 +239,9 @@
   var cladeRoot;
   var layout = d3.layout.cladogram();   // Fonction  D3 qui transforme les donnees en cladograme
   var nodeWidth = 80;                  // Largeur
+  // var nodeWidth = 80;                  // Largeur
   var nodeHeigth = 20;                  // Hauteur
+  // var nodeHeigth = 20;                  // Hauteur
   var x0Align = 350;                  // Cordonee horizonatle de l'alignement
   var stringWidth;                      // Largeur affichage arbre
   var tagSimpleGene = false;            // True si arbre de gene de type PhyloXML, False si arbre de gene de type RecPhyloXML
@@ -271,7 +273,7 @@
   // Début modif : variables globales
   // ==============================================================
 
-  var hStep = 12; // /!\ clic sur la barre x affiche la position x*hStep (console)
+  var hStep = 11; // /!\ clic sur la barre x affiche la position x*hStep (console)
   var vStep = 30;
 
   var psThresholdHigh = $('#ps-threshold-high').val() || 1.0;
@@ -429,7 +431,7 @@ function updateLayout(cRoot,firstLoad=0) {
 
 
 
-  d3.selectAll('#ps-graph, #tooltip-p').remove();
+  d3.selectAll('#ps-graph, #sequences-container').remove();
 
 
 
@@ -456,7 +458,7 @@ function updateLayout(cRoot,firstLoad=0) {
       }
     }
   });
-  layout.nodeSize([nodeWidth, nodeHeigth]);
+  layout.nodeSize([nodeWidth, nodeHeigth]); // *i*
   layout(treeRoot);
   // Traitement des distances dans le cas d'un arbre de gene de type phyloxml
   if (tagSimpleGene) {
@@ -548,7 +550,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   }
   var nodes = treeRoot.descendants();
 
-  // console.log(nodes); // *s*
+  // console.log(nodes); // *m*
   
   var links = treeRoot.links();
   // Coloration du pattern si il existe
@@ -688,11 +690,13 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     nodeEnter
     .merge(node)
     .attr("transform", function(d) {
+      console.log('d:');
+      console.log(d);
       if (d.data.lastEvent.eventType === "loss") {
-        return "translate(" + [d.x, d.y] + ")"; // *i*
+        return "translate(" + [d.x, d.y] + ")";
       }
       else {
-        return "translate(" + [d.x, d.y] + ")";
+        return "translate(" + [d.x, d.y] + ")"; // *i*
       }
     })
     .on("click",action);
@@ -1065,18 +1069,18 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     seq_dataset.push(locnode);
   });
 
-  console.log('seq_dataset:');
-  console.log(seq_dataset);
+  // console.log('seq_dataset:');
+  // console.log(seq_dataset);
 
   seq_dataset.sort((a,b) => a.y - b.y);
 
-  console.log('seq_dataset sorted by y:');
-  console.log(seq_dataset);
+  // console.log('seq_dataset sorted by y:');
+  // console.log(seq_dataset);
 
-  console.log(seq_dataset[0].y);
-  seq_dataset.forEach(function(d,i) {
-    console.log(i, d.name, d.x, d.y);
-  });
+  // console.log(seq_dataset[0].y);
+  // seq_dataset.forEach(function(d,i) {
+  //   console.log(i, d.name, d.y);
+  // });
 
   seq_dataset.forEach(function(d,i) {
     d.y = seq_dataset[0].y + i*20;
@@ -1113,14 +1117,14 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .text(function(d) {
       return d.name;
     })
-    .attr('transform', 'translate('+'-'+(10*maxNameLgt + hStep)+','+0+')');
+    .attr('transform', 'translate('+'-'+(10*(maxNameLgt + 1))+','+0+')');
   seqblocksEnter.append("text") // OK, 1592/1592 AA affichés
       .attr("class", "aa-sequence")
       .html(function(d) {
         var seq_grouped = "";
         var new_group = "";
         var new_group_class = "";
-        for (i=0; i<Math.min(psResultsDataset.length, d.aa.length); i++) {
+        for (i=0; i<psResultsDataset.length; i++) {
           if (psResultsDataset[i].stat > psThresholdHigh) {
             new_group_class = "ps-tH";
           } else if (psResultsDataset[i].stat > psThresholdLow) {
@@ -1147,7 +1151,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         var seq_grouped = "";
         var new_group = "";
         var new_group_class = "";
-        for (i=0; i<Math.min(psResultsDataset.length, d.dna.length); i++) {
+        for (i=0; i<psResultsDataset.length; i++) {
           if (psResultsDataset[i].stat > psThresholdHigh) {
             new_group_class = "ps-tH";
           } else if (psResultsDataset[i].stat > psThresholdLow) {
@@ -1168,16 +1172,12 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       });
 
   // Suppression des blocs de séquences
-  seqblocks.exit()
-    .remove();
+  seqblocks.exit().remove();
 
   d3.select('svg').selectAll('.ps-tH')
     .style('stroke', psThresholdHighColor);
-  // console.log(d3.select('svg').selectAll('a.ps-tH'));
-
   d3.select('svg').selectAll('.ps-tL')
     .style('stroke', psThresholdLowColor);
-
   d3.select('svg').selectAll('.ps-tB')
     .style('stroke', psBelowThresholdColor);
 
@@ -1185,12 +1185,12 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // Fin modif : blocs de séquences
   // ==============================================================
 
-  var mon_tooltip = d3.select('svg')
-    .append('div')
-      .attr('id', 'tooltip-p')
-      .style('position', 'absolute')
-      .style('visibility', 'hidden')
-      .text('coucou !');
+  // var tooltip2 = d3.select('svg')
+  //   .append('div')
+  //     .attr('id', 'tooltip2')
+  //     .style('position', 'absolute')
+  //     .style('visibility', 'hidden')
+  //     .text('tooltip2');
 
   d3.selectAll('.psrects')
     .on('mouseover', function(d) {
@@ -1362,7 +1362,7 @@ function recuAncestors (todo, done) {
 // Fonction de coloration du resultat d'une recherche de  pattern
 // La variable pattern est ici un tableau du nom des feuilles qui ont matchés
 // --------------------------------------------------------------------------
-function subnode(nodes,pattern,colPattern) {
+function subnode(nodes, pattern, colPattern) {
   var ancs;
   var n1;
   var n2;
@@ -1371,7 +1371,13 @@ function subnode(nodes,pattern,colPattern) {
   var racine = null;
   // Selection des feuilles
   var scrollref = 0;
-  nodes.forEach(function (d,i ){
+  nodes.forEach(function (d, i){
+    
+    // console.log(d); // *m*
+    // if (d.height == 0) {
+    //   console.log('Feuille: '+d.data.name);
+    // }
+
     if (d.depth == 0) {
       racine = d;
     }
