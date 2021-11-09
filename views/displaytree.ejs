@@ -1076,7 +1076,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       return 'translate('+transx+', '+transy+')';
     });
   // Seq AA
-  seqblocksEnter.append("text") // OK, 1592/1592 AA affichés (1592 - 4 résultats manquants = 1588 AA)
+  seqblocksEnter.append("text") // OK, 1592/1592 AA affichés
       .attr("class", "aa-sequence")
       .html(function(d) {
         var seq_grouped = "";
@@ -1213,10 +1213,13 @@ function saveSVG(){
   // http://www.coffeegnome.net/converting-svg-to-png-with-canvg/
   var style = "\n";
   var requiredSheets = ['phylogram_d3.css', 'open_sans.css'];
+
+  console.log(requiredSheets);
+
   var img = new Image();
   var serializer = new XMLSerializer();
   // prepend style to svg
-  svg.insert('defs',":first-child")
+  svg.insert('defs',":first-child");
   d3.select("svg defs")
       .append('style')
       .attr('type','text/css')
