@@ -277,10 +277,14 @@
   var psThresholdHigh = $('#ps-threshold-high').val() || 1.0;
   var psThresholdLow = $('#ps-threshold-low').val() || 0.3;
 
-  var psThresholdHighColor = "#00b";
-  var psThresholdLowColor = "#999";
-  var psBelowThresholdColor = "#ddd";
-  var psMissingColor = "#fff";
+  var psThresholdHighBgColor = "#000";
+  var psThresholdLowBgColor = "#ccc";
+  var psBelowThresholdBgColor = "#fff";
+  var psMissingBgColor = "#fff";
+  var psThresholdHighTxtColor = "#fff";
+  var psThresholdLowTxtColor = "#000";
+  var psBelowThresholdTxtColor = "#000";
+  var psMissingTxtColor = "#f00";
 
   var projOffsetLeft = 700;
 
@@ -958,84 +962,84 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .range([psGraphHeight, 0]);
 
   // Ajout du graphe des résultats au SVG
-  var psGraph = svg.append("g")
-    .attr("id", "ps-graph")
-    // .attr("class", "node")
-    // .attr("width", psGraphWidth + psGraphMargins.left + psGraphMargins.right)
-    // .attr("height", psGraphHeight + psGraphMargins.top + psGraphMargins.bottom)
-    .attr("transform", "translate("+(psGraphMargins.left+projOffsetLeft)+", "+psGraphMargins.top+")");
-    // .attr("transform", "translate(" + (psGraphMargins.left)+"px" + "," + psGraphMargins.top + "px"+")");
+  var psGraph = svg.append('g')
+    .attr('id', 'ps-graph')
+    // .attr('class', 'node')
+    // .attr('width', psGraphWidth + psGraphMargins.left + psGraphMargins.right)
+    // .attr('height', psGraphHeight + psGraphMargins.top + psGraphMargins.bottom)
+    .attr('transform', 'translate('+(psGraphMargins.left+projOffsetLeft)+', '+psGraphMargins.top+')');
+    // .attr('transform', 'translate(' + (psGraphMargins.left)+'px' + ',' + psGraphMargins.top + 'px'+')');
 
   // Ajout de l'axe x au graphe
-  psGraph.append("g")
-    .attr("transform", "translate(0," + psGraphHeight + ")")
-    .call(d3.axisBottom(x).ticks(psResultsDataset.length/5, "f"));
+  psGraph.append('g')
+    .attr('transform', 'translate(0,' + psGraphHeight + ')')
+    .call(d3.axisBottom(x).ticks(psResultsDataset.length/5, 'f'));
     // .call(d3.axisBottom(x));
   // Ajout de l'axe y au graphe
-  psGraph.append("g")
+  psGraph.append('g')
     .call(d3.axisLeft(y));
 
   // Ajout du seuil supérieur au graphe (à y = 1)
-  psGraph.append("line")
-    .attr("x1", x(1))
-    .attr("y1", y(psThresholdHigh))
-    .attr("x2", x(psResultsDataset.length+1))
-    .attr("y2", y(psThresholdHigh))
-    .style("stroke", "grey")
-    .style("stroke-width", 2+"px")
-    .style("stroke-dasharray", ("4, 4"));
+  psGraph.append('line')
+    .attr('x1', x(1))
+    .attr('y1', y(psThresholdHigh))
+    .attr('x2', x(psResultsDataset.length+1))
+    .attr('y2', y(psThresholdHigh))
+    .style('stroke', 'grey')
+    .style('stroke-width', 2+'px')
+    .style('stroke-dasharray', ('4, 4'));
   // Ajout du seuil inférieur au graphe (à y = 0.3)
-  psGraph.append("line")
-    .attr("x1", x(1))
-    .attr("y1", y(psThresholdLow))
-    .attr("x2", x(psResultsDataset.length+1))
-    .attr("y2", y(psThresholdLow))
-    .style("stroke", "grey")
-    .style("stroke-width", 2+"px")
-    .style("stroke-dasharray", ("4, 4"));
+  psGraph.append('line')
+    .attr('x1', x(1))
+    .attr('y1', y(psThresholdLow))
+    .attr('x2', x(psResultsDataset.length+1))
+    .attr('y2', y(psThresholdLow))
+    .style('stroke', 'grey')
+    .style('stroke-width', 2+'px')
+    .style('stroke-dasharray', ('4, 4'));
 
   // Suppression du graphe
   psGraph.exit().remove();
 
   // Association des données aux futurs rectangles
-  var rects = psGraph.selectAll(".psrects")
+  var rects = psGraph.selectAll('.psrects')
     .data(psResultsDataset);
   // Affichage des rectangles
   var i_rect = 1;
-  rects.enter().append("rect")
-    .attr("class", "psrects")
-    .attr("title", function(d) {
+  rects.enter().append('rect')
+    .attr('class', 'psrects')
+    .attr('title', function(d) {
       return d.site;
     })
-    .attr("width", function(d) { return hStep; })
-    .attr("height", function(d) { return y(0)-y(d.stat); })
-    .attr("x", function(d) { return x(d.site); })
-    // .attr("x", function(d) { return x(d.site)-hStep; })
-    .attr("y", function(d) { return y(d.stat); })
-    .style("fill", function(d) {
+    .attr('width', function(d) { return hStep; })
+    .attr('height', function(d) { return y(0)-y(d.stat); })
+    .attr('x', function(d) { return x(d.site); })
+    // .attr('x', function(d) { return x(d.site)-hStep; })
+    .attr('y', function(d) { return y(d.stat); })
+    .style('fill', function(d) {
       var col = undefined;
       if (d.stat > psThresholdHigh) {
-        col = psThresholdHighColor;
+        col = psThresholdHighBgColor;
       } else if (d.stat > psThresholdLow) {
-        col = psThresholdLowColor;
+        col = psThresholdLowBgColor;
       } else if (d.stat > -0.0001) {
-        col = psBelowThresholdColor;
+        col = psBelowThresholdBgColor;
       } else {
-        col = psMissingColor;
+        col = psMissingBgColor;
       }
       return col;
     })
-    .style("stroke", "black")
-    .style("stroke-width", 1+"px");
+    .style('stroke', 'black')
+    .style('stroke-width', 1+'px');
 
   // // Suppression des rectangles
   // rects.exit().remove();
 
-  psGraph.on("click", function() {
+  psGraph.on('click', function() {
     var coords = d3.mouse(this);
     // console.log(coords);
     // console.log(psResultsDataset[coords[0]]);
-    // const dnaSequencesNodes = d3.selectAll(".seqblock .dna-sequence")._groups[0];
+    // const dnaSequencesNodes = d3.selectAll('.seqblock .dna-sequence')._groups[0];
     // console.log(children);
 
     // Array.prototype.forEach.call(children, child => {
@@ -1086,6 +1090,23 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   var seqDiv = d3.select('#treeAlign')
     .append('g')
     .attr('id', 'sequences-container');
+
+  // var nSvg = d3.select('#treeAlign')
+  //   .append('svg')
+  //     .attr('id', 'mon-div-defilable')
+  //     .attr('x', '0')
+  //     .attr('y', '0')
+  //     .style('width', '300px')
+  //     .style('height', '300px')
+  //     .append('svg')
+  //       .attr('x', '0')
+  //       .attr('y', '0')
+  //       .attr('width', '400px')
+  //       .attr('height', '400px')
+  //       .style('overflow', 'auto');
+  // var seqDiv = nSvg
+  //   .append('g')
+  //     .attr('id', 'sequences-container');
 
   // Association des données aux futurs blocs de séquences
   var seqblocks = seqDiv.selectAll('.seqblock')
@@ -1151,11 +1172,11 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       .attr('height', maxYSeq - minYSeq + hStepBase*2)
       .style('fill', () => {
         if (psResultsDataset[i].stat > psThresholdHigh) {
-          return psThresholdHighColor;
+          return psThresholdHighBgColor;
         } else if (psResultsDataset[i].stat > psThresholdLow) {
-          return psThresholdLowColor;
+          return psThresholdLowBgColor;
         } else {
-          return psBelowThresholdColor;
+          return psBelowThresholdBgColor;
         }
       });
     oneSeqDna.append('rect')
@@ -1165,11 +1186,11 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       .attr('height', maxYSeq - minYSeq + hStepBase*2)
       .style('fill', () => {
         if (psResultsDataset[i].stat > psThresholdHigh) {
-          return psThresholdHighColor;
+          return psThresholdHighBgColor;
         } else if (psResultsDataset[i].stat > psThresholdLow) {
-          return psThresholdLowColor;
+          return psThresholdLowBgColor;
         } else {
-          return psBelowThresholdColor;
+          return psBelowThresholdBgColor;
         }
       });
   }
@@ -1224,11 +1245,11 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   //     .attr('height', hStep)
   //     .style('fill', () => {
   //       if (psResultsDataset[i].stat > psThresholdHigh) {
-  //         return psThresholdHighColor;
+  //         return psThresholdHighBgColor;
   //       } else if (psResultsDataset[i].stat > psThresholdLow) {
-  //         return psThresholdLowColor;
+  //         return psThresholdLowBgColor;
   //       } else {
-  //         return psBelowThresholdColor;
+  //         return psBelowThresholdBgColor;
   //       }
   //     });
   //   seqTextNuc.append('text')
@@ -1277,12 +1298,12 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // // Suppression des blocs de séquences
   // seqblocks.exit().remove();
 
-  d3.select('svg').selectAll('.ps-tH')
-    .style('stroke', psThresholdHighColor);
-  d3.select('svg').selectAll('.ps-tL')
-    .style('stroke', psThresholdLowColor);
-  d3.select('svg').selectAll('.ps-tB')
-    .style('stroke', psBelowThresholdColor);
+  // d3.select('svg').selectAll('.ps-tH')
+  //   .style('stroke', psThresholdHighBgColor);
+  // d3.select('svg').selectAll('.ps-tL')
+  //   .style('stroke', psThresholdLowBgColor);
+  // d3.select('svg').selectAll('.ps-tB')
+  //   .style('stroke', psBelowThresholdBgColor);
 
   // ==============================================================
   // Fin modif : blocs de séquences
@@ -1915,45 +1936,45 @@ function collapseVeryBigTree(treeRoot,patterns) {
 // ==============================================================
 
 $(document).ready(function() {
-  $('#toggle-seqtype').html("Current display: "+displaySeqType);
+  $('#toggle-seqtype').html('Current display: '+displaySeqType);
   $('div.demo').css({
     'width': $(window).width() - 10,
-    'height': $(window).height() - $("nav").outerHeight() - 40,
+    'height': $(window).height() - $('nav').outerHeight() - 40,
   });
 });
 
 $(window).resize(function() {
-  $("div.demo").css({
-    "margin-top": $("nav").outerHeight(),
+  $('div.demo').css({
+    'margin-top': $('nav').outerHeight(),
     'width': $(window).width() - 10,
-    'height': $(window).height() - $("nav").outerHeight() - 40,
+    'height': $(window).height() - $('nav').outerHeight() - 40,
   });
 });
 
 // Bouton Nuc <-> AA
-$("#toggle-seqtype").on("click", function() {
-  if (displaySeqType == "AA") {
-    console.log("current display: AA, switching to Nuc");
-    displaySeqType = "Nuc";
-    $(".aa-sequence").css("display", "none");
-    $(".dna-sequence").css("display", "block");
-    $("#toggle-seqtype").html("Current display: "+displaySeqType);
+$('#toggle-seqtype').on('click', function() {
+  if (displaySeqType == 'AA') {
+    console.log('current display: AA, switching to Nuc');
+    displaySeqType = 'Nuc';
+    $('.aa-sequence').css('display', 'none');
+    $('.dna-sequence').css('display', 'block');
+    $('#toggle-seqtype').html('Current display: '+displaySeqType);
     // hStep=Math.floor(hStep*3);
     updateLayout(cladeRoot);
   } else {
-    console.log("current display: Nuc, switching to AA");
-    displaySeqType = "AA";
-    $(".dna-sequence").css("display", "none");
-    $(".aa-sequence").css("display", "block");
+    console.log('current display: Nuc, switching to AA');
+    displaySeqType = 'AA';
+    $('.dna-sequence').css('display', 'none');
+    $('.aa-sequence').css('display', 'block');
     // hStep=Math.floor(hStep/3);
     updateLayout(cladeRoot);
   }
-  $("#toggle-seqtype").html("Current display: "+displaySeqType);
+  $('#toggle-seqtype').html('Current display: '+displaySeqType);
 });
 
 // Décalage du SVG vers le bas
-$("div.demo").css({
-  "margin-top": $("nav").outerHeight(),
+$('div.demo').css({
+  'margin-top': $('nav').outerHeight(),
 });
 
 // Modification du seuil supérieur

@@ -19,3 +19,16 @@ form {
 .node.seqblock {
       cursor: default;
 }
+
+/*#mon-div-defilable {
+      display: block;
+      width: 400px;
+
+      border: 3px solid #666;
+      margin: 5px;
+      padding: 5px;
+      position: relative;
+      width: 1000px;
+      height: 600px;
+      overflow: auto;
+}*/
