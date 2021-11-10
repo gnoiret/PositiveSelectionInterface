@@ -1111,7 +1111,10 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   //   .attr('transform', 'translate('+'-'+(10*(maxNameLgt + 1))+','+0+')');
   
   var seqTextAA = seqblocksEnter.append("g")
-      .attr("class", "aa-sequence");
+      .attr("class", "aa-sequence")
+      .style("display", function() {
+        return displaySeqType == "AA" ? "block" : "none";
+      });
   // Seq AA
   for (i=0; i<psResultsDataset.length; i++) {
     seqTextAA.append('rect')
@@ -1172,14 +1175,17 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       // })
       // .style('font-size', '1.667rem')
       // .style("display", "block");
-      .style("display", function() {
-        return displaySeqType == "AA" ? "block" : "none";
-      });
+      // .style("display", function() {
+      //   return displaySeqType == "AA" ? "block" : "none";
+      // });
 
   // Seq Nuc
   var seqTextNuc= seqblocksEnter.append("g")
-      .attr("class", "dna-sequence");
-  for (i=0; i<psResultsDataset.length; i++) {
+      .attr("class", "dna-sequence")
+      .style("display", function() {
+        return displaySeqType == "Nuc" ? "block" : "none";
+      });
+    for (i=0; i<psResultsDataset.length; i++) {
     seqTextNuc.append('rect')
       .attr('x', function(d) {return i*hStep;})
       .attr('y', function(d) {return -hStep/2;})
@@ -1238,9 +1244,9 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       // })
       // .style('font-size', '1.667rem')
       // .style("display", "block");
-      .style("display", function() {
-        return displaySeqType == "Nuc" ? "block" : "none";
-      });
+      // .style("display", function() {
+      //   return displaySeqType == "Nuc" ? "block" : "none";
+      // });
   // seqblocksEnter.append("text") // OK : 4776/4776 nuc. affichés
   //     .attr("class", "dna-sequence")
   //     .html(function(d) {
