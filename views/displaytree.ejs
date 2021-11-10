@@ -273,7 +273,7 @@
   // Début modif : variables globales
   // ==============================================================
 
-  var hStep = 16; // /!\ clic sur la barre x affiche la position x*hStep (console)
+  var hStep = 16;
   var vStep = 30;
 
   var psThresholdHigh = $('#ps-threshold-high').val() || 1.0;
@@ -1110,12 +1110,12 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   //   })
   //   .attr('transform', 'translate('+'-'+(10*(maxNameLgt + 1))+','+0+')');
   
+  // Seq AA
   var seqTextAA = seqblocksEnter.append("g")
       .attr("class", "aa-sequence")
       .style("display", function() {
         return displaySeqType == "AA" ? "block" : "none";
       });
-  // Seq AA
   for (i=0; i<psResultsDataset.length; i++) {
     seqTextAA.append('rect')
       .attr('x', function(d) {return i*hStep;})
@@ -1144,43 +1144,10 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
           return 'black';
         }
       });
-      // .style('stroke', 'black');
   }
-  seqTextAA
-      // .html(function(d,i) {
-        // var seq_grouped = "";
-        // var new_group = "";
-        // var new_group_class = "";
-        // for (i=0; i<psResultsDataset.length; i++) {
-        //   if (psResultsDataset[i].stat > psThresholdHigh) {
-        //     new_group_class = "ps-tH";
-        //   } else if (psResultsDataset[i].stat > psThresholdLow) {
-        //     new_group_class = "ps-tL";
-        //   } else {
-        //     new_group_class = "ps-tB";
-        //   }
-        //   new_group = "<a class='"+new_group_class+"' style='display:block;width:100px;' title='"+i+"'>"+d.aa[i]+"</a>";
-        //   seq_grouped += new_group;
-        // }
-        // return seq_grouped;
-
-        // console.log(d.aa[0], d.aa[1], d.aa[2], d.aa[3]);
-        // console.log(d.aa[d.aa.length-4], d.aa[d.aa.length-3], d.aa[d.aa.length-2], d.aa[d.aa.length-1]);
-        // var seqfinale = '<a style="color:blue;">coucou</a>';
-        // for (i=0; i<psResultsDataset.length; i++) {
-          
-        // }
-
-      //   return seqfinale;
-      // })
-      // .style('font-size', '1.667rem')
-      // .style("display", "block");
-      // .style("display", function() {
-      //   return displaySeqType == "AA" ? "block" : "none";
-      // });
 
   // Seq Nuc
-  var seqTextNuc= seqblocksEnter.append("g")
+  var seqTextNuc = seqblocksEnter.append("g")
       .attr("class", "dna-sequence")
       .style("display", function() {
         return displaySeqType == "Nuc" ? "block" : "none";
@@ -1213,60 +1180,29 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
           return 'black';
         }
       });
-      // .style('stroke', 'black');
   }
-  seqTextNuc
-      // .html(function(d,i) {
-        // var seq_grouped = "";
-        // var new_group = "";
-        // var new_group_class = "";
-        // for (i=0; i<psResultsDataset.length; i++) {
-        //   if (psResultsDataset[i].stat > psThresholdHigh) {
-        //     new_group_class = "ps-tH";
-        //   } else if (psResultsDataset[i].stat > psThresholdLow) {
-        //     new_group_class = "ps-tL";
-        //   } else {
-        //     new_group_class = "ps-tB";
-        //   }
-        //   new_group = "<a class='"+new_group_class+"' style='display:block;width:100px;' title='"+i+"'>"+d.aa[i]+"</a>";
-        //   seq_grouped += new_group;
-        // }
-        // return seq_grouped;
 
-        // console.log(d.aa[0], d.aa[1], d.aa[2], d.aa[3]);
-        // console.log(d.aa[d.aa.length-4], d.aa[d.aa.length-3], d.aa[d.aa.length-2], d.aa[d.aa.length-1]);
-        // var seqfinale = '<a style="color:blue;">coucou</a>';
-        // for (i=0; i<psResultsDataset.length; i++) {
-          
-        // }
-
-      //   return seqfinale;
-      // })
-      // .style('font-size', '1.667rem')
-      // .style("display", "block");
-      // .style("display", function() {
-      //   return displaySeqType == "Nuc" ? "block" : "none";
-      // });
+  // // Vieux code :
   // seqblocksEnter.append("text") // OK : 4776/4776 nuc. affichés
   //     .attr("class", "dna-sequence")
   //     .html(function(d) {
-  //       // var seq_grouped = "";
-  //       // var new_group = "";
-  //       // var new_group_class = "";
-  //       // for (i=0; i<psResultsDataset.length; i++) {
-  //       //   if (psResultsDataset[i].stat > psThresholdHigh) {
-  //       //     new_group_class = "ps-tH";
-  //       //   } else if (psResultsDataset[i].stat > psThresholdLow) {
-  //       //     new_group_class = "ps-tL";
-  //       //   } else {
-  //       //     new_group_class = "ps-tB";
-  //       //   }
-  //       //   new_group = "<a class='"+new_group_class+"' title='"+i+"'>"+d.dna[3*i]+d.dna[3*i+1]+d.dna[3*i+2]+"</a>";
-  //       //   seq_grouped += new_group;
-  //       // }
-  //       // return seq_grouped;
+  //       var seq_grouped = "";
+  //       var new_group = "";
+  //       var new_group_class = "";
+  //       for (i=0; i<psResultsDataset.length; i++) {
+  //         if (psResultsDataset[i].stat > psThresholdHigh) {
+  //           new_group_class = "ps-tH";
+  //         } else if (psResultsDataset[i].stat > psThresholdLow) {
+  //           new_group_class = "ps-tL";
+  //         } else {
+  //           new_group_class = "ps-tB";
+  //         }
+  //         new_group = "<a class='"+new_group_class+"' title='"+i+"'>"+d.dna[3*i]+d.dna[3*i+1]+d.dna[3*i+2]+"</a>";
+  //         seq_grouped += new_group;
+  //       }
+  //       return seq_grouped;
 
-  //       return d.dna;
+  //       // return d.dna;
   //     })
   //     .style('font-size', '1.667rem')
   //     // .style("display", "none");
@@ -1274,8 +1210,8 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   //       return displaySeqType == "Nuc" ? "block" : "none";
   //     });
 
-  // Suppression des blocs de séquences
-  seqblocks.exit().remove();
+  // // Suppression des blocs de séquences
+  // seqblocks.exit().remove();
 
   d3.select('svg').selectAll('.ps-tH')
     .style('stroke', psThresholdHighColor);
@@ -1938,14 +1874,14 @@ $("#toggle-seqtype").on("click", function() {
     $(".aa-sequence").css("display", "none");
     $(".dna-sequence").css("display", "block");
     $("#toggle-seqtype").html("Current display: "+displaySeqType);
-    hStep = Math.floor(hStep*3);
+    hStep=Math.floor(hStep*3);
     updateLayout(cladeRoot);
   } else {
     displaySeqType = "AA";
     console.log("current display: Nuc, switching to AA");
     $(".dna-sequence").css("display", "none");
     $(".aa-sequence").css("display", "block");
-    hStep = Math.floor(hStep/3);
+    hStep=Math.floor(hStep/3);
     updateLayout(cladeRoot);
   }
   $("#toggle-seqtype").html("Current display: "+displaySeqType);
