@@ -239,9 +239,7 @@
   var cladeRoot;
   var layout = d3.layout.cladogram();   // Fonction  D3 qui transforme les donnees en cladograme
   var nodeWidth = 80;                  // Largeur
-  // var nodeWidth = 80;                  // Largeur
-  var nodeHeigth = 20;                  // Hauteur
-  // var nodeHeigth = 20;                  // Hauteur
+  var nodeHeigth = 15;                  // Hauteur
   var x0Align = 350;                  // Cordonee horizonatle de l'alignement
   var stringWidth;                      // Largeur affichage arbre
   var tagSimpleGene = false;            // True si arbre de gene de type PhyloXML, False si arbre de gene de type RecPhyloXML
@@ -273,8 +271,8 @@
   // Début modif : variables globales
   // ==============================================================
 
-  var hStep = 16;
-  var vStep = 30;
+  var displaySeqType = 'Nuc';
+  var hStepBase = 16;
 
   var psThresholdHigh = $('#ps-threshold-high').val() || 1.0;
   var psThresholdLow = $('#ps-threshold-low').val() || 0.3;
@@ -283,8 +281,6 @@
   var psThresholdLowColor = "#999";
   var psBelowThresholdColor = "#ddd";
   var psMissingColor = "#fff";
-
-  var displaySeqType = "AA";
 
   var projOffsetLeft = 700;
 
@@ -477,6 +473,8 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // Début modif : variables pour graphe et séquences
   // ==============================================================
 
+  var hStep = displaySeqType == 'AA' ? hStepBase : hStepBase*3;
+
   var seqblocks = d3.selectAll('.seqblock');
 
   var results = xmlparser.flatTree(recTree.phyloxml.phylogeny.statistics.results);
@@ -491,10 +489,9 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     psResultsDataset.push(result);
   });
 
-  var psGraphMargins = {top: 50, right: 50, bottom: 50, left: 50};
+  var psGraphMargins = {top: 20, right: 50, bottom: 50, left: 50};
   var psGraphWidth = psResultsDataset.length*hStep;
-  // var psGraphWidth = psResultsDataset.length;
-  var psGraphHeight = 120;
+  var psGraphHeight = 130;
 
   // ==============================================================
   // Fin modif : variables pour graphe et séquences
@@ -1069,23 +1066,23 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     seq_dataset.push(locnode);
   });
 
-  // Ordonner les séquences avec un espacement régulier
-  // en partant de la position verticale (Y) de la première
+  // // Ordonner les séquences avec un espacement régulier
+  // // en partant de la position verticale (Y) de la première
   // seq_dataset.sort((a,b) => a.y - b.y);
   // seq_dataset.forEach(function(d,i) {
   //   d.y = seq_dataset[0].y + i*20;
   // });
+  // // Fonction de calcul de la longueur maximale des noms de séquences
+  // function maxNameLength(seqDataset) {
+  //   var currentmax = seqDataset[0].name.length;
+  //   seqDataset.forEach(function(seq) {
+  //     currentmax = seq.name.length > currentmax ? seq.name.length : currentmax;
+  //   });
+  //   return currentmax;
+  // }
+  // var maxNameLgt = maxNameLength(seq_dataset);
 
-  // Fonction de calcul de la longueur maximale des noms de séquences
-  function maxNameLength(seqDataset) {
-    var currentmax = seqDataset[0].name.length;
-    seqDataset.forEach(function(seq) {
-      currentmax = seq.name.length > currentmax ? seq.name.length : currentmax;
-    });
-    return currentmax;
-  }
-  var maxNameLgt = maxNameLength(seq_dataset);
-
+  // Ajout de la div qui contiendra l'alignement
   var seqDiv = d3.select('#treeAlign')
     .append('g')
     .attr('id', 'sequences-container');
@@ -1110,28 +1107,25 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   //   })
   //   .attr('transform', 'translate('+'-'+(10*(maxNameLgt + 1))+','+0+')');
 
-  console.log('seq_dataset:');
-  console.log(seq_dataset);
-
-  var max_y_seqs = function(seqDataset) {
+  var maxYSequences = function(seqDataset) {
     var currentmax = seqDataset[0].y;
     seqDataset.forEach(function(seq) {
       currentmax = seq.y > currentmax ? seq.y : currentmax;
     });
     return currentmax;
   }
-  var maxYSeqs = max_y_seqs(seq_dataset);
+  var maxYSeq = maxYSequences(seq_dataset);
 
-  var min_y_seqs = function(seqDataset) {
+  var minYSequences = function(seqDataset) {
     var currentmin = seqDataset[0].y;
     seqDataset.forEach(function(seq) {
       currentmin = seq.y < currentmin ? seq.y : currentmin;
     });
     return currentmin;
   }
-  var minYSeqs = min_y_seqs(seq_dataset);
+  var minYSeq = minYSequences(seq_dataset);
 
-  console.log('Min:', minYSeqs, 'Max:', maxYSeqs);
+  console.log('Min:', minYSeq, 'Max:', maxYSeq);
   
   // Seq AA
   var seqTextAA = seqblocksEnter.append("g")
@@ -1159,8 +1153,8 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     oneSeq.append('rect')
       .attr('x', function(d) {return i*hStep;})
       .attr('width', hStep)
-      .attr('y', function(d) {return minYSeqs - d.y - hStep;})
-      .attr('height', maxYSeqs - minYSeqs + hStep*2)
+      .attr('y', function(d) {return minYSeq - d.y - hStep;})
+      .attr('height', maxYSeq - minYSeq + hStep*2)
       .style('fill', () => {
         if (psResultsDataset[i].stat > psThresholdHigh) {
           return psThresholdHighColor;
@@ -1171,35 +1165,6 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         }
       });
   }
-  // for (i=0; i<psResultsDataset.length; i++) {
-  //   seqTextAA.append('rect')
-  //     .attr('x', function(d) {return i*hStep;})
-  //     .attr('width', hStep)
-  //     .attr('y', function(d) {return minYSeqs - d.y - hStep;})
-  //     .attr('height', maxYSeqs - minYSeqs + hStep*1.5)
-  //     .style('fill', () => {
-  //       if (psResultsDataset[i].stat > psThresholdHigh) {
-  //         return psThresholdHighColor;
-  //       } else if (psResultsDataset[i].stat > psThresholdLow) {
-  //         return psThresholdLowColor;
-  //       } else {
-  //         return psBelowThresholdColor;
-  //       }
-  //     });
-  //   seqTextAA.append('text')
-  //     .attr('x', function(d) {return hStep*(i+0.2);})
-  //     .attr('y', function(d) {return hStep*0.3;})
-  //     .text(function(d) {return d.aa[i];})
-  //     .style('fill', () => {
-  //       if (psResultsDataset[i].stat > psThresholdHigh) {
-  //         return 'white';
-  //       } else if (psResultsDataset[i].stat > psThresholdLow) {
-  //         return 'black';
-  //       } else {
-  //         return 'black';
-  //       }
-  //     });
-  // }
 
   // Seq Nuc
   var seqTextNuc = seqblocksEnter.append("g")
@@ -1207,24 +1172,10 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       .style("display", function() {
         return displaySeqType == "Nuc" ? "block" : "none";
       });
-    for (i=0; i<psResultsDataset.length; i++) {
-    seqTextNuc.append('rect')
-      .attr('x', function(d) {return i*hStep;})
-      .attr('width', hStep)
-      .attr('y', function(d) {return -hStep/2;})
-      .attr('height', hStep)
-      .style('fill', () => {
-        if (psResultsDataset[i].stat > psThresholdHigh) {
-          return psThresholdHighColor;
-        } else if (psResultsDataset[i].stat > psThresholdLow) {
-          return psThresholdLowColor;
-        } else {
-          return psBelowThresholdColor;
-        }
-      });
+  for (i=0; i<psResultsDataset.length; i++) {
     seqTextNuc.append('text')
-      .attr('x', function(d) {return i*hStep;})
-      .attr('y', function(d) {return hStep/4;})
+      .attr('x', function(d) {return hStep*(i);})
+      .attr('y', function(d) {return Math.floor(hStep/3);})
       .text(function(d) {return d.dna[3*i]+d.dna[3*i+1]+d.dna[3*i+2];})
       .style('fill', () => {
         if (psResultsDataset[i].stat > psThresholdHigh) {
@@ -1236,8 +1187,61 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         }
       });
   }
+  var oneSeq = d3.select('.dna-sequence');
+  for (i=0; i<psResultsDataset.length; i++) {
+    oneSeq.append('rect')
+      .attr('x', function(d) {return i*hStep;})
+      .attr('width', hStep)
+      .attr('y', function(d) {return minYSeq - d.y - hStep;})
+      .attr('height', maxYSeq - minYSeq + hStep*2)
+      .style('fill', () => {
+        if (psResultsDataset[i].stat > psThresholdHigh) {
+          return psThresholdHighColor;
+        } else if (psResultsDataset[i].stat > psThresholdLow) {
+          return psThresholdLowColor;
+        } else {
+          return psBelowThresholdColor;
+        }
+      });
+  }
 
-  // // Vieux code :
+  // // Seq Nuc
+  // var seqTextNuc = seqblocksEnter.append("g")
+  //     .attr("class", "dna-sequence")
+  //     .style("display", function() {
+  //       return displaySeqType == "Nuc" ? "block" : "none";
+  //     });
+  //   for (i=0; i<psResultsDataset.length; i++) {
+  //   seqTextNuc.append('rect')
+  //     .attr('x', function(d) {return i*hStep;})
+  //     .attr('width', hStep)
+  //     .attr('y', function(d) {return -hStep/2;})
+  //     .attr('height', hStep)
+  //     .style('fill', () => {
+  //       if (psResultsDataset[i].stat > psThresholdHigh) {
+  //         return psThresholdHighColor;
+  //       } else if (psResultsDataset[i].stat > psThresholdLow) {
+  //         return psThresholdLowColor;
+  //       } else {
+  //         return psBelowThresholdColor;
+  //       }
+  //     });
+  //   seqTextNuc.append('text')
+  //     .attr('x', function(d) {return i*hStep;})
+  //     .attr('y', function(d) {return hStep/4;})
+  //     .text(function(d) {return d.dna[3*i]+d.dna[3*i+1]+d.dna[3*i+2];})
+  //     .style('fill', () => {
+  //       if (psResultsDataset[i].stat > psThresholdHigh) {
+  //         return 'white';
+  //       } else if (psResultsDataset[i].stat > psThresholdLow) {
+  //         return 'black';
+  //       } else {
+  //         return 'black';
+  //       }
+  //     });
+  // }
+
+  // // Vieux code (Nuc) :
   // seqblocksEnter.append("text") // OK : 4776/4776 nuc. affichés
   //     .attr("class", "dna-sequence")
   //     .html(function(d) {
@@ -1923,20 +1927,20 @@ $(window).resize(function() {
 
 // Bouton Nuc <-> AA
 $("#toggle-seqtype").on("click", function() {
-  if ($(".dna-sequence").css("display") == "none") {
-    displaySeqType = "Nuc";
+  if (displaySeqType == "AA") {
     console.log("current display: AA, switching to Nuc");
+    displaySeqType = "Nuc";
     $(".aa-sequence").css("display", "none");
     $(".dna-sequence").css("display", "block");
     $("#toggle-seqtype").html("Current display: "+displaySeqType);
-    hStep=Math.floor(hStep*3);
+    // hStep=Math.floor(hStep*3);
     updateLayout(cladeRoot);
   } else {
-    displaySeqType = "AA";
     console.log("current display: Nuc, switching to AA");
+    displaySeqType = "AA";
     $(".dna-sequence").css("display", "none");
     $(".aa-sequence").css("display", "block");
-    hStep=Math.floor(hStep/3);
+    // hStep=Math.floor(hStep/3);
     updateLayout(cladeRoot);
   }
   $("#toggle-seqtype").html("Current display: "+displaySeqType);
