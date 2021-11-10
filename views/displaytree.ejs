@@ -273,7 +273,7 @@
   // Début modif : variables globales
   // ==============================================================
 
-  var hStep = 10; // /!\ clic sur la barre x affiche la position x*hStep (console)
+  var hStep = 16; // /!\ clic sur la barre x affiche la position x*hStep (console)
   var vStep = 30;
 
   var psThresholdHigh = $('#ps-threshold-high').val() || 1.0;
@@ -576,11 +576,11 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     return d.y;
   });
   var heightSVG = maxY - minY;
-  var longueurProjAjouteeSvgX = psResultsDataset.length*hStep;
-  var longueurProjAjouteeSvgY = -200;
+  var longueurProjAjouteeSvgX = psResultsDataset.length*hStep - 1600;
+  var hauteurProjAjouteeSvgY = -120;
   var decalageProjSvgY = -80;
   svg.attr("width", widthSVG + margin.right + margin.left+1600     + longueurProjAjouteeSvgX);
-  svg.attr("height", heightSVG + margin.top + margin.down+400      + longueurProjAjouteeSvgY);
+  svg.attr("height", heightSVG + margin.top + margin.down+400      + hauteurProjAjouteeSvgY);
   g.attr("transform", "translate(" + (margin.right - minX - 250) + "," + (margin.top - minY + 200     + decalageProjSvgY) + ")")
   // ====================
   //  D3: Objets LINK
@@ -1069,21 +1069,14 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     seq_dataset.push(locnode);
   });
 
-  // console.log('seq_dataset:');
-  // console.log(seq_dataset);
+  // Ordonner les séquences avec un espacement régulier
+  // en partant de la position verticale (Y) de la première
   // seq_dataset.sort((a,b) => a.y - b.y);
-  // console.log('seq_dataset sorted by y:');
-  // console.log(seq_dataset);
-  // console.log(seq_dataset[0].y);
   // seq_dataset.forEach(function(d,i) {
-  //   console.log(i, d.name, d.y);
+  //   d.y = seq_dataset[0].y + i*20;
   // });
-  seq_dataset.sort((a,b) => a.y - b.y);
-  seq_dataset.forEach(function(d,i) {
-    d.y = seq_dataset[0].y + i*20;
-  });
 
-  // Fonction de calcul du y maximum
+  // Fonction de calcul de la longueur maximale des noms de séquences
   function maxNameLength(seqDataset) {
     var currentmax = seqDataset[0].name.length;
     seqDataset.forEach(function(seq) {
@@ -1108,66 +1101,172 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       var transy = d.y;
       return 'translate('+transx+', '+transy+')';
     });
+  
+  // // Ajout des noms des séquences à gauche de l'alignement
+  // seqblocksEnter.append("text")
+  //   .attr('class', 'sequence-name')
+  //   .text(function(d) {
+  //     return d.name;
+  //   })
+  //   .attr('transform', 'translate('+'-'+(10*(maxNameLgt + 1))+','+0+')');
+  
+  var seqTextAA = seqblocksEnter.append("g")
+      .attr("class", "aa-sequence");
   // Seq AA
-  seqblocksEnter.append("text")
-    .attr('class', 'sequence-name')
-    .text(function(d) {
-      return d.name;
-    })
-    .attr('transform', 'translate('+'-'+(10*(maxNameLgt + 1))+','+0+')');
-  seqblocksEnter.append("text") // OK, 1592/1592 AA affichés
-      .attr("class", "aa-sequence")
-      .html(function(d) {
-        var seq_grouped = "";
-        var new_group = "";
-        var new_group_class = "";
-        for (i=0; i<psResultsDataset.length; i++) {
-          if (psResultsDataset[i].stat > psThresholdHigh) {
-            new_group_class = "ps-tH";
-          } else if (psResultsDataset[i].stat > psThresholdLow) {
-            new_group_class = "ps-tL";
-          } else {
-            new_group_class = "ps-tB";
-          }
-          new_group = "<a class='"+new_group_class+"' style='display:block;width:100px;' title='"+i+"'>"+d.aa[i]+"</a>";
-          seq_grouped += new_group;
+  for (i=0; i<psResultsDataset.length; i++) {
+    seqTextAA.append('rect')
+      .attr('x', function(d) {return i*hStep;})
+      .attr('y', function(d) {return -hStep/2;})
+      .attr('width', hStep)
+      .attr('height', hStep)
+      .style('fill', () => {
+        if (psResultsDataset[i].stat > psThresholdHigh) {
+          return psThresholdHighColor;
+        } else if (psResultsDataset[i].stat > psThresholdLow) {
+          return psThresholdLowColor;
+        } else {
+          return psBelowThresholdColor;
         }
-        return seq_grouped;
+      });
+    seqTextAA.append('text')
+      .attr('x', function(d) {return hStep*(i+0.2);})
+      .attr('y', function(d) {return hStep*0.3;})
+      .text(function(d) {return d.aa[i];})
+      .style('fill', () => {
+        if (psResultsDataset[i].stat > psThresholdHigh) {
+          return 'white';
+        } else if (psResultsDataset[i].stat > psThresholdLow) {
+          return 'black';
+        } else {
+          return 'black';
+        }
+      });
+      // .style('stroke', 'black');
+  }
+  seqTextAA
+      // .html(function(d,i) {
+        // var seq_grouped = "";
+        // var new_group = "";
+        // var new_group_class = "";
+        // for (i=0; i<psResultsDataset.length; i++) {
+        //   if (psResultsDataset[i].stat > psThresholdHigh) {
+        //     new_group_class = "ps-tH";
+        //   } else if (psResultsDataset[i].stat > psThresholdLow) {
+        //     new_group_class = "ps-tL";
+        //   } else {
+        //     new_group_class = "ps-tB";
+        //   }
+        //   new_group = "<a class='"+new_group_class+"' style='display:block;width:100px;' title='"+i+"'>"+d.aa[i]+"</a>";
+        //   seq_grouped += new_group;
+        // }
+        // return seq_grouped;
 
-        // return d.aa;
-      })
-      .style('font-size', '1.667rem')
+        // console.log(d.aa[0], d.aa[1], d.aa[2], d.aa[3]);
+        // console.log(d.aa[d.aa.length-4], d.aa[d.aa.length-3], d.aa[d.aa.length-2], d.aa[d.aa.length-1]);
+        // var seqfinale = '<a style="color:blue;">coucou</a>';
+        // for (i=0; i<psResultsDataset.length; i++) {
+          
+        // }
+
+      //   return seqfinale;
+      // })
+      // .style('font-size', '1.667rem')
       // .style("display", "block");
       .style("display", function() {
         return displaySeqType == "AA" ? "block" : "none";
       });
-  // Seq Nuc
-  seqblocksEnter.append("text") // OK : 4776/4776 nuc. affichés
-      .attr("class", "dna-sequence")
-      .html(function(d) {
-        var seq_grouped = "";
-        var new_group = "";
-        var new_group_class = "";
-        for (i=0; i<psResultsDataset.length; i++) {
-          if (psResultsDataset[i].stat > psThresholdHigh) {
-            new_group_class = "ps-tH";
-          } else if (psResultsDataset[i].stat > psThresholdLow) {
-            new_group_class = "ps-tL";
-          } else {
-            new_group_class = "ps-tB";
-          }
-          new_group = "<a class='"+new_group_class+"' title='"+i+"'>"+d.dna[3*i]+d.dna[3*i+1]+d.dna[3*i+2]+"</a>";
-          seq_grouped += new_group;
-        }
-        return seq_grouped;
 
-        // return d.dna;
-      })
-      .style('font-size', '1.667rem')
-      // .style("display", "none");
+  // Seq Nuc
+  var seqTextNuc= seqblocksEnter.append("g")
+      .attr("class", "dna-sequence");
+  for (i=0; i<psResultsDataset.length; i++) {
+    seqTextNuc.append('rect')
+      .attr('x', function(d) {return i*hStep;})
+      .attr('y', function(d) {return -hStep/2;})
+      .attr('width', hStep)
+      .attr('height', hStep)
+      .style('fill', () => {
+        if (psResultsDataset[i].stat > psThresholdHigh) {
+          return psThresholdHighColor;
+        } else if (psResultsDataset[i].stat > psThresholdLow) {
+          return psThresholdLowColor;
+        } else {
+          return psBelowThresholdColor;
+        }
+      });
+    seqTextNuc.append('text')
+      .attr('x', function(d) {return i*hStep;})
+      .attr('y', function(d) {return hStep/4;})
+      .text(function(d) {return d.dna[3*i]+d.dna[3*i+1]+d.dna[3*i+2];})
+      .style('fill', () => {
+        if (psResultsDataset[i].stat > psThresholdHigh) {
+          return 'white';
+        } else if (psResultsDataset[i].stat > psThresholdLow) {
+          return 'black';
+        } else {
+          return 'black';
+        }
+      });
+      // .style('stroke', 'black');
+  }
+  seqTextNuc
+      // .html(function(d,i) {
+        // var seq_grouped = "";
+        // var new_group = "";
+        // var new_group_class = "";
+        // for (i=0; i<psResultsDataset.length; i++) {
+        //   if (psResultsDataset[i].stat > psThresholdHigh) {
+        //     new_group_class = "ps-tH";
+        //   } else if (psResultsDataset[i].stat > psThresholdLow) {
+        //     new_group_class = "ps-tL";
+        //   } else {
+        //     new_group_class = "ps-tB";
+        //   }
+        //   new_group = "<a class='"+new_group_class+"' style='display:block;width:100px;' title='"+i+"'>"+d.aa[i]+"</a>";
+        //   seq_grouped += new_group;
+        // }
+        // return seq_grouped;
+
+        // console.log(d.aa[0], d.aa[1], d.aa[2], d.aa[3]);
+        // console.log(d.aa[d.aa.length-4], d.aa[d.aa.length-3], d.aa[d.aa.length-2], d.aa[d.aa.length-1]);
+        // var seqfinale = '<a style="color:blue;">coucou</a>';
+        // for (i=0; i<psResultsDataset.length; i++) {
+          
+        // }
+
+      //   return seqfinale;
+      // })
+      // .style('font-size', '1.667rem')
+      // .style("display", "block");
       .style("display", function() {
         return displaySeqType == "Nuc" ? "block" : "none";
       });
+  // seqblocksEnter.append("text") // OK : 4776/4776 nuc. affichés
+  //     .attr("class", "dna-sequence")
+  //     .html(function(d) {
+  //       // var seq_grouped = "";
+  //       // var new_group = "";
+  //       // var new_group_class = "";
+  //       // for (i=0; i<psResultsDataset.length; i++) {
+  //       //   if (psResultsDataset[i].stat > psThresholdHigh) {
+  //       //     new_group_class = "ps-tH";
+  //       //   } else if (psResultsDataset[i].stat > psThresholdLow) {
+  //       //     new_group_class = "ps-tL";
+  //       //   } else {
+  //       //     new_group_class = "ps-tB";
+  //       //   }
+  //       //   new_group = "<a class='"+new_group_class+"' title='"+i+"'>"+d.dna[3*i]+d.dna[3*i+1]+d.dna[3*i+2]+"</a>";
+  //       //   seq_grouped += new_group;
+  //       // }
+  //       // return seq_grouped;
+
+  //       return d.dna;
+  //     })
+  //     .style('font-size', '1.667rem')
+  //     // .style("display", "none");
+  //     .style("display", function() {
+  //       return displaySeqType == "Nuc" ? "block" : "none";
+  //     });
 
   // Suppression des blocs de séquences
   seqblocks.exit().remove();
@@ -1189,18 +1288,18 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   //     .style('position', 'absolute')
   //     .style('visibility', 'hidden')
   //     .text('tooltip2');
-
-  d3.selectAll('.psrects')
-    .on('mouseover', function(d) {
-      // console.log('mouseover: '+d.site);
-      return mon_tooltip.style('visibility', 'visible').text(d.site);
-    })
-    .on('mousemove', function() {
-      return mon_tooltip.style('top', (event.pageY)+'px').style('left', (event.pageX)+'px')
-    })
-    .on('mouseout', function() {
-      return mon_tooltip.style('visibility', 'hidden').text('');
-    });
+  //
+  // d3.selectAll('.psrects')
+  //   .on('mouseover', function(d) {
+  //     // console.log('mouseover: '+d.site);
+  //     return tooltip2.style('visibility', 'visible').text(d.site);
+  //   })
+  //   .on('mousemove', function() {
+  //     return tooltip2.style('top', (event.pageY)+'px').style('left', (event.pageX)+'px')
+  //   })
+  //   .on('mouseout', function() {
+  //     return tooltip2.style('visibility', 'hidden').text('');
+  //   });
 
   
 
@@ -1212,7 +1311,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
 
 
   // -------------------------------------------------------
-  // Centre sue la sequence requete lors du premier chargement
+  // Centre sur la sequence requete lors du premier chargement
   // ---------------------------------------------------------
   // ***************************************************************************************
   // if (firstLoad === 1 ) {
@@ -1248,11 +1347,8 @@ function isStorageSupported(storage) {
 function saveSVG(){
   // get styles from all required stylesheets
   // http://www.coffeegnome.net/converting-svg-to-png-with-canvg/
+  var style = "\n.seqblock text {font-family: 'Courier';}";
   var requiredSheets = ['phylogram_d3.css', 'open_sans.css'];
-  var style = "\n.seqblock text {font-size: 10px; font-family: 'Courier';}";
-
-  console.log('requiredSheets:');
-  console.log(requiredSheets);
 
   var img = new Image();
   var serializer = new XMLSerializer();
@@ -1814,6 +1910,8 @@ function collapseVeryBigTree(treeRoot,patterns) {
 
 $(document).ready(function() {
   $('#toggle-seqtype').html("Current display: "+displaySeqType);
+  $('div.demo').css('width', $(window).width() - 10);
+  $('div.demo').css('height', $(window).height() - 140);
 });
 
 // Bouton Nuc <-> AA
