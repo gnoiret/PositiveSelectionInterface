@@ -36,6 +36,99 @@ import base64
 import file_reader
 import translate
 
+def dna_to_prot(dna_seq:str):
+    matches = {
+        'TTT':'F', 'TTC':'F', 'TTA':'L', 'TTG':'L',
+        'TCT':'S', 'TCC':'S', 'TCA':'S', 'TCG':'S', 
+        'TAT':'Y', 'TAC':'Y', 'TAA':'*', 'TAG':'*',
+        'TGT':'C', 'TGC':'C', 'TGA':'*', 'TGG':'W',
+        
+        'CTT':'L', 'CTC':'L', 'CTA':'L', 'CTG':'L',
+        'CCT':'P', 'CCC':'P', 'CCA':'P', 'CCG':'P',
+        'CAT':'H', 'CAC':'H', 'CAA':'Q', 'CAG':'Q',
+        'CGT':'R', 'CGC':'R', 'CGA':'R', 'CGG':'R',
+
+        'ATT':'I', 'ATC':'I', 'ATA':'I', 'ATG':'M',
+        'ACT':'T', 'ACC':'T', 'ACA':'T', 'ACG':'T',
+        'AAT':'N', 'AAC':'N', 'AAA':'K', 'AAG':'K',
+        'AGT':'S', 'AGC':'S', 'AGA':'R', 'AGG':'R',
+        
+        'GTT':'V', 'GTC':'V', 'GTA':'V', 'GTG':'V',
+        'GCT':'A', 'GCC':'A', 'GCA':'A', 'GCG':'A',
+        'GAT':'D', 'GAC':'D', 'GAA':'E', 'GAG':'E',
+        'GGT':'G', 'GGC':'G', 'GGA':'G', 'GGG':'G',
+
+        '---':'-',
+    }
+    aa = ''
+    # print(dna_seq)
+    if len(dna_seq)%3 == 0:
+        codons = [dna_seq[i:i+3].upper() for i in range(0, len(dna_seq), 3)]
+        # print('codons:', codons)
+        for codon in codons:
+            codon = codon.replace('U', 'T')
+            try:
+                aa += matches[codon]
+            except KeyError:
+                print(f'/!\\ Unknown codon: {codon}, translation aborted')
+        # print('aa:', aa)
+        return aa
+    else:
+        print('/!\\ Inorrect length for dna_seq')
+        return False
+
+def loadAlignment(alignmentFile):
+    alignmentDict = {}
+    
+    with open(alignmentFile, 'r') as af:
+        for line in af:
+            # if len(line) > 50:
+            #   print('line:', line[:50] + ' ...')
+            # else:
+            #   print('line:', line)
+            if line[0] == '>': # la ligne est un en-tête fasta
+                seq_id = line.strip('\n')[1:]
+                # print('seq_id:', seq_id)
+                alignmentDict[seq_id] = ''
+            else: # la ligne est une séquence alignée
+                aligned_seq = line.strip('\n')
+                # print('aligned_seq:', aligned_seq)
+                alignmentDict[seq_id] = aligned_seq
+
+    # print(alignmentDict)
+    #alignmentDict: {'XM_023507720dot1_oto_Gar_SAMD9': 'ATGGCAAAGCA(...)', (...)}
+    return alignmentDict
+
+def loadResults(resultsFile):
+    resultsDict = {}
+    with open(resultsFile, 'r') as f:
+        i = 0
+        for line in f:
+            if i > 0:   # on évite de lire les en-têtes des colonnes
+                line = line.strip('\n').split('\t')
+                try:
+                    site = int(line[0])
+                    res = float(line[8])
+                except ValueError:
+                    print('Conversion failed:', line[0], line[8])
+                else:
+                    while not i == site:    # si le site est absent, on lui définit une statistique aberrante
+                        print(f'Site {i} missing')
+                        resultsDict[i] = -1.1111
+                        i += 1
+                    resultsDict[i] = res
+                    # print(site == i, site, i, res)
+            i += 1
+
+    resultsText = ''
+    for key, item in resultsDict.items():
+        # print(f'{key} : {item}')
+        resultsText += f'{key}:{item}'
+        if key != max(resultsDict.keys()):
+            resultsText += ' '
+    # print(f'>{resultsText}<')
+    return resultsText
+
 def createPhyloXML(fam,newick):
     #Parse and return exactly one tree from the given file or handle
     if not ':' in newick:
