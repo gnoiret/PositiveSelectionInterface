@@ -273,7 +273,7 @@
   // Début modif : variables globales
   // ==============================================================
 
-  var hStep = 11; // /!\ clic sur la barre x affiche la position x*hStep (console)
+  var hStep = 10; // /!\ clic sur la barre x affiche la position x*hStep (console)
   var vStep = 30;
 
   var psThresholdHigh = $('#ps-threshold-high').val() || 1.0;
@@ -1071,17 +1071,14 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
 
   // console.log('seq_dataset:');
   // console.log(seq_dataset);
-
-  seq_dataset.sort((a,b) => a.y - b.y);
-
+  // seq_dataset.sort((a,b) => a.y - b.y);
   // console.log('seq_dataset sorted by y:');
   // console.log(seq_dataset);
-
   // console.log(seq_dataset[0].y);
   // seq_dataset.forEach(function(d,i) {
   //   console.log(i, d.name, d.y);
   // });
-
+  seq_dataset.sort((a,b) => a.y - b.y);
   seq_dataset.forEach(function(d,i) {
     d.y = seq_dataset[0].y + i*20;
   });
@@ -1139,7 +1136,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
 
         // return d.aa;
       })
-      .style('font-size', (hStep/6)+'rem')
+      .style('font-size', '1.667rem')
       // .style("display", "block");
       .style("display", function() {
         return displaySeqType == "AA" ? "block" : "none";
@@ -1166,6 +1163,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
 
         // return d.dna;
       })
+      .style('font-size', '1.667rem')
       // .style("display", "none");
       .style("display", function() {
         return displaySeqType == "Nuc" ? "block" : "none";
@@ -1250,8 +1248,8 @@ function isStorageSupported(storage) {
 function saveSVG(){
   // get styles from all required stylesheets
   // http://www.coffeegnome.net/converting-svg-to-png-with-canvg/
-  var style = "\n";
   var requiredSheets = ['phylogram_d3.css', 'open_sans.css'];
+  var style = "\ntext {font-size: 1.2rem; font-family: 'Courier';}";
 
   console.log('requiredSheets:');
   console.log(requiredSheets);
