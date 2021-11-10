@@ -271,8 +271,8 @@
   // Début modif : variables globales
   // ==============================================================
 
-  var displaySeqType = 'AA';
-  var hStepBase = 12;
+  var displaySeqType = 'Nuc';
+  var hStepBase = 16;
 
   var psThresholdHigh = $('#ps-threshold-high').val() || 1.0;
   var psThresholdLow = $('#ps-threshold-low').val() || 0.3;
@@ -1126,62 +1126,17 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   var minYSeq = minYSequences(seq_dataset);
 
   console.log('Min:', minYSeq, 'Max:', maxYSeq);
-
-  // Alignement : ajout des conteneurs au SVG
-  var seqTextAA = seqblocksEnter.append('g')
-      .attr('class', 'aa-sequence')
-      .style('display', function() {
-        return displaySeqType == 'AA' ? 'block' : 'none';
-      });
-  var seqTextNuc = seqblocksEnter.append('g')
-      .attr('class', 'dna-sequence')
-      .style('display', function() {
-        return displaySeqType == 'Nuc' ? 'block' : 'none';
-      });
-
-  // Alignement : ajout des rectangles
-  var oneSeqAA = d3.select('.aa-sequence');
-  var oneSeqDna = d3.select('.dna-sequence');
   
-  for (i=0; i<psResultsDataset.length; i++) {
-    oneSeqAA.append('rect')
-      .attr('x', function(d) {return i*hStep;})
-      .attr('width', hStep)
-      .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
-      .attr('height', maxYSeq - minYSeq + hStepBase*2)
-      .style('fill', () => {
-        if (psResultsDataset[i].stat > psThresholdHigh) {
-          return psThresholdHighColor;
-        } else if (psResultsDataset[i].stat > psThresholdLow) {
-          return psThresholdLowColor;
-        } else {
-          return psBelowThresholdColor;
-        }
+  // Seq AA
+  var seqTextAA = seqblocksEnter.append("g")
+      .attr("class", "aa-sequence")
+      .style("display", function() {
+        return displaySeqType == "AA" ? "block" : "none";
       });
-    oneSeqDna.append('rect')
-      .attr('x', function(d) {return i*hStep;})
-      .attr('width', hStep)
-      .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
-      .attr('height', maxYSeq - minYSeq + hStepBase*2)
-      .style('fill', () => {
-        if (psResultsDataset[i].stat > psThresholdHigh) {
-          return psThresholdHighColor;
-        } else if (psResultsDataset[i].stat > psThresholdLow) {
-          return psThresholdLowColor;
-        } else {
-          return psBelowThresholdColor;
-        }
-      });
-  }
-  // for (i=0; i<psResultsDataset.length; i++) {
-    
-  // }
-
-  // Alignement : ajout des AA / codons
   for (i=0; i<psResultsDataset.length; i++) {
     seqTextAA.append('text')
-      .attr('x', function(d) {return hStep*(i)+1;})
-      .attr('y', function(d) {return Math.floor(hStepBase/3);})
+      .attr('x', function(d) {return hStep*(i+0.2);})
+      .attr('y', function(d) {return hStep*0.3;})
       .text(function(d) {return d.aa[i];})
       .style('fill', () => {
         if (psResultsDataset[i].stat > psThresholdHigh) {
@@ -1192,9 +1147,35 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
           return 'black';
         }
       });
+  }
+  var oneSeq = d3.select('.aa-sequence');
+  for (i=0; i<psResultsDataset.length; i++) {
+    oneSeq.append('rect')
+      .attr('x', function(d) {return i*hStep;})
+      .attr('width', hStep)
+      .attr('y', function(d) {return minYSeq - d.y - hStep;})
+      .attr('height', maxYSeq - minYSeq + hStep*2)
+      .style('fill', () => {
+        if (psResultsDataset[i].stat > psThresholdHigh) {
+          return psThresholdHighColor;
+        } else if (psResultsDataset[i].stat > psThresholdLow) {
+          return psThresholdLowColor;
+        } else {
+          return psBelowThresholdColor;
+        }
+      });
+  }
+
+  // Seq Nuc
+  var seqTextNuc = seqblocksEnter.append("g")
+      .attr("class", "dna-sequence")
+      .style("display", function() {
+        return displaySeqType == "Nuc" ? "block" : "none";
+      });
+  for (i=0; i<psResultsDataset.length; i++) {
     seqTextNuc.append('text')
-      .attr('x', function(d) {return hStep*(i)+3;})
-      .attr('y', function(d) {return Math.floor(hStepBase/3);})
+      .attr('x', function(d) {return hStep*(i);})
+      .attr('y', function(d) {return Math.floor(hStep/3);})
       .text(function(d) {return d.dna[3*i]+d.dna[3*i+1]+d.dna[3*i+2];})
       .style('fill', () => {
         if (psResultsDataset[i].stat > psThresholdHigh) {
@@ -1206,9 +1187,23 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         }
       });
   }
-  // for (i=0; i<psResultsDataset.length; i++) {
-    
-  // }
+  var oneSeq = d3.select('.dna-sequence');
+  for (i=0; i<psResultsDataset.length; i++) {
+    oneSeq.append('rect')
+      .attr('x', function(d) {return i*hStep;})
+      .attr('width', hStep)
+      .attr('y', function(d) {return minYSeq - d.y - hStep;})
+      .attr('height', maxYSeq - minYSeq + hStep*2)
+      .style('fill', () => {
+        if (psResultsDataset[i].stat > psThresholdHigh) {
+          return psThresholdHighColor;
+        } else if (psResultsDataset[i].stat > psThresholdLow) {
+          return psThresholdLowColor;
+        } else {
+          return psBelowThresholdColor;
+        }
+      });
+  }
 
   // // Seq Nuc
   // var seqTextNuc = seqblocksEnter.append("g")
