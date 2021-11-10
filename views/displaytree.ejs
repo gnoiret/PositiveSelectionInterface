@@ -1109,6 +1109,29 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   //     return d.name;
   //   })
   //   .attr('transform', 'translate('+'-'+(10*(maxNameLgt + 1))+','+0+')');
+
+  console.log('seq_dataset:');
+  console.log(seq_dataset);
+
+  var max_y_seqs = function(seqDataset) {
+    var currentmax = seqDataset[0].y;
+    seqDataset.forEach(function(seq) {
+      currentmax = seq.y > currentmax ? seq.y : currentmax;
+    });
+    return currentmax;
+  }
+  var maxYSeqs = max_y_seqs(seq_dataset);
+
+  var min_y_seqs = function(seqDataset) {
+    var currentmin = seqDataset[0].y;
+    seqDataset.forEach(function(seq) {
+      currentmin = seq.y < currentmin ? seq.y : currentmin;
+    });
+    return currentmin;
+  }
+  var minYSeqs = min_y_seqs(seq_dataset);
+
+  console.log('Min:', minYSeqs, 'Max:', maxYSeqs);
   
   // Seq AA
   var seqTextAA = seqblocksEnter.append("g")
@@ -1117,20 +1140,6 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         return displaySeqType == "AA" ? "block" : "none";
       });
   for (i=0; i<psResultsDataset.length; i++) {
-    seqTextAA.append('rect')
-      .attr('x', function(d) {return i*hStep;})
-      .attr('y', function(d) {return -hStep/2;})
-      .attr('width', hStep)
-      .attr('height', hStep)
-      .style('fill', () => {
-        if (psResultsDataset[i].stat > psThresholdHigh) {
-          return psThresholdHighColor;
-        } else if (psResultsDataset[i].stat > psThresholdLow) {
-          return psThresholdLowColor;
-        } else {
-          return psBelowThresholdColor;
-        }
-      });
     seqTextAA.append('text')
       .attr('x', function(d) {return hStep*(i+0.2);})
       .attr('y', function(d) {return hStep*0.3;})
@@ -1145,6 +1154,52 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         }
       });
   }
+  var oneSeq = d3.select('.aa-sequence');
+  for (i=0; i<psResultsDataset.length; i++) {
+    oneSeq.append('rect')
+      .attr('x', function(d) {return i*hStep;})
+      .attr('width', hStep)
+      .attr('y', function(d) {return minYSeqs - d.y - hStep;})
+      .attr('height', maxYSeqs - minYSeqs + hStep*2)
+      .style('fill', () => {
+        if (psResultsDataset[i].stat > psThresholdHigh) {
+          return psThresholdHighColor;
+        } else if (psResultsDataset[i].stat > psThresholdLow) {
+          return psThresholdLowColor;
+        } else {
+          return psBelowThresholdColor;
+        }
+      });
+  }
+  // for (i=0; i<psResultsDataset.length; i++) {
+  //   seqTextAA.append('rect')
+  //     .attr('x', function(d) {return i*hStep;})
+  //     .attr('width', hStep)
+  //     .attr('y', function(d) {return minYSeqs - d.y - hStep;})
+  //     .attr('height', maxYSeqs - minYSeqs + hStep*1.5)
+  //     .style('fill', () => {
+  //       if (psResultsDataset[i].stat > psThresholdHigh) {
+  //         return psThresholdHighColor;
+  //       } else if (psResultsDataset[i].stat > psThresholdLow) {
+  //         return psThresholdLowColor;
+  //       } else {
+  //         return psBelowThresholdColor;
+  //       }
+  //     });
+  //   seqTextAA.append('text')
+  //     .attr('x', function(d) {return hStep*(i+0.2);})
+  //     .attr('y', function(d) {return hStep*0.3;})
+  //     .text(function(d) {return d.aa[i];})
+  //     .style('fill', () => {
+  //       if (psResultsDataset[i].stat > psThresholdHigh) {
+  //         return 'white';
+  //       } else if (psResultsDataset[i].stat > psThresholdLow) {
+  //         return 'black';
+  //       } else {
+  //         return 'black';
+  //       }
+  //     });
+  // }
 
   // Seq Nuc
   var seqTextNuc = seqblocksEnter.append("g")
@@ -1155,8 +1210,8 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     for (i=0; i<psResultsDataset.length; i++) {
     seqTextNuc.append('rect')
       .attr('x', function(d) {return i*hStep;})
-      .attr('y', function(d) {return -hStep/2;})
       .attr('width', hStep)
+      .attr('y', function(d) {return -hStep/2;})
       .attr('height', hStep)
       .style('fill', () => {
         if (psResultsDataset[i].stat > psThresholdHigh) {
@@ -1854,7 +1909,7 @@ $(document).ready(function() {
   $('#toggle-seqtype').html("Current display: "+displaySeqType);
   $('div.demo').css({
     'width': $(window).width() - 10,
-    'height': $(window).height() - $("nav").outerHeight() - 35,
+    'height': $(window).height() - $("nav").outerHeight() - 40,
   });
 });
 
@@ -1862,7 +1917,7 @@ $(window).resize(function() {
   $("div.demo").css({
     "margin-top": $("nav").outerHeight(),
     'width': $(window).width() - 10,
-    'height': $(window).height() - $("nav").outerHeight() - 35,
+    'height': $(window).height() - $("nav").outerHeight() - 40,
   });
 });
 
