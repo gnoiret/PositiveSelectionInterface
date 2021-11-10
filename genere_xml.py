@@ -33,8 +33,8 @@ import sqlite3
 import zlib
 import base64
 
-import file_reader
-import translate
+# import file_reader
+# import translate
 
 def dna_to_prot(dna_seq:str):
     matches = {
@@ -227,7 +227,8 @@ def createPhyloXML(fam,newick):
 
             ## Ajout des séquences aux feuilles
             leaf.set('dnaAlign', seq_alg) # ajout de la séquence en nucléotides
-            leaf.set('aaAlign', translate.dna_to_prot(seq_alg)) # ajout de la séquence en acides aminés
+            # leaf.set('aaAlign', translate.dna_to_prot(seq_alg)) # ajout de la séquence en acides aminés
+            leaf.set('aaAlign', dna_to_prot(seq_alg)) # ajout de la séquence en acides aminés
 
             if 'crossdico' in globals():
                 leaf.append(crossref)
@@ -286,11 +287,13 @@ print(sys.getrecursionlimit())
 # print ("OK")
 
 print ("Loading alignment... ")
-alignmentDict =  file_reader.loadAlignment(alignment)
+# alignmentDict =  file_reader.loadAlignment(alignment)
+alignmentDict =  loadAlignment(alignment)
 print ("OK")
 
 print ("Loading results... ")
-resultsText =  file_reader.loadResults(results)
+# resultsText =  file_reader.loadResults(results)
+resultsText =  loadResults(results)
 print ("OK")
 
 #Creates empty phyloxml document
