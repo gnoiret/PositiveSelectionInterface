@@ -1916,8 +1916,18 @@ function collapseVeryBigTree(treeRoot,patterns) {
 
 $(document).ready(function() {
   $('#toggle-seqtype').html("Current display: "+displaySeqType);
-  $('div.demo').css('width', $(window).width() - 10);
-  $('div.demo').css('height', $(window).height() - 140);
+  $('div.demo').css({
+    'width': $(window).width() - 10,
+    'height': $(window).height() - $("nav").outerHeight() - 35,
+  });
+});
+
+$(window).resize(function() {
+  $("div.demo").css({
+    "margin-top": $("nav").outerHeight(),
+    'width': $(window).width() - 10,
+    'height': $(window).height() - $("nav").outerHeight() - 35,
+  });
 });
 
 // Bouton Nuc <-> AA
@@ -1944,12 +1954,6 @@ $("#toggle-seqtype").on("click", function() {
 // Décalage du SVG vers le bas
 $("div.demo").css({
   "margin-top": $("nav").outerHeight(),
-});
-
-$(window).resize(function() {
-  $("div.demo").css({
-    "margin-top": $("nav").outerHeight(),
-  });
 });
 
 // Modification du seuil supérieur
