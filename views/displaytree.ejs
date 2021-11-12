@@ -197,7 +197,7 @@
 
       <!-- Bouton  Export -->
       <div class="btn-group" role="group" id="export">
-        <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="export figure">
+        <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="export figure">
           Export
           <span class="caret"></span>
         </button>
@@ -217,7 +217,7 @@
         Current display:
       </button> -->
       <div class="btn-group" role="group" id="alignement">
-        <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="Choose type of alignment"  >
+        <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="Choose type of alignment"  >
           Alignment
           <span class="caret"></span>
         </button>
@@ -228,11 +228,11 @@
       </div>
 
       <!-- Champs Seuils sup. et inf. -->
-      <label for="ps-threshold-high" style="font-size: 12px;">Upper threshold:</label><input type="number" id="ps-threshold-high" min="0.0" step="0.05" placeholder="PS Threshold" value="1.0" style="width: 3.5em; font-size: 12px;"/>
-      <label for="ps-threshold-low"  style="font-size: 12px;">Lower threshold:</label><input type="number" id="ps-threshold-low" min="0.0" step="0.05" placeholder="PS Threshold" value="0.3" style="width: 3.5em; font-size: 12px;"/>
+      <label for="ps-threshold-high" style="font-size: 12px;">Upper threshold:</label><input type="number" id="ps-threshold-high" min="0.0" step="0.05" placeholder="PS Threshold" value="1.0" style="width: 5em; font-size: 12px;"/>
+      <label for="ps-threshold-low"  style="font-size: 12px;">Lower threshold:</label><input type="number" id="ps-threshold-low" min="0.0" step="0.05" placeholder="PS Threshold" value="0.3" style="width: 5em; font-size: 12px;"/>
 
       <!-- Bouton Rafaîchir -->
-      <button type="button" class="btn btn-default btn-xs" aria-label="OK threshold" id="refresh" data-toggle="tooltip" data-placement="top" title="Recalculate with this threshold">
+      <button type="button" class="btn btn-default btn-sm" aria-label="OK threshold" id="refresh" data-toggle="tooltip" data-placement="top" title="Recalculate with this threshold">
         <span>Refresh</span>
       </button>
 
@@ -1208,7 +1208,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   }
   var minYSeq = minYSequences(seq_dataset);
 
-  console.log('Y min:', minYSeq, 'Y max:', maxYSeq);
+  // console.log('Y min:', minYSeq, 'Y max:', maxYSeq);
 
   // Alignement : ajout des conteneurs au SVG
   var seqTextAA = seqblocksEnter.append('g')
@@ -2025,27 +2025,21 @@ $('#alignement').on('click', function(event, dropdownData) {
   }
 });
 
-// Modification du seuil supérieur
-$('#ps-threshold-high').on('change', function() {
+// Modification des seuils
+$('#ps-threshold-high, #ps-threshold-low').on('change', function() {
   psThresholdsChanged = true;
-  psThresholdHigh = $('#ps-threshold-high').val();
   var psHighVal = $('#ps-threshold-high').val();
   var psLowVal = $('#ps-threshold-low').val();
-  psThresholdHigh = psHighVal;
-  if (psLowVal < psHighVal) {
-    psThresholdHigh = psHighVal;
+  if (psHighVal < psLowVal) {
+    $('#ps-threshold-low').val(psHighVal);
+    psLowVal = psHighVal;
   }
-});
 
-// Modification du seuil inférieur
-$('#ps-threshold-low').on('change', function() {
-  psThresholdsChanged = true;
-  var psHighVal = $('#ps-threshold-high').val();
-  var psLowVal = $('#ps-threshold-low').val();
+  // console.log(psLowVal, '<=', psHighVal);
+  
+  // Réaffectation des seuils
+  psThresholdHigh = psHighVal;
   psThresholdLow = psLowVal;
-  if (psLowVal < psHighVal) {
-    psThresholdLow = psLowVal;
-  }
 });
 
 $('#refresh').click(function() {
