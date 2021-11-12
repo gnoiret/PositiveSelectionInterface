@@ -482,9 +482,8 @@ function  main_display() {
 function updateLayout(cRoot,firstLoad=0) {
 
 
-
+  // Suppression de l'ancien affichage de l'alignement et du graphe
   d3.selectAll('#ps-graph, #sequences-container').remove();
-
 
 
   var treeRoot = d3.hierarchy(cRoot, function(d) {
@@ -1190,14 +1189,6 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       var transy = d.y + psGraphMargins.top + 550; // fonctionne seulement avec nodeHeight = 15 *amod*
       return 'translate('+transx+', '+transy+')';
     });
-  
-  // // Ajout des noms des séquences à gauche de l'alignement
-  // seqblocksEnter.append("text")
-  //   .attr('class', 'sequence-name')
-  //   .text(function(d) {
-  //     return d.name;
-  //   })
-  //   .attr('transform', 'translate('+'-'+(10*(maxNameLgt + 1))+','+0+')');
 
   var maxYSequences = function(seqDataset) {
     var currentmax = seqDataset[0].y;
@@ -1217,7 +1208,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   }
   var minYSeq = minYSequences(seq_dataset);
 
-  // console.log('Y min:', minYSeq, 'Y max:', maxYSeq);
+  console.log('Y min:', minYSeq, 'Y max:', maxYSeq);
 
   // Alignement : ajout des conteneurs au SVG
   var seqTextAA = seqblocksEnter.append('g')
@@ -1236,38 +1227,40 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   var oneSeqDna = d3.select('.dna-sequence');
   
   for (i=0; i<psResultsDataset.length; i++) {
-    oneSeqAA.append('rect')
-      .attr('x', function(d) {return i*hStep;})
-      .attr('width', hStep)
-      .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
-      .attr('height', maxYSeq - minYSeq + hStepBase*2)
-      .style('fill', () => {
-        if (psResultsDataset[i].stat > psThresholdHigh) {
-          return psThresholdHighBgColor;
-        } else if (psResultsDataset[i].stat > psThresholdLow) {
-          return psThresholdLowBgColor;
-        } else {
-          return psBelowThresholdBgColor;
-        }
-      });
-    oneSeqDna.append('rect')
-      .attr('x', function(d) {return i*hStep;})
-      .attr('width', hStep)
-      .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
-      .attr('height', maxYSeq - minYSeq + hStepBase*2)
-      .style('fill', () => {
-        if (psResultsDataset[i].stat > psThresholdHigh) {
-          return psThresholdHighBgColor;
-        } else if (psResultsDataset[i].stat > psThresholdLow) {
-          return psThresholdLowBgColor;
-        } else {
-          return psBelowThresholdBgColor;
-        }
-      });
+    if (displaySeqType == 'AA') {
+      // Ajout des rectangles colorés pour chaque AA
+      oneSeqAA.append('rect')
+        .attr('x', function(d) {return i*hStep;})
+        .attr('width', hStep)
+        .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
+        .attr('height', maxYSeq - minYSeq + hStepBase*2)
+        .style('fill', () => {
+          if (psResultsDataset[i].stat > psThresholdHigh) {
+            return psThresholdHighBgColor;
+          } else if (psResultsDataset[i].stat > psThresholdLow) {
+            return psThresholdLowBgColor;
+          } else {
+            return psBelowThresholdBgColor;
+          }
+        });
+      } else {
+        // Ajout des rectangles colorés pour chaque codon
+        oneSeqDna.append('rect')
+          .attr('x', function(d) {return i*hStep;})
+          .attr('width', hStep)
+          .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
+          .attr('height', maxYSeq - minYSeq + hStepBase*2)
+          .style('fill', () => {
+            if (psResultsDataset[i].stat > psThresholdHigh) {
+              return psThresholdHighBgColor;
+            } else if (psResultsDataset[i].stat > psThresholdLow) {
+              return psThresholdLowBgColor;
+            } else {
+              return psBelowThresholdBgColor;
+            }
+          });
+      }
   }
-  // for (i=0; i<psResultsDataset.length; i++) {
-    
-  // }
 
   // Alignement : ajout des AA / codons
   for (i=0; i<psResultsDataset.length; i++) {
@@ -1298,117 +1291,10 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         }
       });
   }
-  // for (i=0; i<psResultsDataset.length; i++) {
-    
-  // }
-
-  // // Seq Nuc
-  // var seqTextNuc = seqblocksEnter.append("g")
-  //     .attr("class", "dna-sequence")
-  //     .style("display", function() {
-  //       return displaySeqType == "Nuc" ? "block" : "none";
-  //     });
-  //   for (i=0; i<psResultsDataset.length; i++) {
-  //   seqTextNuc.append('rect')
-  //     .attr('x', function(d) {return i*hStep;})
-  //     .attr('width', hStep)
-  //     .attr('y', function(d) {return -hStep/2;})
-  //     .attr('height', hStep)
-  //     .style('fill', () => {
-  //       if (psResultsDataset[i].stat > psThresholdHigh) {
-  //         return psThresholdHighBgColor;
-  //       } else if (psResultsDataset[i].stat > psThresholdLow) {
-  //         return psThresholdLowBgColor;
-  //       } else {
-  //         return psBelowThresholdBgColor;
-  //       }
-  //     });
-  //   seqTextNuc.append('text')
-  //     .attr('x', function(d) {return i*hStep;})
-  //     .attr('y', function(d) {return hStep/4;})
-  //     .text(function(d) {return d.dna[3*i]+d.dna[3*i+1]+d.dna[3*i+2];})
-  //     .style('fill', () => {
-  //       if (psResultsDataset[i].stat > psThresholdHigh) {
-  //         return 'white';
-  //       } else if (psResultsDataset[i].stat > psThresholdLow) {
-  //         return 'black';
-  //       } else {
-  //         return 'black';
-  //       }
-  //     });
-  // }
-
-  // // Vieux code (Nuc) :
-  // seqblocksEnter.append("text") // OK : 4776/4776 nuc. affichés
-  //     .attr("class", "dna-sequence")
-  //     .html(function(d) {
-  //       var seq_grouped = "";
-  //       var new_group = "";
-  //       var new_group_class = "";
-  //       for (i=0; i<psResultsDataset.length; i++) {
-  //         if (psResultsDataset[i].stat > psThresholdHigh) {
-  //           new_group_class = "ps-tH";
-  //         } else if (psResultsDataset[i].stat > psThresholdLow) {
-  //           new_group_class = "ps-tL";
-  //         } else {
-  //           new_group_class = "ps-tB";
-  //         }
-  //         new_group = "<a class='"+new_group_class+"' title='"+i+"'>"+d.dna[3*i]+d.dna[3*i+1]+d.dna[3*i+2]+"</a>";
-  //         seq_grouped += new_group;
-  //       }
-  //       return seq_grouped;
-
-  //       // return d.dna;
-  //     })
-  //     .style('font-size', '1.667rem')
-  //     // .style("display", "none");
-  //     .style("display", function() {
-  //       return displaySeqType == "Nuc" ? "block" : "none";
-  //     });
-
-  // // Suppression des blocs de séquences
-  // seqblocks.exit().remove();
-
-  // ^1SVG
-  //   // d3.select('svg').selectAll('.ps-tH')
-  //   //   .style('stroke', psThresholdHighBgColor);
-  //   // d3.select('svg').selectAll('.ps-tL')
-  //   //   .style('stroke', psThresholdLowBgColor);
-  //   // d3.select('svg').selectAll('.ps-tB')
-  //   //   .style('stroke', psBelowThresholdBgColor);
-  // ^1SVG
-  // ^2SVG
-  // d3.select('svg').selectAll('.ps-tH')
-  //   .style('stroke', psThresholdHighBgColor);
-  // d3.select('svg').selectAll('.ps-tL')
-  //   .style('stroke', psThresholdLowBgColor);
-  // d3.select('svg').selectAll('.ps-tB')
-  //   .style('stroke', psBelowThresholdBgColor);
-  // $2SVG
 
   // ==============================================================
   // Fin modif : blocs de séquences
   // ==============================================================
-
-  // var tooltip2 = d3.select('svg')
-  //   .append('div')
-  //     .attr('id', 'tooltip2')
-  //     .style('position', 'absolute')
-  //     .style('visibility', 'hidden')
-  //     .text('tooltip2');
-  //
-  // d3.selectAll('.psrects')
-  //   .on('mouseover', function(d) {
-  //     // console.log('mouseover: '+d.site);
-  //     return tooltip2.style('visibility', 'visible').text(d.site);
-  //   })
-  //   .on('mousemove', function() {
-  //     return tooltip2.style('top', (event.pageY)+'px').style('left', (event.pageX)+'px')
-  //   })
-  //   .on('mouseout', function() {
-  //     return tooltip2.style('visibility', 'hidden').text('');
-  //   });
-
   
 
 
