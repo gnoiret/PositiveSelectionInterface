@@ -203,7 +203,7 @@
         </button>
         <ul class="dropdown-menu">
           <li><a href="#" id="tree">Tree</a></li>
-          <li><a href="#" id="selecp">Alignement</a></li>
+          <li><a href="#" id="selecp">Alignment</a></li>
         </ul>
       </div>
 
@@ -217,12 +217,12 @@
         Current display:
       </button> -->
       <div class="btn-group" role="group" id="alignement">
-        <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="Choose type of alignement"  >
-          Alignement
+        <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="Choose type of alignment"  >
+          Alignment
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
-          <li><a href="#" id="nucleotid">Nucleotid</a></li>
+          <li><a href="#" id="nucleotid">Codons</a></li>
           <li><a href="#" id="aminoacid" style="color: red;">Amino Acids</a></li>
         </ul>
       </div>
@@ -1448,23 +1448,41 @@ function isStorageSupported(storage) {
 
 // Fonction d'export du SVG
 // ------------------------
-function saveSVG(){
+function saveSVGTree(){
   // get styles from all required stylesheets
   // http://www.coffeegnome.net/converting-svg-to-png-with-canvg/
   var style = "\n.seqblock text {font-family: 'Courier';}";
   var requiredSheets = ['phylogram_d3.css', 'open_sans.css'];
 
   var img = new Image();
-  var serializer = new XMLSerializer();
   // prepend style to svg
-  svg1.insert('defs',":first-child");
+  const treeSvg = d3.select('.svg1');
+  treeSvg.insert('defs',":first-child");
   d3.select(".svg1 defs")
       .append('style')
       .attr('type','text/css')
       .html(style);
-  var svgStr = serializer.serializeToString(svg1.node());
-  img.src = 'data:image/svg+xml;base64,'+window.btoa(unescape(encodeURIComponent(svgStr)));
-  window.open().document.write('<p>Please copy or save the the image <img src="' + img.src + '"/>');
+  var as_text = new XMLSerializer().serializeToString(treeSvg.node());
+  img.src = 'data:image/svg+xml;base64,'+window.btoa(unescape(encodeURIComponent(as_text)));
+  window.open().document.write('<p>Please copy or save the the image (it may not display if it is too large) <img src="' + img.src + '"/>');
+};
+function saveSVGAlignment(){
+  // get styles from all required stylesheets
+  // http://www.coffeegnome.net/converting-svg-to-png-with-canvg/
+  var style = "\n.seqblock text {font-family: 'Courier';}";
+  var requiredSheets = ['phylogram_d3.css', 'open_sans.css'];
+
+  var img = new Image();
+  // prepend style to svg
+  const alignmentSvg = d3.select('.svg2');
+  alignmentSvg.insert('defs',":first-child");
+  d3.select(".svgr defs")
+      .append('style')
+      .attr('type','text/css')
+      .html(style);
+  var as_text = new XMLSerializer().serializeToString(alignmentSvg.node());
+  img.src = 'data:image/svg+xml;base64,'+window.btoa(unescape(encodeURIComponent(as_text)));
+  window.open().document.write('<p>Please copy or save the the image (it may not display if it is too large) <img src="' + img.src + '"/>');
 };
 
 // Fonction recursive qui renvoie les noeuds ancestraux communs a
@@ -1995,17 +2013,18 @@ function collapseVeryBigTree(treeRoot,patterns) {
     case "Tree":
       $("#tree").css('color', 'red');
       $("#selecp").css('color', 'black');
-      saveSVG();
+      saveSVGTree();
       break;
     case "Alignement":
       $("#tree").css('color', 'black');
       $("#selecp").css('color', 'red');
-      var img = new Image();
-      const svg_s = document.querySelector(".svg2");
-      // convert to a valid XML source
-      var as_text = new XMLSerializer().serializeToString(svg_s);
-      img.src = 'data:image/svg+xml;base64,'+window.btoa(unescape(encodeURIComponent(as_text)));
-      window.open().document.write('<p>Please copy or save the the image <img src="' + img.src + '"/>');
+      saveSVGAlignment();
+      // var img = new Image();
+      // const svg_s = document.querySelector(".svg2");
+      // // convert to a valid XML source
+      // var as_text = new XMLSerializer().serializeToString(svg_s);
+      // img.src = 'data:image/svg+xml;base64,'+window.btoa(unescape(encodeURIComponent(as_text)));
+      // window.open().document.write('<p>Please copy or save the the image (it may not display if it is too large) <img src="' + img.src + '"/>');
       break;
     default:
   }
@@ -2054,25 +2073,55 @@ $(window).resize(function() {
   });
 });
 
+// // Bouton Nuc <-> AA
+// $('#toggle-seqtype').on('click', function() {
+//   if (displaySeqType == 'AA') {
+//     console.log('current display: AA, switching to Nuc');
+//     displaySeqType = 'Nuc';
+//     $('.aa-sequence').css('display', 'none');
+//     $('.dna-sequence').css('display', 'block');
+//     $('#toggle-seqtype').html('Current display: '+displaySeqType);
+//     // hStep=Math.floor(hStep*3);
+//     updateLayout(cladeRoot);
+//   } else {
+//     console.log('current display: Nuc, switching to AA');
+//     displaySeqType = 'AA';
+//     $('.dna-sequence').css('display', 'none');
+//     $('.aa-sequence').css('display', 'block');
+//     // hStep=Math.floor(hStep/3);
+//     updateLayout(cladeRoot);
+//   }
+//   $('#toggle-seqtype').html('Current display: '+displaySeqType);
+// });
+
 // Bouton Nuc <-> AA
-$('#toggle-seqtype').on('click', function() {
-  if (displaySeqType == 'AA') {
-    console.log('current display: AA, switching to Nuc');
-    displaySeqType = 'Nuc';
-    $('.aa-sequence').css('display', 'none');
-    $('.dna-sequence').css('display', 'block');
-    $('#toggle-seqtype').html('Current display: '+displaySeqType);
-    // hStep=Math.floor(hStep*3);
-    updateLayout(cladeRoot);
-  } else {
-    console.log('current display: Nuc, switching to AA');
-    displaySeqType = 'AA';
-    $('.dna-sequence').css('display', 'none');
-    $('.aa-sequence').css('display', 'block');
-    // hStep=Math.floor(hStep/3);
-    updateLayout(cladeRoot);
+$('#alignement').on('click', function(event, dropdownData) {
+  var target = event.toElement || event.relatedTarget || event.target || function () { throw "Failed to attach an event target!"; }
+  myStorage.setItem("alignement",target.text);
+  switch (target.text) {
+    case "Codons":
+      displaySeqType = "Nuc";
+      console.log("current display: AA, switching to Nuc");
+      $(".aa-sequence").css("display", "none");
+      $(".dna-sequence").css("display", "block");
+      $("#toggle-seqtype").html("Current display: "+displaySeqType);
+      // hStepBase = Math.floor(hStepBase*3 - 3);
+      $("#nucleotid").css('color', 'red');
+      $("#aminoacid").css('color', 'black');
+      updateLayout(cladeRoot);
+      break;
+    case "Amino Acids":
+      displaySeqType = "AA";
+      console.log("current display: Nuc, switching to AA");
+      $(".dna-sequence").css("display", "none");
+      $(".aa-sequence").css("display", "block");
+      // hStepBase = Math.floor((hStepBase + 3)/3);
+      $("#nucleotid").css('color', 'black');
+      $("#aminoacid").css('color', 'red');
+      updateLayout(cladeRoot);
+      break;
+    default:
   }
-  $('#toggle-seqtype').html('Current display: '+displaySeqType);
 });
 
 // Décalage du SVG vers le bas
