@@ -85,9 +85,9 @@
     .testnav  a:hover {color:red;}
     div.demo {
       border: 3px solid #666;
-      margin: 5px;
+      /*margin: 5px;*/
       margin-top: 150px; /* correctif utile si jquery n'est pas chargé (ex : hors-ligne) */
-      padding: 5px;
+      /*padding: 5px;*/
       position: relative;
       width: 2500px;
       height: 1000px;
@@ -250,11 +250,11 @@
       <!-- $1SVG -->
 
       <!-- ^2SVG -->
-      <div  style="border:3px solid #666; float: left; overflow: scroll; width: 50%;" class="arbre">
-        <svg class="svg1"></svg>
+      <div  style="border:3px solid #666; float: left; overflow: scroll; width: 50%;" id="tree-container">
+        <svg id="svg1"></svg>
       </div>
-      <div style="border:3px solid #666; overflow: scroll;" class="align_mult" >
-        <svg class="svg2"></svg>
+      <div style="border:3px solid #666; overflow: scroll;" id="alignment-container" >
+        <svg id="svg2"></svg>
       </div>
       <!-- $2SVG -->
 
@@ -408,7 +408,7 @@ function  main_display() {
   //   .attr("id", "treeAlign");
   // $1SVG
   // ^2SVG
-  svg1 = d3.select(".svg1");   // selectionne la div svg1
+  svg1 = d3.select("#svg1");   // selectionne la div svg1
   g = svg1.append("g")      // ajoute element au svg1
     .attr("id", "treeAlign");
   // $2SVG
@@ -998,7 +998,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // ==============================================================
 
   // ^2SVG
-  var svg2 = d3.select(".svg2");
+  var svg2 = d3.select("#svg2");
   // svg2.attr("width", width)
   //   .attr("height",  height);
   svg2.attr("width", widthSVG + margin.right + longueurProjAjouteeSvgX)
@@ -1171,7 +1171,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   //   .attr('id', 'sequences-container');
   // $1SVG
   // ^2SVG
-  var seqDiv = d3.select('.svg2')
+  var seqDiv = d3.select('#svg2')
     .append('g')
     .attr('id', 'sequences-container');
   // $2SVG
@@ -1227,23 +1227,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   var oneSeqDna = d3.select('.dna-sequence');
   
   for (i=0; i<psResultsDataset.length; i++) {
-    if (displaySeqType == 'AA') {
-      // Ajout des rectangles colorés pour chaque AA
-      oneSeqAA.append('rect')
-        .attr('x', function(d) {return i*hStep;})
-        .attr('width', hStep)
-        .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
-        .attr('height', maxYSeq - minYSeq + hStepBase*2)
-        .style('fill', () => {
-          if (psResultsDataset[i].stat > psThresholdHigh) {
-            return psThresholdHighBgColor;
-          } else if (psResultsDataset[i].stat > psThresholdLow) {
-            return psThresholdLowBgColor;
-          } else {
-            return psBelowThresholdBgColor;
-          }
-        });
-      } else {
+    if (displaySeqType == 'Nuc') {
         // Ajout des rectangles colorés pour chaque codon
         oneSeqDna.append('rect')
           .attr('x', function(d) {return i*hStep;})
@@ -1259,6 +1243,22 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
               return psBelowThresholdBgColor;
             }
           });
+      } else {
+      // Ajout des rectangles colorés pour chaque AA
+      oneSeqAA.append('rect')
+        .attr('x', function(d) {return i*hStep;})
+        .attr('width', hStep)
+        .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
+        .attr('height', maxYSeq - minYSeq + hStepBase*2)
+        .style('fill', () => {
+          if (psResultsDataset[i].stat > psThresholdHigh) {
+            return psThresholdHighBgColor;
+          } else if (psResultsDataset[i].stat > psThresholdLow) {
+            return psThresholdLowBgColor;
+          } else {
+            return psBelowThresholdBgColor;
+          }
+        });
       }
   }
 
@@ -1346,9 +1346,9 @@ function saveSVGTree(){
 
   var img = new Image();
   // prepend style to svg
-  const treeSvg = d3.select('.svg1');
+  const treeSvg = d3.select('#svg1');
   treeSvg.insert('defs',":first-child");
-  d3.select(".svg1 defs")
+  d3.select("#svg1 defs")
       .append('style')
       .attr('type','text/css')
       .html(style);
@@ -1364,9 +1364,9 @@ function saveSVGAlignment(){
 
   var img = new Image();
   // prepend style to svg
-  const alignmentSvg = d3.select('.svg2');
+  const alignmentSvg = d3.select('#svg2');
   alignmentSvg.insert('defs',":first-child");
-  d3.select(".svgr defs")
+  d3.select("#svg2 defs")
       .append('style')
       .attr('type','text/css')
       .html(style);
@@ -1905,12 +1905,12 @@ function collapseVeryBigTree(treeRoot,patterns) {
       $("#selecp").css('color', 'black');
       saveSVGTree();
       break;
-    case "Alignement":
+    case "Alignment":
       $("#tree").css('color', 'black');
       $("#selecp").css('color', 'red');
       saveSVGAlignment();
       // var img = new Image();
-      // const svg_s = document.querySelector(".svg2");
+      // const svg_s = document.querySelector("#svg2");
       // // convert to a valid XML source
       // var as_text = new XMLSerializer().serializeToString(svg_s);
       // img.src = 'data:image/svg+xml;base64,'+window.btoa(unescape(encodeURIComponent(as_text)));
@@ -1949,22 +1949,25 @@ function collapseVeryBigTree(treeRoot,patterns) {
 
 $(document).ready(function() {
   $('#toggle-seqtype').html('Current display: '+displaySeqType);
+  
   $('div.demo').css({
-    'width': $(window).width() - 10,
-    'height': $(window).height() - $('nav').outerHeight() - 40,
+    'margin-top': $('nav').outerHeight(),
+    'width': $(window).width() - 20,
+    'height': $(window).height() - $('nav').outerHeight(),
   });
-  // $('.svg1').attr('height', $('.demo').outerHeight() - 50);
-  // $('.svg2').attr('height', $('.demo').outerHeight() - 50);
+  // $('#svg-container').attr('height', $('.demo').outerHeight() - 50);
+  // $('#tree-container').attr('height', $('.demo').outerHeight() - 50);
+  // $('#alignment-container').attr('height', $('.demo').outerHeight() - 50);
 });
 
 $(window).resize(function() {
   $('div.demo').css({
-    'margin-top': $('nav').outerHeight(),
-    'width': $(window).width() - 10,
-    'height': $(window).height() - $('nav').outerHeight() - 40,
+    // 'margin': $('nav').outerHeight()+' 0 0 0',
+    'width': $(window).width() - 20,
+    'height': $(window).height() - $('nav').outerHeight(),
   });
-  // $('.svg1').attr('height', $('.demo').outerHeight() - 50);
-  // $('.svg2').attr('height', $('.demo').outerHeight() - 50);
+  // $('#svg1').attr('height', $('.demo').outerHeight() - 50);
+  // $('#svg2').attr('height', $('.demo').outerHeight() - 50);
 });
 
 // // Ancien bouton Nuc <-> AA
@@ -2020,11 +2023,6 @@ $('#alignement').on('click', function(event, dropdownData) {
       break;
     default:
   }
-});
-
-// Décalage du SVG vers le bas
-$('div.demo').css({
-  'margin-top': $('nav').outerHeight(),
 });
 
 // Modification du seuil supérieur
