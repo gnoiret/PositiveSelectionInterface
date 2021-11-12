@@ -527,7 +527,8 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // Début modif : variables pour graphe et séquences
   // ==============================================================
 
-  var hStep = displaySeqType == 'AA' ? hStepBase : hStepBase*3;
+  // Ajustement du pas selon le type de séquences affichées
+  var hStep = displaySeqType == 'AA' ? hStepBase : hStepBase*3-4;
 
   var seqblocks = d3.selectAll('.seqblock');
 
@@ -1177,7 +1178,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // Association des données aux futurs blocs de séquences
   var seqblocks = seqDiv.selectAll('.seqblock')
     .data(seq_dataset);
-    // Création des blocs de séquences
+  // Création et positionnement des blocs de séquences
   var seqblocksEnter = seqblocks.enter().append('g')
     .attr('class', 'node seqblock')
     .attr('transform', function(d) {
@@ -2073,7 +2074,7 @@ $(window).resize(function() {
   });
 });
 
-// // Bouton Nuc <-> AA
+// // Ancien bouton Nuc <-> AA
 // $('#toggle-seqtype').on('click', function() {
 //   if (displaySeqType == 'AA') {
 //     console.log('current display: AA, switching to Nuc');
@@ -2100,25 +2101,29 @@ $('#alignement').on('click', function(event, dropdownData) {
   myStorage.setItem("alignement",target.text);
   switch (target.text) {
     case "Codons":
-      displaySeqType = "Nuc";
-      console.log("current display: AA, switching to Nuc");
-      $(".aa-sequence").css("display", "none");
-      $(".dna-sequence").css("display", "block");
-      $("#toggle-seqtype").html("Current display: "+displaySeqType);
-      // hStepBase = Math.floor(hStepBase*3 - 3);
-      $("#nucleotid").css('color', 'red');
-      $("#aminoacid").css('color', 'black');
-      updateLayout(cladeRoot);
+      if (displaySeqType != 'Nuc') {
+        displaySeqType = "Nuc";
+        console.log("current display: AA, switching to Nuc");
+        $(".aa-sequence").css("display", "none");
+        $(".dna-sequence").css("display", "block");
+        $("#toggle-seqtype").html("Current display: "+displaySeqType);
+        // hStep = Math.floor(hStepBase*3 - 3);
+        $("#nucleotid").css('color', 'red');
+        $("#aminoacid").css('color', 'black');
+        updateLayout(cladeRoot);
+      }
       break;
     case "Amino Acids":
-      displaySeqType = "AA";
-      console.log("current display: Nuc, switching to AA");
-      $(".dna-sequence").css("display", "none");
-      $(".aa-sequence").css("display", "block");
-      // hStepBase = Math.floor((hStepBase + 3)/3);
-      $("#nucleotid").css('color', 'black');
-      $("#aminoacid").css('color', 'red');
-      updateLayout(cladeRoot);
+      if (displaySeqType != 'AA') {
+        displaySeqType = "AA";
+        console.log("current display: Nuc, switching to AA");
+        $(".dna-sequence").css("display", "none");
+        $(".aa-sequence").css("display", "block");
+        // hStep = Math.floor((hStepBase + 3)/3);
+        $("#nucleotid").css('color', 'black');
+        $("#aminoacid").css('color', 'red');
+        updateLayout(cladeRoot);
+      }
       break;
     default:
   }
