@@ -1023,7 +1023,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // Définition de l'échelle pour l'axe x
   var x = d3.scaleLinear()
     .domain([1, psResultsDataset.length+1])
-    .range([1, psGraphWidth+1]);
+    .range([0, psGraphWidth]);
   // Définition de l'échelle pour l'axe y
   var y = d3.scaleLinear()
     .domain([0, maxStat(psResultsDataset)])
@@ -1186,7 +1186,8 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .attr('transform', function(d) {
       // var transx = projOffsetLeft;
       var transx = psGraphMargins.left;
-      var transy = d.y + psGraphMargins.top + 550;
+      // var transy = d.y;
+      var transy = d.y + psGraphMargins.top + 550; // fonctionne seulement avec nodeHeight = 15 *amod*
       return 'translate('+transx+', '+transy+')';
     });
   
@@ -1284,7 +1285,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         }
       });
     seqTextNuc.append('text')
-      .attr('x', function(d) {return hStep*(i)+3;})
+      .attr('x', function(d) {return hStep*(i)+1;})
       .attr('y', function(d) {return Math.floor(hStepBase/3);})
       .text(function(d) {return d.dna[3*i]+d.dna[3*i+1]+d.dna[3*i+2];})
       .style('fill', () => {
