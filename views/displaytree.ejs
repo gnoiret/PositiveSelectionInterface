@@ -215,7 +215,20 @@
   </nav>
   <!-- <div  class="testnav" id="testnav" ></div> -->
     <div id="svg-container">
-      <svg></svg>
+      
+      <!-- ^1SVG -->
+      <!-- <svg></svg> -->
+      <!-- $1SVG -->
+
+      <!-- ^2SVG -->
+      <div  style="border:3px solid #666; float: left; overflow: auto; width: 50%;" class="arbre">
+        <svg class="svg1"></svg>
+      </div>
+      <div style="border:3px solid #666; overflow: auto;" class="align_mult" >
+        <svg class="svg2"></svg>
+      </div>
+      <!-- $2SVG -->
+
     </div>
   </div> <!-- <demo > -->
 </body>
@@ -357,9 +370,17 @@ function  main_display() {
     .attr("class", "tooltip")
     .style("opacity", 0);
   // Definit le svg
-  svg = d3.select("svg");   // selectionne la div svg
-  g = svg.append("g")      // ajoute element au svg
+
+  // ^1SVG
+  // svg = d3.select("svg");   // selectionne la div svg
+  // g = svg.append("g")      // ajoute element au svg
+  //   .attr("id", "treeAlign");
+  // $1SVG
+  // ^2SVG
+  svg1 = d3.select(".svg1");   // selectionne la div svg1
+  g = svg1.append("g")      // ajoute element au svg1
     .attr("id", "treeAlign");
+  // $2SVG
   var transition = d3.transition();
   margin = {
     top: 100,
@@ -577,11 +598,17 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     return d.y;
   });
   var heightSVG = maxY - minY;
-  var longueurProjAjouteeSvgX = psResultsDataset.length*hStep - 1600;
-  var hauteurProjAjouteeSvgY = -120;
-  var decalageProjSvgY = -80;
-  svg.attr("width", widthSVG + margin.right + margin.left+1600     + longueurProjAjouteeSvgX);
-  svg.attr("height", heightSVG + margin.top + margin.down+400      + hauteurProjAjouteeSvgY);
+  var longueurProjAjouteeSvgX = psResultsDataset.length*hStep - 520;
+  var hauteurProjAjouteeSvgY = -200;
+  var decalageProjSvgY = -90;
+  // ^1SVG
+  // svg.attr("width", widthSVG + margin.right + margin.left+1600     + longueurProjAjouteeSvgX);
+  // svg.attr("height", heightSVG + margin.top + margin.down+400      + hauteurProjAjouteeSvgY);
+  // $1SVG
+  // ^2SVG
+  svg1.attr("width", widthSVG + margin.right + margin.left);
+  svg1.attr("height", heightSVG + margin.top + margin.down+400      + hauteurProjAjouteeSvgY);
+  // $2SVG
   g.attr("transform", "translate(" + (margin.right - minX - 250) + "," + (margin.top - minY + 200     + decalageProjSvgY) + ")")
   // ====================
   //  D3: Objets LINK
@@ -939,12 +966,21 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // Début modif : graphe des résultats de sélection positive
   // ==============================================================
 
-  // Fonction de calcul du y maximum
+  // ^2SVG
+  var svg2 = d3.select(".svg2");
+  // svg2.attr("width", width)
+  //   .attr("height",  height);
+  svg2.attr("width", widthSVG + margin.right + longueurProjAjouteeSvgX)
+    .attr("height",  heightSVG + margin.top + margin.down + 200);
+    // .attr("height",  heightSVG + margin.top + margin.down + 300);
+  // var g2 = svg2.append("g")
+  //     .attr("class", "align");
+  // $2SVG
+
+  // Fonction de calcul de la statistique maximale dans les résultats
   function maxStat(results) {
-    // console.log(results);
     var currentmax = results[0].stat;
     results.forEach(function(res) {
-      // console.log(currentmax);
       if (res.stat > currentmax) {
         currentmax = res.stat;
       }
@@ -962,13 +998,24 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .range([psGraphHeight, 0]);
 
   // Ajout du graphe des résultats au SVG
-  var psGraph = svg.append('g')
+  // ^1SVG
+  // var psGraph = svg.append('g')
+  //   .attr('id', 'ps-graph')
+  //   // .attr('class', 'node')
+  //   // .attr('width', psGraphWidth + psGraphMargins.left + psGraphMargins.right)
+  //   // .attr('height', psGraphHeight + psGraphMargins.top + psGraphMargins.bottom)
+  //   .attr('transform', 'translate('+(psGraphMargins.left+projOffsetLeft)+', '+psGraphMargins.top+')');
+  //   // .attr('transform', 'translate(' + (psGraphMargins.left)+'px' + ',' + psGraphMargins.top + 'px'+')');
+  // $1SVG
+  // ^2SVG
+  var psGraph = svg2.append('g')
     .attr('id', 'ps-graph')
     // .attr('class', 'node')
     // .attr('width', psGraphWidth + psGraphMargins.left + psGraphMargins.right)
     // .attr('height', psGraphHeight + psGraphMargins.top + psGraphMargins.bottom)
-    .attr('transform', 'translate('+(psGraphMargins.left+projOffsetLeft)+', '+psGraphMargins.top+')');
+    .attr('transform', 'translate('+psGraphMargins.left+', '+psGraphMargins.top+')');
     // .attr('transform', 'translate(' + (psGraphMargins.left)+'px' + ',' + psGraphMargins.top + 'px'+')');
+  // $2SVG
 
   // Ajout de l'axe x au graphe
   psGraph.append('g')
@@ -1087,26 +1134,16 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // var maxNameLgt = maxNameLength(seq_dataset);
 
   // Ajout de la div qui contiendra l'alignement
-  var seqDiv = d3.select('#treeAlign')
+  // ^1SVG
+  // var seqDiv = d3.select('#treeAlign')
+  //   .append('g')
+  //   .attr('id', 'sequences-container');
+  // $1SVG
+  // ^2SVG
+  var seqDiv = d3.select('.svg2')
     .append('g')
     .attr('id', 'sequences-container');
-
-  // var nSvg = d3.select('#treeAlign')
-  //   .append('svg')
-  //     .attr('id', 'mon-div-defilable')
-  //     .attr('x', '0')
-  //     .attr('y', '0')
-  //     .style('width', '300px')
-  //     .style('height', '300px')
-  //     .append('svg')
-  //       .attr('x', '0')
-  //       .attr('y', '0')
-  //       .attr('width', '400px')
-  //       .attr('height', '400px')
-  //       .style('overflow', 'auto');
-  // var seqDiv = nSvg
-  //   .append('g')
-  //     .attr('id', 'sequences-container');
+  // $2SVG
 
   // Association des données aux futurs blocs de séquences
   var seqblocks = seqDiv.selectAll('.seqblock')
@@ -1115,8 +1152,9 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   var seqblocksEnter = seqblocks.enter().append('g')
     .attr('class', 'node seqblock')
     .attr('transform', function(d) {
-      var transx = projOffsetLeft;
-      var transy = d.y;
+      // var transx = projOffsetLeft;
+      var transx = psGraphMargins.left;
+      var transy = d.y + psGraphMargins.top + 550;
       return 'translate('+transx+', '+transy+')';
     });
   
@@ -1298,12 +1336,22 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // // Suppression des blocs de séquences
   // seqblocks.exit().remove();
 
+  // ^1SVG
+  //   // d3.select('svg').selectAll('.ps-tH')
+  //   //   .style('stroke', psThresholdHighBgColor);
+  //   // d3.select('svg').selectAll('.ps-tL')
+  //   //   .style('stroke', psThresholdLowBgColor);
+  //   // d3.select('svg').selectAll('.ps-tB')
+  //   //   .style('stroke', psBelowThresholdBgColor);
+  // ^1SVG
+  // ^2SVG
   // d3.select('svg').selectAll('.ps-tH')
   //   .style('stroke', psThresholdHighBgColor);
   // d3.select('svg').selectAll('.ps-tL')
   //   .style('stroke', psThresholdLowBgColor);
   // d3.select('svg').selectAll('.ps-tB')
   //   .style('stroke', psBelowThresholdBgColor);
+  // $2SVG
 
   // ==============================================================
   // Fin modif : blocs de séquences
@@ -1905,9 +1953,35 @@ function collapseVeryBigTree(treeRoot,patterns) {
     updateLayout(cladeRoot);
   });
 
+  // ^1SVG
   $('#export').on('click', function() {
     saveSVG();
   });
+  // $1SVG
+  // ^2SVG
+  $('#export').on('click', function(event, dropdownData) {
+  var target = event.toElement || event.relatedTarget || event.target || function () { throw "Failed to attach an event target!"; }
+  myStorage.setItem("export",target.text);
+  switch (target.text) {
+    case "Tree":
+      $("#tree").css('color', 'red');
+      $("#selecp").css('color', 'black');
+      saveSVG();
+      break;
+    case "Alignement":
+      $("#tree").css('color', 'black');
+      $("#selecp").css('color', 'red');
+      var img = new Image();
+      const svg_s = document.querySelector(".svg2");
+      // convert to a valid XML source
+      var as_text = new XMLSerializer().serializeToString(svg_s);
+      img.src = 'data:image/svg+xml;base64,'+window.btoa(unescape(encodeURIComponent(as_text)));
+      window.open().document.write('<p>Please copy or save the the image <img src="' + img.src + '"/>');
+      break;
+    default:
+  }
+});
+// $2SVG
 
 
 
