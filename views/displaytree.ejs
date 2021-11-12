@@ -250,10 +250,10 @@
       <!-- $1SVG -->
 
       <!-- ^2SVG -->
-      <div  style="border:3px solid #666; float: left; overflow: auto; width: 50%;" class="arbre">
+      <div  style="border:3px solid #666; float: left; overflow: scroll; width: 50%;" class="arbre">
         <svg class="svg1"></svg>
       </div>
-      <div style="border:3px solid #666; overflow: auto;" class="align_mult" >
+      <div style="border:3px solid #666; overflow: scroll;" class="align_mult" >
         <svg class="svg2"></svg>
       </div>
       <!-- $2SVG -->
@@ -329,6 +329,8 @@
   var psMissingTxtColor = "#f00";
 
   var projOffsetLeft = 700;
+
+  var psThresholdsChanged = false;
 
   // ==============================================================
   // Fin modif : variables globales
@@ -2064,6 +2066,8 @@ $(document).ready(function() {
     'width': $(window).width() - 10,
     'height': $(window).height() - $('nav').outerHeight() - 40,
   });
+  // $('.svg1').attr('height', $('.demo').outerHeight() - 50);
+  // $('.svg2').attr('height', $('.demo').outerHeight() - 50);
 });
 
 $(window).resize(function() {
@@ -2072,6 +2076,8 @@ $(window).resize(function() {
     'width': $(window).width() - 10,
     'height': $(window).height() - $('nav').outerHeight() - 40,
   });
+  // $('.svg1').attr('height', $('.demo').outerHeight() - 50);
+  // $('.svg2').attr('height', $('.demo').outerHeight() - 50);
 });
 
 // // Ancien bouton Nuc <-> AA
@@ -2136,6 +2142,7 @@ $('div.demo').css({
 
 // Modification du seuil supérieur
 $('#ps-threshold-high').on('change', function() {
+  psThresholdsChanged = true;
   psThresholdHigh = $('#ps-threshold-high').val();
   var psHighVal = $('#ps-threshold-high').val();
   var psLowVal = $('#ps-threshold-low').val();
@@ -2147,6 +2154,7 @@ $('#ps-threshold-high').on('change', function() {
 
 // Modification du seuil inférieur
 $('#ps-threshold-low').on('change', function() {
+  psThresholdsChanged = true;
   var psHighVal = $('#ps-threshold-high').val();
   var psLowVal = $('#ps-threshold-low').val();
   psThresholdLow = psLowVal;
@@ -2156,18 +2164,12 @@ $('#ps-threshold-low').on('change', function() {
 });
 
 $('#refresh').click(function() {
-  // d3.selectAll('#ps-graph').remove();
-  console.log('Mise à jour avec seuil inf. = '+psThresholdLow+' et seuil sup. = '+psThresholdHigh);
-  updateLayout(cladeRoot);
+  if (psThresholdsChanged) {
+    console.log('Updating... (lower = '+psThresholdLow+' ; upper = '+psThresholdHigh+')');
+    updateLayout(cladeRoot);
+    psThresholdsChanged = false;
+  }
 });
-
-$('g#ps-graph g#sequences-container').css({
-    'width': '500px',
-    'overflow-x': 'scroll',
-  });
-
-d3.select('#ps-graph').style('width', '500px').style('overflow-x', 'scroll');
-d3.select('#sequences-container').style('width', '500px').style('overflow-x', 'scroll');
 
 // ==============================================================
 // Fin modif : jQuery
