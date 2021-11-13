@@ -1414,9 +1414,12 @@ function saveSVG(){
 };
 
 function saveSVGTree(){
+  $("a#tree").css('color', 'red');
+  $("a#selecp").css('color', 'black');
+
   // get styles from all required stylesheets
   // http://www.coffeegnome.net/converting-svg-to-png-with-canvg/
-  var style = "\n.seqblock text {font-family: 'Courier'; letter-spacing: 10px;}";
+  var style = "\n";
   // var requiredSheets = ['phylogram_d3.css', 'open_sans.css'];
 
   var img = new Image();
@@ -1432,9 +1435,17 @@ function saveSVGTree(){
   window.open().document.write('<p>Please copy or save the the image (it may not display if it is too large) <img src="' + img.src + '"/>');
 };
 function saveSVGAlignment(){
+  $("a#tree").css('color', 'black');
+  $("a#selecp").css('color', 'red');
+  
+  $('.seqblock text').css({
+    'font-family':'Courier',
+    'letter-spacing':(hStepBase - 9.6)+'px',
+  });
+
   // get styles from all required stylesheets
   // http://www.coffeegnome.net/converting-svg-to-png-with-canvg/
-  var style = "\n.seqblock text {font-family: 'Courier'; letter-spacing: 100px;}";
+  var style = "\n";
   // var requiredSheets = ['phylogram_d3.css', 'open_sans.css'];
 
   var img = new Image();
@@ -1448,10 +1459,6 @@ function saveSVGAlignment(){
   var as_text = new XMLSerializer().serializeToString(alignmentSvg.node());
   img.src = 'data:image/svg+xml;base64,'+window.btoa(unescape(encodeURIComponent(as_text)));
   window.open().document.write('<p>Please copy or save the the image (it may not display if it is too large) <img src="' + img.src + '"/>');
-  $('.seqblock text').css({
-    'font-family':'Courier',
-    'letter-spacing':hStepBase-10+'px',
-  });
 };
 
 // Fonction recursive qui renvoie les noeuds ancestraux communs a
@@ -1999,33 +2006,52 @@ function collapseVeryBigTree(treeRoot,patterns) {
   //       break;
   //   }
   // });
-  $('#export').on('click', function(event, dropdownData) {
+  // $('#export').on('click', function(event, dropdownData) {
+  //   var target = event.toElement || event.relatedTarget || event.target || function () { throw "Failed to attach an event target!"; }
+  //   myStorage.setItem("export",target.text);
+  //   switch (target.text) {
+  //     case "Tree":
+  //       $("a#tree").css('color', 'red');
+  //       $("a#selecp").css('color', 'black');
+  //       saveSVG();
+  //       break;
+  //     case "Alignment":
+  //       $("a#tree").css('color', 'black');
+  //       $("a#selecp").css('color', 'red');
+  //       // $(".aa-sequence").css('font-size', '1.145rem');
+  //       // $(".dna-sequence").css('font-size', '1.042rem');
+  //       $('.seqblock text').css({
+  //         'font-family':'Courier',
+  //         'letter-spacing':(hStepBase - 9.6)+'px',
+  //       });
+  //       var img = new Image();
+  //       const svg_s = document.querySelector("#svg2");
+  //       // convert to a valid XML source
+  //       var as_text = new XMLSerializer().serializeToString(svg_s);
+  //       img.src = 'data:image/svg+xml;base64,'+window.btoa(unescape(encodeURIComponent(as_text)));
+  //       console.log("ok");
+  //       window.open().document.write('<p>Please copy or save the image <img src="' + img.src + '"/>');
+  //       // $(".aa-sequence").css('font-size',  (hStep/6)+'rem');
+  //       // $(".dna-sequence").css('font-size', (hStep/18)+'rem');
+  //       break;
+  //     default:
+  //   }
+  // });
+$('#export').on('click', function(event, dropdownData) {
     var target = event.toElement || event.relatedTarget || event.target || function () { throw "Failed to attach an event target!"; }
     myStorage.setItem("export",target.text);
     switch (target.text) {
       case "Tree":
-        $("a#tree").css('color', 'red');
-        $("a#selecp").css('color', 'black');
-        saveSVG();
+        saveSVGTree();
         break;
       case "Alignment":
-        $("a#tree").css('color', 'black');
-        $("a#selecp").css('color', 'red');
-        // $(".aa-sequence").css('font-size', '1.145rem');
-        // $(".dna-sequence").css('font-size', '1.042rem');
-        $('.seqblock text').css({
-          'font-family':'Courier',
-          'letter-spacing':(hStepBase - 9.6)+'px',
-        });
-        var img = new Image();
-        const svg_s = document.querySelector("#svg2");
-        // convert to a valid XML source
-        var as_text = new XMLSerializer().serializeToString(svg_s);
-        img.src = 'data:image/svg+xml;base64,'+window.btoa(unescape(encodeURIComponent(as_text)));
-        console.log("ok");
-        window.open().document.write('<p>Please copy or save the image <img src="' + img.src + '"/>');
+        saveSVGAlignment();
         // $(".aa-sequence").css('font-size',  (hStep/6)+'rem');
         // $(".dna-sequence").css('font-size', (hStep/18)+'rem');
+        $('.seqblock text').css({
+          'font-family':'Courier',
+          'letter-spacing':(hStepBase - 10)+'px',
+        });
         break;
       default:
     }
