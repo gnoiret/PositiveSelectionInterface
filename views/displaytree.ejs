@@ -1268,12 +1268,12 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // Alignement : ajout des AA / codons (version séquence entière)
   seqTextAA.append('text')
     .style('letter-spacing', (hStepBase - 10)+'px') // Espacement des lettres pour correpondre au graphe
-    .attr('x', function(d) {return 3;})
+    .attr('x', function(d) {return 1;})
     .attr('y', function(d) {return Math.floor(hStepBase/3);})
     .text(function(d) {return d.aa;});
   seqTextNuc.append('text')
     .style('letter-spacing', (hStepBase - 10)+'px') // Espacement des lettres pour correpondre au graphe
-    .attr('x', function(d) {return 3;})
+    .attr('x', function(d) {return 1;})
     .attr('y', function(d) {return Math.floor(hStepBase/3);})
     .text(function(d) {return d.dna;});
 
