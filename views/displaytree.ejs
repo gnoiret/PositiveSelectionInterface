@@ -222,8 +222,8 @@
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
+          <li><a href="#" id="aminoacid">Amino Acids</a></li>
           <li><a href="#" id="nucleotid">Codons</a></li>
-          <li><a href="#" id="aminoacid" style="color: red;">Amino Acids</a></li>
         </ul>
       </div>
 
@@ -314,7 +314,7 @@
   // ==============================================================
 
   var displaySeqType = 'AA';
-  var hStepBase = 16;
+  var hStepBase = 12;
 
   var psThresholdHigh = $('#ps-threshold-high').val() || 1.0;
   var psThresholdLow = $('#ps-threshold-low').val() || 0.3;
@@ -1051,13 +1051,12 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // Ajout de l'axe x au graphe
   psGraph.append('g')
     .attr('transform', 'translate(0,' + psGraphHeight + ')')
-    .call(d3.axisBottom(x).ticks(psResultsDataset.length/5, 'f'));
-    // .call(d3.axisBottom(x));
+    .call(d3.axisBottom(x).ticks(psResultsDataset.length/5)); // graduations tous les 5 codons / AA
   // Ajout de l'axe y au graphe
   psGraph.append('g')
     .call(d3.axisLeft(y));
 
-  // Ajout du seuil supérieur au graphe (à y = 1)
+  // Ajout du seuil supérieur au graphe (à y = seuil haut)
   psGraph.append('line')
     .attr('x1', x(1))
     .attr('y1', y(psThresholdHigh))
@@ -1066,7 +1065,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .style('stroke', 'grey')
     .style('stroke-width', 2+'px')
     .style('stroke-dasharray', ('4, 4'));
-  // Ajout du seuil inférieur au graphe (à y = 0.3)
+  // Ajout du seuil inférieur au graphe (à y = seuil bas)
   psGraph.append('line')
     .attr('x1', x(1))
     .attr('y1', y(psThresholdLow))
@@ -1076,8 +1075,8 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .style('stroke-width', 2+'px')
     .style('stroke-dasharray', ('4, 4'));
 
-  // Suppression du graphe
-  psGraph.exit().remove();
+  // // Suppression du graphe
+  // psGraph.exit().remove();
 
   // Association des données aux futurs rectangles
   var rects = psGraph.selectAll('.psrects')
@@ -1392,11 +1391,33 @@ function isStorageSupported(storage) {
 
 // Fonction d'export du SVG
 // ------------------------
+
+// saveSVG()
+function saveSVG(){
+  // get styles from all required stylesheets
+  // http://www.coffeegnome.net/converting-svg-to-png-with-canvg/
+  var style = "\n";
+  var requiredSheets = ['phylogram_d3.css', 'open_sans.css'];
+  console.log('requiredSheets:');
+  console.log(requiredSheets);
+  var img = new Image();
+  var serializer = new XMLSerializer();
+  // prepend style to svg
+  svg1.insert('defs',":first-child");
+  d3.select("svg defs")
+      .append('style')
+      .attr('type','text/css')
+      .html(style);
+  var svgStr = serializer.serializeToString(svg1.node());
+  img.src = 'data:image/svg+xml;base64,'+window.btoa(unescape(encodeURIComponent(svgStr)));
+  window.open().document.write('<p>Please copy or save the the image <img src="' + img.src + '"/>');
+};
+
 function saveSVGTree(){
   // get styles from all required stylesheets
   // http://www.coffeegnome.net/converting-svg-to-png-with-canvg/
-  var style = "\n.seqblock text {font-family: 'Courier';}";
-  var requiredSheets = ['phylogram_d3.css', 'open_sans.css'];
+  var style = "\n.seqblock text {font-family: 'Courier'; letter-spacing: 10px;}";
+  // var requiredSheets = ['phylogram_d3.css', 'open_sans.css'];
 
   var img = new Image();
   // prepend style to svg
@@ -1413,8 +1434,8 @@ function saveSVGTree(){
 function saveSVGAlignment(){
   // get styles from all required stylesheets
   // http://www.coffeegnome.net/converting-svg-to-png-with-canvg/
-  var style = "\n.seqblock text {font-family: 'Courier';}";
-  var requiredSheets = ['phylogram_d3.css', 'open_sans.css'];
+  var style = "\n.seqblock text {font-family: 'Courier'; letter-spacing: 100px;}";
+  // var requiredSheets = ['phylogram_d3.css', 'open_sans.css'];
 
   var img = new Image();
   // prepend style to svg
@@ -1427,6 +1448,10 @@ function saveSVGAlignment(){
   var as_text = new XMLSerializer().serializeToString(alignmentSvg.node());
   img.src = 'data:image/svg+xml;base64,'+window.btoa(unescape(encodeURIComponent(as_text)));
   window.open().document.write('<p>Please copy or save the the image (it may not display if it is too large) <img src="' + img.src + '"/>');
+  $('.seqblock text').css({
+    'font-family':'Courier',
+    'letter-spacing':hStepBase-10+'px',
+  });
 };
 
 // Fonction recursive qui renvoie les noeuds ancestraux communs a
@@ -1950,29 +1975,61 @@ function collapseVeryBigTree(treeRoot,patterns) {
   // });
   // $1SVG
   // ^2SVG
+  // $('#export').on('click', function(event, dropdownData) {
+  //   var target = event.toElement || event.relatedTarget || event.target || function () { throw "Failed to attach an event target!"; }
+  //   myStorage.setItem("export",target.text);
+  //   switch (target.text) {
+  //     case "Tree":
+  //       $("a#tree").css('color', 'red');
+  //       $("a#selecp").css('color', 'black');
+  //       saveSVGTree();
+  //       break;
+  //     case "Alignment":
+  //       $("a#tree").css('color', 'black');
+  //       $("a#selecp").css('color', 'red');
+  //       saveSVGAlignment();
+  //       // var img = new Image();
+  //       // const svg_s = document.querySelector("#svg2");
+  //       // // convert to a valid XML source
+  //       // var as_text = new XMLSerializer().serializeToString(svg_s);
+  //       // img.src = 'data:image/svg+xml;base64,'+window.btoa(unescape(encodeURIComponent(as_text)));
+  //       // window.open().document.write('<p>Please copy or save the the image (it may not display if it is too large) <img src="' + img.src + '"/>');
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // });
   $('#export').on('click', function(event, dropdownData) {
-  var target = event.toElement || event.relatedTarget || event.target || function () { throw "Failed to attach an event target!"; }
-  myStorage.setItem("export",target.text);
-  switch (target.text) {
-    case "Tree":
-      $("#tree").css('color', 'red');
-      $("#selecp").css('color', 'black');
-      saveSVGTree();
-      break;
-    case "Alignment":
-      $("#tree").css('color', 'black');
-      $("#selecp").css('color', 'red');
-      saveSVGAlignment();
-      // var img = new Image();
-      // const svg_s = document.querySelector("#svg2");
-      // // convert to a valid XML source
-      // var as_text = new XMLSerializer().serializeToString(svg_s);
-      // img.src = 'data:image/svg+xml;base64,'+window.btoa(unescape(encodeURIComponent(as_text)));
-      // window.open().document.write('<p>Please copy or save the the image (it may not display if it is too large) <img src="' + img.src + '"/>');
-      break;
-    default:
-  }
-});
+    var target = event.toElement || event.relatedTarget || event.target || function () { throw "Failed to attach an event target!"; }
+    myStorage.setItem("export",target.text);
+    switch (target.text) {
+      case "Tree":
+        $("a#tree").css('color', 'red');
+        $("a#selecp").css('color', 'black');
+        saveSVG();
+        break;
+      case "Alignment":
+        $("a#tree").css('color', 'black');
+        $("a#selecp").css('color', 'red');
+        // $(".aa-sequence").css('font-size', '1.145rem');
+        // $(".dna-sequence").css('font-size', '1.042rem');
+        $('.seqblock text').css({
+          'font-family':'Courier',
+          'letter-spacing':(hStepBase - 9.6)+'px',
+        });
+        var img = new Image();
+        const svg_s = document.querySelector("#svg2");
+        // convert to a valid XML source
+        var as_text = new XMLSerializer().serializeToString(svg_s);
+        img.src = 'data:image/svg+xml;base64,'+window.btoa(unescape(encodeURIComponent(as_text)));
+        console.log("ok");
+        window.open().document.write('<p>Please copy or save the image <img src="' + img.src + '"/>');
+        // $(".aa-sequence").css('font-size',  (hStep/6)+'rem');
+        // $(".dna-sequence").css('font-size', (hStep/18)+'rem');
+        break;
+      default:
+    }
+  });
 // $2SVG
 
 
@@ -2003,7 +2060,22 @@ function collapseVeryBigTree(treeRoot,patterns) {
 
 // Actions à la fin du chargement de la page
 $(document).ready(function() {
-  $('#toggle-seqtype').html('Current display: '+displaySeqType);
+  // $('#toggle-seqtype').html('Current display: '+displaySeqType);
+
+  switch (displaySeqType) {
+    case 'AA':
+      $('a#aminoacid').css('color', 'red');
+      $('a#nucleotid').css('color', 'black');
+      break;
+    case 'Nuc':
+      $('a#aminoacid').css('color', 'black');
+      $('a#nucleotid').css('color', 'red');
+      break;
+    default:
+      $('a#aminoacid').css('color', 'black');
+      $('a#nucleotid').css('color', 'black');
+      break;
+  }
   
   $('div.demo').css({
     'margin-top': $('nav').outerHeight(),
@@ -2080,24 +2152,33 @@ $(document).ready(function() {
 
   // Gestion de la modification des seuils
   $('#ps-threshold-high, #ps-threshold-low').on('change', function(event) {
+    // On a modifié un des seuils
     psThresholdsChanged = true;
 
     // Correction des valeurs en présence d'incohérences
     var psHighVal = $('#ps-threshold-high').val();
     var psLowVal = $('#ps-threshold-low').val();
+    console.log('> ', psHighVal, '>=', psLowVal);
     if (psHighVal < psLowVal) {
       if (event.currentTarget.id == 'ps-threshold-high') {
-        $('#ps-threshold-high').val(psLowVal);
-        psHighVal = psLowVal;
-      } else {
+        // On a descendu le seuil supérieur plus bas que le seuil inférieur
+        // ex : psHighVal = 0.95 | psLowVal = 1.0
+        // On veut donc redecsendre le seuil inférieur en conséquence
         $('#ps-threshold-low').val(psHighVal);
         psLowVal = psHighVal;
+      } else {
+        // On a monté le seuil inférieur plus haut que le seuil supérieur
+        // ex : psHighVal = 1.0 | psLowVal = 1.05
+        // On veut donc remonter le seuil supérieur en conséquence
+        $('#ps-threshold-high').val(psLowVal);
+        psHighVal = psLowVal;
       }
     }
 
     // Réaffectation des variables globales
     psThresholdHigh = psHighVal;
     psThresholdLow = psLowVal;
+    console.log('>> ', psThresholdHigh, '>=', psThresholdLow);
   });
 
   // Gestion du bouton "rafraîchir"
