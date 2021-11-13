@@ -1953,7 +1953,7 @@ $(document).ready(function() {
   
   $('div.demo').css({
     'margin-top': $('nav').outerHeight(),
-    'width': $(window).width() - 20,
+    'width': $(window).width(),
     'height': $(window).height() - $('nav').outerHeight() - 30,
   });
   $('#svg-container').attr('height', $('.demo').outerHeight() - 50);
@@ -1964,7 +1964,7 @@ $(document).ready(function() {
   $(window).resize(function() {
     $('div.demo').css({
       'margin-top': $('nav').outerHeight(),
-      'width': $(window).width() - 20,
+      'width': $(window).width(),
       'height': $(window).height() - $('nav').outerHeight() - 30,
     });
     // $('#svg1').attr('height', $('.demo').outerHeight() - 50);
