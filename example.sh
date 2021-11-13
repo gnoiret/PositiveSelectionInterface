@@ -1,2 +1,1 @@
-python3 genere_xml_new.py data/example_tree.tree data/example_alignment.fasta data/example_results.info || python genere_xml_new.py data/example_tree.tree data/example_alignment.fasta data/example_results.info;
-cp data/example_tree.tree.xml input_tree.xml;
+python3 genere_xml_new.py data/example1_tree.tree data/example1_alignment.fasta data/example1_results.info || python genere_xml_new.py data/example_tree.tree data/example_alignment.fasta data/example_results.info && cp data/example1_tree.tree.xml input_tree.xml
