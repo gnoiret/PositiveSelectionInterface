@@ -630,7 +630,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     return d.y;
   });
   var heightSVG = maxY - minY;
-  var longueurProjAjouteeSvgX = psResultsDataset.length*hStep - 520;
+  var longueurProjAjouteeSvgX = psResultsDataset.length*hStep - 380;
   var hauteurProjAjouteeSvgY = -200;
   var decalageProjSvgY = -90;
   // ^1SVG
@@ -638,7 +638,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // svg.attr("height", heightSVG + margin.top + margin.down+400      + hauteurProjAjouteeSvgY);
   // $1SVG
   // ^2SVG
-  svg1.attr("width", widthSVG + margin.right + margin.left);
+  svg1.attr("width", widthSVG + margin.left + margin.right);
   svg1.attr("height", heightSVG + margin.top + margin.down+400      + hauteurProjAjouteeSvgY);
   // $2SVG
   g.attr("transform", "translate(" + (margin.right - minX - 250) + "," + (margin.top - minY + 200     + decalageProjSvgY) + ")")
@@ -1002,7 +1002,8 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   var svg2 = d3.select("#svg2");
   // svg2.attr("width", width)
   //   .attr("height",  height);
-  svg2.attr("width", widthSVG + margin.right + longueurProjAjouteeSvgX + seqNameOffset)
+  svg2.attr("width", 0 + margin.left + margin.right + longueurProjAjouteeSvgX + seqNameOffset)
+  // svg2.attr("width", widthSVG + margin.left + margin.right + longueurProjAjouteeSvgX + seqNameOffset)
     .attr("height",  heightSVG + margin.top + margin.down + 200);
     // .attr("height",  heightSVG + margin.top + margin.down + 300);
   // var g2 = svg2.append("g")
