@@ -243,7 +243,7 @@
 
   </nav>
   <!-- <div  class="testnav" id="testnav" ></div> -->
-    <div id="svg-container">
+    <div id="svgs-container">
       
       <!-- ^1SVG -->
       <!-- <svg></svg> -->
@@ -281,7 +281,7 @@
   var cladeRoot;
   var layout = d3.layout.cladogram();   // Fonction  D3 qui transforme les donnees en cladograme
   var nodeWidth = 80;                  // Largeur
-  var nodeHeigth = 15;                  // Hauteur
+  var nodeHeight = 16;                  // Hauteur
   var x0Align = 350;                  // Cordonee horizonatle de l'alignement
   var stringWidth;                      // Largeur affichage arbre
   var tagSimpleGene = false;            // True si arbre de gene de type PhyloXML, False si arbre de gene de type RecPhyloXML
@@ -470,7 +470,7 @@ function  main_display() {
   treeRoot = d3.hierarchy(cladeRoot, function(d) {
     return d.clade;
   });
-  // addNumberSeqSpec(treeRoot);  ******************************************************
+  addNumberSeqSpec(treeRoot);
   updateLayout(cladeRoot,1);
 }
 
@@ -509,7 +509,7 @@ function updateLayout(cRoot,firstLoad=0) {
       }
     }
   });
-  layout.nodeSize([nodeWidth, nodeHeigth]); // *i*
+  layout.nodeSize([nodeWidth, nodeHeight]); // *i*
   layout(treeRoot);
   // Traitement des distances dans le cas d'un arbre de gene de type phyloxml
   if (tagSimpleGene) {
@@ -545,7 +545,8 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     psResultsDataset.push(result);
   });
 
-  var psGraphMargins = {top: 20, right: 50, bottom: 50, left: 50};
+  var seqNameOffset = 320;
+  var psGraphMargins = {top: 20, right: 50, bottom: 50, left: 50+seqNameOffset};
   var psGraphWidth = psResultsDataset.length*hStep;
   var psGraphHeight = 150;
 
@@ -575,7 +576,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     lengthLinkLoss : config.lengthLinkLoss || 10,
     linkStrokeSize : config.linkStrokeSize || 2,
     nodeWidth : config.nodeWidth || 30,
-    nodeHeigth : config.nodeHeigth || 30,
+    nodeHeight : config.nodeHeight || 30,
     margin : config.margin || { top: 10, down: 20, left: 500  , right: 50},
     color : config.color || {
       speciation : "#2F4F4F",
@@ -1001,7 +1002,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   var svg2 = d3.select("#svg2");
   // svg2.attr("width", width)
   //   .attr("height",  height);
-  svg2.attr("width", widthSVG + margin.right + longueurProjAjouteeSvgX)
+  svg2.attr("width", widthSVG + margin.right + longueurProjAjouteeSvgX + seqNameOffset)
     .attr("height",  heightSVG + margin.top + margin.down + 200);
     // .attr("height",  heightSVG + margin.top + margin.down + 300);
   // var g2 = svg2.append("g")
@@ -1146,7 +1147,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   });
 
   // // Ordonner les séquences avec un espacement régulier
-  // // en partant de la position verticale (Y) de la première
+  // // en partant du y de la première
   // seq_dataset.sort((a,b) => a.y - b.y);
   // seq_dataset.forEach(function(d,i) {
   //   d.y = seq_dataset[0].y + i*20;
@@ -1168,44 +1169,34 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   //   .attr('id', 'sequences-container');
   // $1SVG
   // ^2SVG
+  console.log('maxX:', maxX);
   var seqDiv = d3.select('#svg2')
     .append('g')
-    .attr('id', 'sequences-container');
+      .attr("transform", "translate(" + (margin.right - minX - 300) + "," + (margin.top - minY + 200     + decalageProjSvgY) + ")")
+      .attr('id', 'sequences-container');
   // $2SVG
 
   // Association des données aux futurs blocs de séquences
   var seqblocks = seqDiv.selectAll('.seqblock')
     .data(seq_dataset);
   // Création et positionnement des blocs de séquences
+  // console.log('Y :');
   var seqblocksEnter = seqblocks.enter().append('g')
     .attr('class', 'node seqblock')
     .attr('transform', function(d) {
       // var transx = projOffsetLeft;
       var transx = psGraphMargins.left;
-      // var transy = d.y;
-      var transy = d.y + psGraphMargins.top + 550; // fonctionne seulement avec nodeHeight = 15 *amod*
+      var transy = d.y;
+      // var transy = d.y + psGraphMargins.top + 550; // /!\ décalage
       return 'translate('+transx+', '+transy+')';
     });
 
-  var maxYSequences = function(seqDataset) {
-    var currentmax = seqDataset[0].y;
-    seqDataset.forEach(function(seq) {
-      currentmax = seq.y > currentmax ? seq.y : currentmax;
-    });
-    return currentmax;
-  }
-  var maxYSeq = maxYSequences(seq_dataset);
-
-  var minYSequences = function(seqDataset) {
-    var currentmin = seqDataset[0].y;
-    seqDataset.forEach(function(seq) {
-      currentmin = seq.y < currentmin ? seq.y : currentmin;
-    });
-    return currentmin;
-  }
-  var minYSeq = minYSequences(seq_dataset);
-
-  // console.log('Y min:', minYSeq, 'Y max:', maxYSeq);
+  seqblocksEnter.append('text')
+    .attr('class', 'sequence-name')
+    .text(function(d) {
+      return d.name;
+    })
+    .attr('transform', 'translate('+-seqNameOffset+','+4+')');
 
   // Alignement : ajout des conteneurs au SVG
   var seqTextAA = seqblocksEnter.append('g')
@@ -1228,8 +1219,8 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       oneSeqAA.append('rect')
         .attr('x', function(d) {return i*hStep;})
         .attr('width', hStep)
-        .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
-        .attr('height', maxYSeq - minYSeq + hStepBase*2)
+        .attr('y', function(d) {return minY - d.y - hStepBase;})
+        .attr('height', maxY - minY + hStepBase*2)
         .style('fill', () => {
           if (psResultsDataset[i].stat > psThresholdHigh) {
             return psThresholdHighBgColor;
@@ -1241,15 +1232,13 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
             return psMissingBgColor;
           }
         });
-        // .style('stroke-width', 1)
-        // .style('fill', 'transparent');
     } else {
       // Ajout d'un rectangle coloré par codon
       oneSeqDna.append('rect')
         .attr('x', function(d) {return i*hStep;})
         .attr('width', hStep)
-        .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
-        .attr('height', maxYSeq - minYSeq + hStepBase*2)
+        .attr('y', function(d) {return minY - d.y - hStepBase;})
+        .attr('height', maxY - minY + hStepBase*2)
         .style('fill', () => {
           if (psResultsDataset[i].stat > psThresholdHigh) {
             return psThresholdHighBgColor;
@@ -1261,8 +1250,6 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
             return psMissingBgColor;
           }
         });
-        // .style('stroke-width', 1)
-        // .style('fill', 'transparent');
     }
   }
   // Alignement : ajout des AA / codons (version séquence entière)
@@ -1276,74 +1263,6 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .attr('x', function(d) {return 1;})
     .attr('y', function(d) {return Math.floor(hStepBase/3);})
     .text(function(d) {return d.dna;});
-
-  // Alignement : ajout des rectangles (ancienne version)
-  // // AA par AA
-  // for (i=0; i<psResultsDataset.length; i++) {
-  //   if (displaySeqType == 'Nuc') {
-  //       // Ajout des rectangles colorés pour chaque codon
-  //       oneSeqDna.append('rect')
-  //         .attr('x', function(d) {return i*hStep;})
-  //         .attr('width', hStep)
-  //         .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
-  //         .attr('height', maxYSeq - minYSeq + hStepBase*2)
-  //         .style('fill', () => {
-  //           if (psResultsDataset[i].stat > psThresholdHigh) {
-  //             return psThresholdHighBgColor;
-  //           } else if (psResultsDataset[i].stat > psThresholdLow) {
-  //             return psThresholdLowBgColor;
-  //           } else {
-  //             return psBelowThresholdBgColor;
-  //           }
-  //         });
-  //     } else {
-  //     // Ajout des rectangles colorés pour chaque AA
-  //     oneSeqAA.append('rect')
-  //       .attr('x', function(d) {return i*hStep;})
-  //       .attr('width', hStep)
-  //       .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
-  //       .attr('height', maxYSeq - minYSeq + hStepBase*2)
-  //       .style('fill', () => {
-  //         if (psResultsDataset[i].stat > psThresholdHigh) {
-  //           return psThresholdHighBgColor;
-  //         } else if (psResultsDataset[i].stat > psThresholdLow) {
-  //           return psThresholdLowBgColor;
-  //         } else {
-  //           return psBelowThresholdBgColor;
-  //         }
-  //       });
-  //     }
-  // }
-
-  // // Alignement : ajout des AA / codons (version AA par AA)
-  // for (i=0; i<psResultsDataset.length; i++) {
-  //   seqTextAA.append('text')
-  //     .attr('x', function(d) {return hStep*(i)+1;})
-  //     .attr('y', function(d) {return Math.floor(hStepBase/3);})
-  //     .text(function(d) {return d.aa[i];})
-  //     .style('fill', () => {
-  //       if (psResultsDataset[i].stat > psThresholdHigh) {
-  //         return 'white';
-  //       } else if (psResultsDataset[i].stat > psThresholdLow) {
-  //         return 'black';
-  //       } else {
-  //         return 'black';
-  //       }
-  //     });
-  //   seqTextNuc.append('text')
-  //     .attr('x', function(d) {return hStep*(i)+1;})
-  //     .attr('y', function(d) {return Math.floor(hStepBase/3);})
-  //     .text(function(d) {return d.dna[3*i]+d.dna[3*i+1]+d.dna[3*i+2];})
-  //     .style('fill', () => {
-  //       if (psResultsDataset[i].stat > psThresholdHigh) {
-  //         return 'white';
-  //       } else if (psResultsDataset[i].stat > psThresholdLow) {
-  //         return 'black';
-  //       } else {
-  //         return 'black';
-  //       }
-  //     });
-  // }
 
   // ==============================================================
   // Fin modif : blocs de séquences
@@ -1365,6 +1284,9 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   //   $( "div.demo" )
   //   .animate({scrollTop: -minY + scrollref},(2000 + Math.abs(-minY +scrollref)/500),function() {});
   // }
+
+  resizeSvgs();
+
 }
 // Fin de la fonction updateSvg
 // ----------------------------
@@ -1438,7 +1360,7 @@ function saveSVGAlignment(){
   $("a#tree").css('color', 'black');
   $("a#selecp").css('color', 'red');
   
-  $('.seqblock text').css({
+  $('.seqblock g text').css({
     'font-family':'Courier',
     'letter-spacing':(hStepBase - 9.6)+'px',
   });
@@ -1655,6 +1577,59 @@ function phylogeny_setloss(treeRoot,offset) {
      d.x = (d.x+lospar.x)/2
     }
   });
+}
+
+// Fonction ajoute nb sequences et especes
+// ---------------------------------------
+function  addNumberSeqSpec(treeRoot) {
+  treeRoot.eachAfter(function (d) {
+    var specs = [];
+    if (!d.children) {
+      d.data.nbseqspe =  {nbSeq : 1,nbSpe : 1};
+    }
+    else {
+      var nbseq = 0;
+      var nbspe = 0;
+      var fils = d.children;
+      fils.forEach(function (d){
+        nbseq = nbseq + d.data.nbseqspe.nbSeq;
+        // nbspe = nbspe + d.data.nbseqspe.nbSpe;
+        var spec = getSpec(d);
+        specs = specs.concat(spec);
+      })
+      var tmp = specs;
+      uspecs=removeDuplicates(tmp);
+      nbspe=uspecs.length;
+      d.data.nbseqspe =  {nbSeq :nbseq,nbSpe :nbspe};
+    }
+  });
+}
+// Fonction recupere especes
+// -------------------------
+function getSpec (noeud) {
+  if (!noeud.children) {
+    var specs = [];
+    var eventsRec = noeud.data.eventsRec;
+    if (eventsRec) {
+      var lastEvent = eventsRec[eventsRec.length - 1];
+      specs.push(lastEvent.speciesLocation)
+    }
+    else {
+      console.log(" ERROR : NO EVENTS FOR ");
+      console.log(noeud.data);
+    }
+    return specs;
+  }
+  else {
+    var specs = [];
+    var fils = noeud.children;
+      fils.forEach(function (d, i ){
+        var spec = getSpec(d);
+        var tmp = specs.concat(spec);
+        specs = tmp;
+      });
+    return specs;
+  }
 }
 
 // Fonction qui collapse les noeuds d'une certaine profondeur
@@ -1936,32 +1911,33 @@ function collapseVeryBigTree(treeRoot,patterns) {
     updateLayout(cladeRoot);
   });
 
-  var step = 5;
+  var stepHeight = 2;
+  var stepWidth = 10;
 
   $('#moreWidth').on('click', function(event, dropdownData) {
-    nodeWidth += step;
+    nodeWidth += stepWidth;
     myStorage.setItem("width",nodeWidth);
     updateLayout(cladeRoot);
   });
 
   $('#lessWidth').on('click', function(event, dropdownData) {
-    nodeWidth -= step;
-    if  (nodeWidth  < step ) {
-      nodeWidth = step;
+    nodeWidth -= stepWidth;
+    if  (nodeWidth  < stepWidth ) {
+      nodeWidth = stepWidth;
     }
     myStorage.setItem("width",nodeWidth);
     updateLayout(cladeRoot);
   });
 
   $('#moreHeigth').on('click', function(event, dropdownData) {
-    nodeHeigth += step;
+    nodeHeight += stepHeight;
     updateLayout(cladeRoot);
   });
 
   $('#lessHeigth').on('click', function(event, dropdownData) {
-    nodeHeigth -= step;
-    if  (nodeHeigth  < 0 ) {
-      nodeHeigth = 1;
+    nodeHeight -= stepHeight;
+    if  (nodeHeight  < 0 ) {
+      nodeHeight = 1;
     }
     updateLayout(cladeRoot);
   });
@@ -1976,67 +1952,6 @@ function collapseVeryBigTree(treeRoot,patterns) {
     updateLayout(cladeRoot);
   });
 
-  // ^1SVG
-  // $('#export').on('click', function() {
-  //   saveSVG();
-  // });
-  // $1SVG
-  // ^2SVG
-  // $('#export').on('click', function(event, dropdownData) {
-  //   var target = event.toElement || event.relatedTarget || event.target || function () { throw "Failed to attach an event target!"; }
-  //   myStorage.setItem("export",target.text);
-  //   switch (target.text) {
-  //     case "Tree":
-  //       $("a#tree").css('color', 'red');
-  //       $("a#selecp").css('color', 'black');
-  //       saveSVGTree();
-  //       break;
-  //     case "Alignment":
-  //       $("a#tree").css('color', 'black');
-  //       $("a#selecp").css('color', 'red');
-  //       saveSVGAlignment();
-  //       // var img = new Image();
-  //       // const svg_s = document.querySelector("#svg2");
-  //       // // convert to a valid XML source
-  //       // var as_text = new XMLSerializer().serializeToString(svg_s);
-  //       // img.src = 'data:image/svg+xml;base64,'+window.btoa(unescape(encodeURIComponent(as_text)));
-  //       // window.open().document.write('<p>Please copy or save the the image (it may not display if it is too large) <img src="' + img.src + '"/>');
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  // });
-  // $('#export').on('click', function(event, dropdownData) {
-  //   var target = event.toElement || event.relatedTarget || event.target || function () { throw "Failed to attach an event target!"; }
-  //   myStorage.setItem("export",target.text);
-  //   switch (target.text) {
-  //     case "Tree":
-  //       $("a#tree").css('color', 'red');
-  //       $("a#selecp").css('color', 'black');
-  //       saveSVG();
-  //       break;
-  //     case "Alignment":
-  //       $("a#tree").css('color', 'black');
-  //       $("a#selecp").css('color', 'red');
-  //       // $(".aa-sequence").css('font-size', '1.145rem');
-  //       // $(".dna-sequence").css('font-size', '1.042rem');
-  //       $('.seqblock text').css({
-  //         'font-family':'Courier',
-  //         'letter-spacing':(hStepBase - 9.6)+'px',
-  //       });
-  //       var img = new Image();
-  //       const svg_s = document.querySelector("#svg2");
-  //       // convert to a valid XML source
-  //       var as_text = new XMLSerializer().serializeToString(svg_s);
-  //       img.src = 'data:image/svg+xml;base64,'+window.btoa(unescape(encodeURIComponent(as_text)));
-  //       console.log("ok");
-  //       window.open().document.write('<p>Please copy or save the image <img src="' + img.src + '"/>');
-  //       // $(".aa-sequence").css('font-size',  (hStep/6)+'rem');
-  //       // $(".dna-sequence").css('font-size', (hStep/18)+'rem');
-  //       break;
-  //     default:
-  //   }
-  // });
 $('#export').on('click', function(event, dropdownData) {
     var target = event.toElement || event.relatedTarget || event.target || function () { throw "Failed to attach an event target!"; }
     myStorage.setItem("export",target.text);
@@ -2048,7 +1963,7 @@ $('#export').on('click', function(event, dropdownData) {
         saveSVGAlignment();
         // $(".aa-sequence").css('font-size',  (hStep/6)+'rem');
         // $(".dna-sequence").css('font-size', (hStep/18)+'rem');
-        $('.seqblock text').css({
+        $('.seqblock g text').css({
           'font-family':'Courier',
           'letter-spacing':(hStepBase - 10)+'px',
         });
@@ -2084,10 +1999,21 @@ $('#export').on('click', function(event, dropdownData) {
 // Début modif : jQuery
 // ==============================================================
 
+function resizeSvgs() {
+  $('div.demo').css({
+    'margin-top': $('nav').outerHeight(),
+    'width': $(window).width(),
+    'height': $(window).height() - $('nav').outerHeight() - 30,
+  });
+  // $('div#svgs-container').attr('height', $('.demo').outerHeight() - 34);
+  // $('div#tree-container').attr('height', $('.demo').outerHeight() - 34);
+  // $('#svg1').attr('height', $('.demo').outerHeight() - 34);
+  // $('div#alignment-container').attr('height', $('.demo').outerHeight() - 34);
+  // $('#svg2').attr('height', $('.demo').outerHeight() - 34);
+}
+
 // Actions à la fin du chargement de la page
 $(document).ready(function() {
-  // $('#toggle-seqtype').html('Current display: '+displaySeqType);
-
   switch (displaySeqType) {
     case 'AA':
       $('a#aminoacid').css('color', 'red');
@@ -2103,46 +2029,12 @@ $(document).ready(function() {
       break;
   }
   
-  $('div.demo').css({
-    'margin-top': $('nav').outerHeight(),
-    'width': $(window).width(),
-    'height': $(window).height() - $('nav').outerHeight() - 30,
-  });
-  $('#svg-container').attr('height', $('.demo').outerHeight() - 50);
-  $('#tree-container').attr('height', $('.demo').outerHeight() - 50);
-  $('#alignment-container').attr('height', $('.demo').outerHeight() - 50);
+  resizeSvgs();
 
   // Gestion du redimensionnement de la fenêtre
   $(window).resize(function() {
-    $('div.demo').css({
-      'margin-top': $('nav').outerHeight(),
-      'width': $(window).width(),
-      'height': $(window).height() - $('nav').outerHeight() - 30,
-    });
-    // $('#svg1').attr('height', $('.demo').outerHeight() - 50);
-    // $('#svg2').attr('height', $('.demo').outerHeight() - 50);
+    resizeSvgs();
   });
-
-  // // Ancien bouton Nuc <-> AA
-  // $('#toggle-seqtype').on('click', function() {
-  //   if (displaySeqType == 'AA') {
-  //     console.log('current display: AA, switching to Nuc');
-  //     displaySeqType = 'Nuc';
-  //     $('.aa-sequence').css('display', 'none');
-  //     $('.dna-sequence').css('display', 'block');
-  //     $('#toggle-seqtype').html('Current display: '+displaySeqType);
-  //     // hStep=Math.floor(hStep*3);
-  //     updateLayout(cladeRoot);
-  //   } else {
-  //     console.log('current display: Nuc, switching to AA');
-  //     displaySeqType = 'AA';
-  //     $('.dna-sequence').css('display', 'none');
-  //     $('.aa-sequence').css('display', 'block');
-  //     // hStep=Math.floor(hStep/3);
-  //     updateLayout(cladeRoot);
-  //   }
-  //   $('#toggle-seqtype').html('Current display: '+displaySeqType);
-  // });
 
   // Gestion du bouton pour le type d'alignement
   $('#alignement').on('click', function(event, dropdownData) {
@@ -2187,15 +2079,9 @@ $(document).ready(function() {
     console.log('> ', psHighVal, '>=', psLowVal);
     if (psHighVal < psLowVal) {
       if (event.currentTarget.id == 'ps-threshold-high') {
-        // On a descendu le seuil supérieur plus bas que le seuil inférieur
-        // ex : psHighVal = 0.95 | psLowVal = 1.0
-        // On veut donc redecsendre le seuil inférieur en conséquence
         $('#ps-threshold-low').val(psHighVal);
         psLowVal = psHighVal;
       } else {
-        // On a monté le seuil inférieur plus haut que le seuil supérieur
-        // ex : psHighVal = 1.0 | psLowVal = 1.05
-        // On veut donc remonter le seuil supérieur en conséquence
         $('#ps-threshold-high').val(psLowVal);
         psHighVal = psLowVal;
       }

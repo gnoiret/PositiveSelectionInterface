@@ -10,8 +10,8 @@ Positional arguments:
   treeFile              family name / phylogenic trees in newick format
   alignmentFile         multiple alignment in fasta format
   resultsFile           statistics
-
 """
+
 import sys
 import re
 import random
@@ -36,7 +36,7 @@ import base64
 # import file_reader
 # import translate
 
-def dna_to_prot(dna_seq:str):
+def dnaToProt(dna_seq:str):
     matches = {
         'TTT':'F', 'TTC':'F', 'TTA':'L', 'TTG':'L',
         'TCT':'S', 'TCC':'S', 'TCA':'S', 'TCG':'S', 
@@ -129,21 +129,39 @@ def loadResults(resultsFile):
     # print(f'>{resultsText}<')
     return resultsText
 
+def loadDico(fileDico):
+    """
+    Fonction qui prend un fichier d'alignement en entree et retourne un dictionnaire des noms d'espece des sequences
+    """
+
+    file = open(fileDico,"r")
+    speciesDico = {}
+    for line in file:
+        if line[0]==">":
+            speciesDico[line.split('>')[1].split('\n')[0]] = line.split('>')[1].split('\n')[0]
+            # tline = re.split('_',line)
+            # #key = f"{tline[0]} {tline[1]}"
+            # key = line.split('\n')[0]
+            # fin = tline[4].split("\n")[0]
+            # speciesDico[key.split(">")[1]] = f"{tline[2]} {tline[3]} {fin}"
+    file.close()
+    return speciesDico
+
 def createPhyloXML(fam,newick):
     #Parse and return exactly one tree from the given file or handle
     if not ':' in newick:
         nv_arbre = ""
         for i in range(len(newick)):
             if (newick[i]==',' and newick[i-1]!=')') or (newick[i]==')' and newick[i-1]!=')'):
-                nv_arbre+=":1"
+                nv_arbre+=":0.7"
                 nv_arbre+=newick[i]
             elif (newick[i]==',' and newick[i-1]==')') or (newick[i]==')' and newick[i-1]==')'):
-                nv_arbre+="50:0.4"
+                nv_arbre+="30:0.4"
                 nv_arbre+=newick[i]
             else:
                 nv_arbre+=newick[i]
         newick = nv_arbre
-    # print(newick)
+    print(newick)
     handle = StringIO(newick)
     trees = Phylo.read(handle, 'newick')
     #Write a sequence of Tree objects to the given file or handle
@@ -181,11 +199,11 @@ def createPhyloXML(fam,newick):
         if (enom is not None) :
             nbfeuille = nbfeuille + 1
             cds = enom.text
-            # sp = dico.get(cds)
-            # if (not  sp):
-            #     print ("undefined species for "+ cds)
-            #     sp = "undefined"
-            # famspecies[sp] = 1
+            sp = dico.get(cds)
+            if (not  sp):
+                print ("undefined species for "+ cds)
+                sp = "undefined"
+            famspecies[sp] = 1
 
             ## Affectation de la séquence pour l'ID en cours
             seq_alg = alignmentDict.get(cds)
@@ -217,7 +235,7 @@ def createPhyloXML(fam,newick):
                         tabcross = buf.split(":")
                         if len(tabcross) > 1 :
                             crossref.set(tabcross[0], tabcross[1])
-            # leaf.set('speciesLocation', sp)
+            leaf.set('speciesLocation', sp)
             if 'seqdefdico' in globals():
                 if cds in seqdefdico:
                     leaf.set('defintiion', seqdefdico[cds])
@@ -227,8 +245,8 @@ def createPhyloXML(fam,newick):
 
             ## Ajout des séquences aux feuilles
             leaf.set('dnaAlign', seq_alg) # ajout de la séquence en nucléotides
-            # leaf.set('aaAlign', translate.dna_to_prot(seq_alg)) # ajout de la séquence en acides aminés
-            leaf.set('aaAlign', dna_to_prot(seq_alg)) # ajout de la séquence en acides aminés
+            # leaf.set('aaAlign', translate.dnaToProt(seq_alg)) # ajout de la séquence en acides aminés
+            leaf.set('aaAlign', dnaToProt(seq_alg)) # ajout de la séquence en acides aminés
 
             if 'crossdico' in globals():
                 leaf.append(crossref)
@@ -298,6 +316,9 @@ print ("OK")
 
 #Creates empty phyloxml document
 #project = Phyloxml()   a decommenter si on veut un fichier xml unique
+
+# Loads Species name dico
+dico = loadDico(alignment)
 
 # Loads newick tree
 treefile = open(tree,"r")
