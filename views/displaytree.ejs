@@ -195,18 +195,6 @@
 
       <!-- Début modif -->
 
-      <!-- Bouton  Export -->
-      <div class="btn-group" role="group" id="export">
-        <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="export figure">
-          Export
-          <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-          <li><a href="#" id="tree">Tree</a></li>
-          <li><a href="#" id="selecp">Alignment</a></li>
-        </ul>
-      </div>
-
       <!-- Ancien bouton Type de séquence -->
       <!-- <button type="button" class="btn btn-default btn-sm" aria-label="Seqtype" id="toggle-seqtype" data-toggle="tooltip" data-placement="top" title="Change sequence type">
         Current display:
@@ -235,6 +223,18 @@
       <button type="button" class="btn btn-default btn-sm" aria-label="OK threshold" id="refresh" data-toggle="tooltip" data-placement="top" title="Recalculate with this threshold">
         <span>Refresh</span>
       </button>
+
+      <!-- Bouton  Export -->
+      <div class="btn-group" role="group" id="export">
+        <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="export figure">
+          Export
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+          <li><a href="#" id="tree">Tree</a></li>
+          <li><a href="#" id="selecp">Alignment</a></li>
+        </ul>
+      </div>
 
       <!-- Fin modif -->
 
@@ -1257,10 +1257,10 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   for (i=0; i<psResultsDataset.length; i++) {
     if (displaySeqType == 'AA') {
       // Ajout d'un rectangle coloré par AA
-      seqDiv.append('rect')
+      oneSeqAA.append('rect')
         .attr('x', function(d) {return i*hStep;})
         .attr('width', hStep)
-        .attr('y', function(d) {return minYDisp - hStepBase;})
+        .attr('y', function(d) {return minYDisp - hStepBase - d.y;})
         // .attr('y', function(d) {return minY - d.y - hStepBase;})
         .attr('height', function(d) {
           return maxYDisp - minYDisp + hStepBase*2;
@@ -2138,16 +2138,23 @@ $(document).ready(function() {
     psThresholdHigh = psHighVal;
     psThresholdLow = psLowVal;
     console.log('>> ', psThresholdHigh, '>=', psThresholdLow);
-  });
 
-  // Gestion du bouton "rafraîchir"
-  $('#refresh').click(function() {
+    // Gestion du bouton "rafraîchir"
     if (psThresholdsChanged) {
       console.log('Updating... (lower = '+psThresholdLow+' ; upper = '+psThresholdHigh+')');
       updateLayout(cladeRoot);
       psThresholdsChanged = false;
     }
   });
+
+  // // Gestion du bouton "rafraîchir"
+  // $('#refresh').click(function() {
+  //   if (psThresholdsChanged) {
+  //     console.log('Updating... (lower = '+psThresholdLow+' ; upper = '+psThresholdHigh+')');
+  //     updateLayout(cladeRoot);
+  //     psThresholdsChanged = false;
+  //   }
+  // });
 });
 
 // ==============================================================
