@@ -1,8 +1,8 @@
-#
 # Part of this  code is taken from https://groups.google.com/forum/#!topic/etetoolkit/cYTHHsL21KY
 # written by Jaime Huerta-Cepas
 
-"""Ecrit un  arbre au format XML .
+"""
+Ecrit un  arbre au format XML .
 Usage:
   genere_xml.py <treeFile> <alignmentFile> <resultsFile>
 
@@ -10,6 +10,7 @@ Positional arguments:
   treeFile              family name / phylogenic trees in newick format
   alignmentFile         multiple alignment in fasta format
   resultsFile           statistics
+
 """
 
 import sys
@@ -36,13 +37,13 @@ import base64
 # import file_reader
 # import translate
 
-def dnaToProt(dna_seq:str):
+def dna_to_prot(dna_seq:str):
     matches = {
         'TTT':'F', 'TTC':'F', 'TTA':'L', 'TTG':'L',
-        'TCT':'S', 'TCC':'S', 'TCA':'S', 'TCG':'S', 
+        'TCT':'S', 'TCC':'S', 'TCA':'S', 'TCG':'S',
         'TAT':'Y', 'TAC':'Y', 'TAA':'*', 'TAG':'*',
         'TGT':'C', 'TGC':'C', 'TGA':'*', 'TGG':'W',
-        
+
         'CTT':'L', 'CTC':'L', 'CTA':'L', 'CTG':'L',
         'CCT':'P', 'CCC':'P', 'CCA':'P', 'CCG':'P',
         'CAT':'H', 'CAC':'H', 'CAA':'Q', 'CAG':'Q',
@@ -52,7 +53,7 @@ def dnaToProt(dna_seq:str):
         'ACT':'T', 'ACC':'T', 'ACA':'T', 'ACG':'T',
         'AAT':'N', 'AAC':'N', 'AAA':'K', 'AAG':'K',
         'AGT':'S', 'AGC':'S', 'AGA':'R', 'AGG':'R',
-        
+
         'GTT':'V', 'GTC':'V', 'GTA':'V', 'GTG':'V',
         'GCT':'A', 'GCC':'A', 'GCA':'A', 'GCG':'A',
         'GAT':'D', 'GAC':'D', 'GAA':'E', 'GAG':'E',
@@ -79,7 +80,7 @@ def dnaToProt(dna_seq:str):
 
 def loadAlignment(alignmentFile):
     alignmentDict = {}
-    
+    seq_idMax = 0
     with open(alignmentFile, 'r') as af:
         for line in af:
             # if len(line) > 50:
@@ -88,6 +89,8 @@ def loadAlignment(alignmentFile):
             #   print('line:', line)
             if line[0] == '>': # la ligne est un en-tête fasta
                 seq_id = line.strip('\n')[1:]
+                if len(seq_id) > seq_idMax:
+                    seq_idMax = len(seq_id)
                 # print('seq_id:', seq_id)
                 alignmentDict[seq_id] = ''
             else: # la ligne est une séquence alignée
@@ -97,7 +100,7 @@ def loadAlignment(alignmentFile):
 
     # print(alignmentDict)
     #alignmentDict: {'XM_023507720dot1_oto_Gar_SAMD9': 'ATGGCAAAGCA(...)', (...)}
-    return alignmentDict
+    return alignmentDict, seq_idMax
 
 def loadResults(resultsFile):
     resultsDict = {}
@@ -217,7 +220,7 @@ def createPhyloXML(fam,newick):
             # synRight=synteRightDico.get(cds)
             # if (not synRight):
             #     synRight = ""
-            
+
             # seq = dico_sequences.get(cds)
             # if not seq:
             #     seq = ""
@@ -245,8 +248,8 @@ def createPhyloXML(fam,newick):
 
             ## Ajout des séquences aux feuilles
             leaf.set('dnaAlign', seq_alg) # ajout de la séquence en nucléotides
-            # leaf.set('aaAlign', translate.dnaToProt(seq_alg)) # ajout de la séquence en acides aminés
-            leaf.set('aaAlign', dnaToProt(seq_alg)) # ajout de la séquence en acides aminés
+            # leaf.set('aaAlign', translate.dna_to_prot(seq_alg)) # ajout de la séquence en acides aminés
+            leaf.set('aaAlign', dna_to_prot(seq_alg)) # ajout de la séquence en acides aminés
 
             if 'crossdico' in globals():
                 leaf.append(crossref)
@@ -267,11 +270,15 @@ def createPhyloXML(fam,newick):
     resultsElement = etree.Element('statistics')
     resultsElement.set('results', resultsText)
 
+    LengthMaxSeqID = etree.Element('seqIDMax')
+    LengthMaxSeqID.set('lengthMax', str(seq_idMax))
+
     treesize =  etree.Element("size")
     treesize.set('leaves',str(nbfeuille))
     treesize.set('species',str(nbspecies))
     e=subtree[0].find('phylogeny')
     e.append(treesize)
+    e.append(LengthMaxSeqID)
     e.append(resultsElement) # ajout de la balise contenant les résultats
     text =  minidom.parseString(ElementTree.tostring(subtree[0])).toprettyxml()
     # remove blank lines
@@ -282,9 +289,6 @@ def createPhyloXML(fam,newick):
 args = docopt(__doc__)
 
 tree = args["<treeFile>"]
-# speciesDico = args["<speciesDicoFile>"]
-# synLeft = args["<syntenyLeftFile>"]
-# synRight = args["<syntenyRightFile>"]
 alignment = args["<alignmentFile>"]
 results = args["<resultsFile>"]
 arguments = docopt(__doc__, version='1.0.0rc2')
@@ -306,7 +310,8 @@ print(sys.getrecursionlimit())
 
 print ("Loading alignment... ")
 # alignmentDict =  file_reader.loadAlignment(alignment)
-alignmentDict =  loadAlignment(alignment)
+alignmentDict =  loadAlignment(alignment)[0]
+seq_idMax = loadAlignment(alignment)[1]
 print ("OK")
 
 print ("Loading results... ")

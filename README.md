@@ -16,7 +16,7 @@ Projet : développement d'une interface web pour la sélection positive
 
 ### Cloner le dépôt
 
-`git clone git@github.com:gennaBnh/Projet_S1.git`
+`git clone https://github.com/gnoiret/Projet_S1.git`
 
 ## Utilisation
 

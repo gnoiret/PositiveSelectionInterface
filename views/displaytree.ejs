@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Page 2 - Affichage des données</title>
+  <title>Affichage des données</title>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -36,7 +36,7 @@
       fill: none;
     }
     .internal {
-        font: 8px sans-serif;
+        font: 10px sans-serif;
     }
     div.tooltip {
       position: absolute;
@@ -84,14 +84,12 @@
     }
     .testnav  a:hover {color:red;}
     div.demo {
-      border: 3px solid #666;
-      /*margin: 5px;*/
       margin-top: 150px; /* correctif utile si jquery n'est pas chargé (ex : hors-ligne) */
-      /*padding: 5px;*/
       position: relative;
-      width: 2500px;
-      height: 1000px;
-      overflow: auto;
+      width: 100%;
+      min-height: 100%;
+      overflow-y: visible;
+      overflow-x: hidden;
     }
     .dropdown-menu {
       height: auto;
@@ -107,20 +105,6 @@
 
       <% include ../partials/header %>
 
-      <!-- Bouton Display -->
-      <div class="btn-group" id="display" >
-        <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" data-toggle="tooltip" data-placement="top" title="Choose information to display" >
-          Display
-          <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-          <li id="nameSelection">
-            <a href="#" class="small" data-value="name" tabIndex="-1"><input type="checkbox" id="name"/>&nbsp;Sequence Name</a>
-          </li>
-          <li><a href="#" class="small" data-value="species" tabIndex="-1"><input type="checkbox" id="species"/>&nbsp;Species Name</a></li>
-          <li><a href="#" class="small" data-value="intname" tabIndex="-1"><input type="checkbox" id="intname"/>&nbsp;Node Support</a></li>
-        </ul>
-      </div>
 
       <!-- Division pour eventuel bouton crossref -->
       <div class="btn-group" id="crossref">
@@ -173,40 +157,27 @@
         <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
       </button>
 
-      <!-- Bouton Shift left -->
-      <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="goLeft"  data-toggle="tooltip" data-placement="top" title="Shift synteny left">
-        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-      </button>
-
-      <!-- Bouton Shift right -->
-      <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="goRight" data-toggle="tooltip" data-placement="top" title="Shift synteny right">
-        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-      </button>
-
-
-
-      <!-- Ancien bouton  Export -->
-      <!-- <button type="button" class="btn btn-default btn-sm" aria-label="ExportSVG" id="export" data-toggle="tooltip" data-placement="top" title="Export the SVG">
-        <span>Export SVG</span>
-      </button> -->
-
 
 
 
       <!-- Début modif -->
 
-      <!-- Ancien bouton Type de séquence -->
-      <!-- <button type="button" class="btn btn-default btn-sm" aria-label="Seqtype" id="toggle-seqtype" data-toggle="tooltip" data-placement="top" title="Change sequence type">
-        Current display:
-      </button> -->
+      <!-- Bouton  Export -->
+      <div class="btn-group" role="group" id="export">
+        <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="export figure">
+          Export
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+          <li><a href="#" id="tree">Tree</a></li>
+          <li><a href="#" id="selecp">Alignment</a></li>
+        </ul>
+      </div>
 
-      <!-- Bouton Type de séquence -->
-      <!-- <button type="button" class="btn btn-default btn-sm" aria-label="Seqtype" id="toggle-seqtype" data-toggle="tooltip" data-placement="top" title="Change sequence type">
-        Current display:
-      </button> -->
+      <!-- Bouton  Alignement -->
       <div class="btn-group" role="group" id="alignement">
         <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="Choose type of alignment"  >
-          Alignment
+          AlignmentNature
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
@@ -224,18 +195,6 @@
         <span>Refresh</span>
       </button>
 
-      <!-- Bouton  Export -->
-      <div class="btn-group" role="group" id="export">
-        <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="export figure">
-          Export
-          <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-          <li><a href="#" id="tree">Tree</a></li>
-          <li><a href="#" id="selecp">Alignment</a></li>
-        </ul>
-      </div>
-
       <!-- Fin modif -->
 
 
@@ -243,20 +202,14 @@
 
   </nav>
   <!-- <div  class="testnav" id="testnav" ></div> -->
-    <div id="svgs-container">
-      
-      <!-- ^1SVG -->
-      <!-- <svg></svg> -->
-      <!-- $1SVG -->
+    <div id="svg-container">
 
-      <!-- ^2SVG -->
-      <div  style="border:3px solid #666; float: left; overflow: scroll; width: 50%;" id="tree-container">
+      <div  style="border:2px solid lightgrey; float: left; overflow-y: auto; width: 50%;" id="tree-container">
         <svg id="svg1"></svg>
       </div>
-      <div style="border:3px solid #666; overflow: scroll;" id="alignment-container" >
+      <div style="border:2px solid lightgrey; overflow-x: auto; overflow-y: auto;" id="alignment-container" >
         <svg id="svg2"></svg>
       </div>
-      <!-- $2SVG -->
 
     </div>
   </div> <!-- <demo > -->
@@ -274,14 +227,13 @@
   // ----------------------------------------------
   var recTree = <%- arbre %>;
   var pattern = <%- pattern %>;
-
   // Variables globales
   // ------------------
   var treeRoot;
   var cladeRoot;
   var layout = d3.layout.cladogram();   // Fonction  D3 qui transforme les donnees en cladograme
   var nodeWidth = 80;                  // Largeur
-  var nodeHeight = 16;                  // Hauteur
+  var nodeHeigth = 15;                  // Hauteur
   var x0Align = 350;                  // Cordonee horizonatle de l'alignement
   var stringWidth;                      // Largeur affichage arbre
   var tagSimpleGene = false;            // True si arbre de gene de type PhyloXML, False si arbre de gene de type RecPhyloXML
@@ -302,48 +254,27 @@
   var div;
   var myStorage = window.localStorage;    // utilisation de localStorage pour consrever les preferences
 
-
-
-
-
-
-
-
   // ==============================================================
   // Début modif : variables globales
   // ==============================================================
-
   var displaySeqType = 'AA';
   var hStepBase = 12;
-
   var psThresholdHigh = $('#ps-threshold-high').val() || 1.0;
   var psThresholdLow = $('#ps-threshold-low').val() || 0.3;
-
-  var psThresholdHighBgColor = "#ec7063";
+  var psThresholdHighBgColor = "#6665FC";
   var psThresholdLowBgColor = "#f7dc6f";
-  var psBelowThresholdBgColor = "#fff";
+  var psBelowThresholdBgColor = "beige";
   var psMissingBgColor = "#aaa";
   var psThresholdHighTxtColor = "#fff";
   var psThresholdLowTxtColor = "#000";
   var psBelowThresholdTxtColor = "#000";
   var psMissingTxtColor = "#aaa";
-
   var projOffsetLeft = 700;
-
   var psThresholdsChanged = false;
 
   // ==============================================================
   // Fin modif : variables globales
   // ==============================================================
-
-
-
-
-
-
-
-
-
 
   if (!isStorageSupported(myStorage)) {
     console.log("window.localStorage problem");
@@ -391,27 +322,19 @@ function  main_display() {
     // treeRoot = recTree.phyloxml.phylogeny;
     tagSimpleGene = true;
   }
-  // Affiche palette
-  // ===============
-  // affichePalette(); *****************************************************************
+
   // Creation du SVG
   // ===============
+
   // Definit  la div tooltip
   div = d3.select("body").append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
-  // Definit le svg
 
-  // ^1SVG
-  // svg = d3.select("svg");   // selectionne la div svg
-  // g = svg.append("g")      // ajoute element au svg
-  //   .attr("id", "treeAlign");
-  // $1SVG
-  // ^2SVG
   svg1 = d3.select("#svg1");   // selectionne la div svg1
   g = svg1.append("g")      // ajoute element au svg1
     .attr("id", "treeAlign");
-  // $2SVG
+
   var transition = d3.transition();
   margin = {
     top: 100,
@@ -419,12 +342,14 @@ function  main_display() {
     left: 200,
     right: 300
   }
+
   // Option d'affichage
   stringOptions = myStorage.getItem("options");
   if (stringOptions === null || stringOptions === undefined || stringOptions === "undefined"){
     stringOptions = "name,species";
   }
   options = stringOptions.split(",");
+
   // Action associee au click
   action = svgEvents.switchChildren;
   var stringAction = myStorage.getItem("action");
@@ -444,6 +369,7 @@ function  main_display() {
       break;
     default:
   }
+
   // Largeur de l'arbre
   if (tagSimpleGene === false) {
     nodeWidth = nodeWidth / 5 ;
@@ -453,12 +379,14 @@ function  main_display() {
     stringWidth = nodeWidth;
     myStorage.setItem("width",stringWidth);
   }
+
   // Concerne les arbres recphyloxml
   var flatTreeConfig = {
     transferBack :false,
     speciationLoss : false,
     speciationOutLoss : false,
   }
+
   // Operation effectuee si il s'agt d'un arbre RecPhyloXML
   if (tagSimpleGene === false) {
     // cladeRoot est la racine hierarchisee en clade avec des modifs
@@ -481,22 +409,20 @@ function  main_display() {
 // ---------------------------------------
 function updateLayout(cRoot,firstLoad=0) {
 
-
   // Suppression de l'ancien affichage de l'alignement et du graphe
   d3.selectAll('#ps-graph, #sequences-container').remove();
-
-
   var treeRoot = d3.hierarchy(cRoot, function(d) {
-    // console.log(d);
     return d.clade;
   });
   treeRoot.each(function (d) {
     var eventsRec = d.data.eventsRec;
+
     // Test si on a un noeud enrichi avec l'info eventsRec (type RecPhyloXML) ou non (type phyloxml)
     if (eventsRec){
       d.data.lastEvent = eventsRec[eventsRec.length - 1];
     }
     else {
+
       // Lors de la premiere lecture de l'arbre phyloxml, il n'y a pas de data.lastEvent defini aux noeuds
       // (Sauf les noeuds ecrases par la monophylie)
       // Mais ensuite ils sont definis : on choisit "speciation" meme si il ne s'agit pas d'une speciation en
@@ -509,8 +435,9 @@ function updateLayout(cRoot,firstLoad=0) {
       }
     }
   });
-  layout.nodeSize([nodeWidth, nodeHeight]); // *i*
+  layout.nodeSize([nodeWidth, nodeHeigth]); // *i*
   layout(treeRoot);
+
   // Traitement des distances dans le cas d'un arbre de gene de type phyloxml
   if (tagSimpleGene) {
     phylogeny(treeRoot,nodeWidth);
@@ -529,13 +456,11 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // ==============================================================
 
   // Ajustement du pas selon le type de séquences affichées
+
   var hStep = displaySeqType == 'AA' ? hStepBase : hStepBase*3;
-
   var seqblocks = d3.selectAll('.seqblock');
-
   var results = xmlparser.flatTree(recTree.phyloxml.phylogeny.statistics.results);
   results = results.split(' ');
-
   var psResultsDataset = [];
   var site = 0;
   var stat = 0.0;
@@ -544,9 +469,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     result = {site:d[0], stat:d[1]};
     psResultsDataset.push(result);
   });
-
-  var seqNameOffset = 320;
-  var psGraphMargins = {top: 20, right: 50, bottom: 50, left: 50+seqNameOffset};
+  var psGraphMargins = {top: 20, right: 50, bottom: 50, left: 380};
   var psGraphWidth = psResultsDataset.length*hStep;
   var psGraphHeight = 150;
 
@@ -554,30 +477,16 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // Fin modif : variables pour graphe et séquences
   // ==============================================================
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   var scrollref=0;
   var configLayout = {
-    layout : config.layout || "cladogramSpecial",
-    links : config.links || "shoulder",
+    layout : config.layout || "cladogramSpecial",
+    links : config.links || "shoulder",
     symbolSize : config.symbolSize || 128,
-    lengthLinkLoss : config.lengthLinkLoss || 10,
+    lengthLinkLoss : config.lengthLinkLoss || 10,
     linkStrokeSize : config.linkStrokeSize || 2,
     nodeWidth : config.nodeWidth || 30,
-    nodeHeight : config.nodeHeight || 30,
-    margin : config.margin || { top: 10, down: 20, left: 500  , right: 50},
+    nodeHeigth : config.nodeHeigth || 30,
+    margin : config.margin || { top: 10, down: 20, left: 500  , right: 50},
     color : config.color || {
       speciation : "#2F4F4F",
       speciationOutLoss : "#2CA02C",
@@ -604,19 +513,19 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   }
   var nodes = treeRoot.descendants();
 
-  // console.log(nodes); // *m*
-  
   var links = treeRoot.links();
+
   // Coloration du pattern si il existe
   if ((pattern != "none") && (pattern !== ' ') && (pattern !== undefined)) {
+
     // Boucle sur les differents patterns
     patterns.forEach(function (d,i) {
+
       // Traite le pattern d avec comme index i
       // var subNodes = subnode(nodes,d,i);
       scrollref = subnode(nodes,d,i);
     });
   }
-  // console.log('nodes:', nodes);
   var minX = d3.min(nodes, function(d) {
     return d.x;
   });
@@ -631,24 +540,23 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     return d.y;
   });
   var heightSVG = maxY - minY;
-  var longueurProjAjouteeSvgX = psResultsDataset.length*hStep - 380;
+  var longueurProjAjouteeSvgX = psResultsDataset.length*hStep - 520;
   var hauteurProjAjouteeSvgY = -200;
   var decalageProjSvgY = -90;
-  // ^1SVG
-  // svg.attr("width", widthSVG + margin.right + margin.left+1600     + longueurProjAjouteeSvgX);
-  // svg.attr("height", heightSVG + margin.top + margin.down+400      + hauteurProjAjouteeSvgY);
-  // $1SVG
-  // ^2SVG
-  svg1.attr("width", widthSVG + margin.left + margin.right);
+
+  svg1.attr("width", widthSVG + margin.right + margin.left);
   svg1.attr("height", heightSVG + margin.top + margin.down+400      + hauteurProjAjouteeSvgY);
-  // $2SVG
   g.attr("transform", "translate(" + (margin.right - minX - 250) + "," + (margin.top - minY + 200     + decalageProjSvgY) + ")")
+
   // ====================
   //  D3: Objets LINK
   // ====================
+
   var link = g.selectAll(".link").data(links);  // associe l'element link a la donnee links
+
   //EXIT gere les elements qui ont disparu
   link.exit().remove();
+
   //ENTER gere les elements nouveaux
   var linkEnter =
     link
@@ -680,6 +588,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         var sel1 =g.selectAll(".link").filter(function(e) {
           var pa = e.target.data.lastEvent.pattern;
           if (pa !== undefined) {
+
             // pa est le tableau des index des pattern  associee au noeud
             // pattIndex[0] est l'index de la pattern  associee au noeud survole
             return (pa.indexOf(pattIndex[0]) > -1)
@@ -695,6 +604,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         var sel1 =g.selectAll(".link").filter(function(e) {
           var pa = e.target.data.lastEvent.pattern;
           if (pa !== undefined) {
+
             // pa est le tableau des index des pattern  associee au noeud
             // pattIndex[0] est l'index de la pattern  associee au noeud survole
             return (pa.indexOf(pattIndex[0]) > -1)
@@ -707,16 +617,21 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .attr("d", diagonal)
     .attr('stroke-dasharray',function(d){
       var et = d.target.data.lastEvent.eventType;
+
       // var sl = d.target.data.lastEvent.speciesLocation;
       // if (et === "transferBack" || et === "bifurcationOut" || sl == "Out") return '5,5';
       if (et === "transferBack" || et === "bifurcationOut") return '5,5';
     });
+
   // ====================
   // D3:  Objets NODE
   // ====================
+
   var node = g.selectAll(".node").data(nodes);
+
   //EXIT
   node.exit().remove();
+
   //ENTER
   var nodeEnter =
     node
@@ -733,6 +648,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .attr("class", "label")
     .on("click", function(d) {
       if (d.data.lastEvent.crossref) {
+
         // Si la balise crossref est presente on fait un lien vers l'url
         // qui requete l'identifiant dans la base de donnees selectionnee
         var cross=d.data.lastEvent.crossref;
@@ -746,13 +662,13 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   nodeEnter
     .append("text")
     .attr("class", "internal");
+
   //ENTER + UPDATE
   var allNodes =
     nodeEnter
     .merge(node)
     .attr("transform", function(d) {
-      // console.log('d:');
-      // console.log(d);
+
       if (d.data.lastEvent.eventType === "loss") {
         return "translate(" + [d.x, d.y] + ")";
       }
@@ -816,6 +732,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         }
       })
     .attr("d", function(d) { //Type de symbol
+
        // Verification si le noeud est collapse
       if (d.data.nodeinfo) {
           if (d.data.nodeinfo.status === "collapsed") {
@@ -929,7 +846,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
           }
         }
         else {
-          name += (d.data.name || d.data.lastEvent.geneName);
+          name += (d.data.name || d.data.lastEvent.geneName);
         }
         if (d.data.lastEvent.pattern !==undefined) {
           name = ">>>>"+name+"<<<<";
@@ -947,6 +864,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       return name;
     })
     .style("fill",function (d) {
+
       // if (d.data.name && d.data.lastEvent.eventType === "leaf") {
       //   return setLeafColour(d.data.lastEvent.speciesLocation);
       // }
@@ -967,7 +885,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   allNodes
     .select(".internal")
     .transition()
-    .attr("y", 10)
+    .attr("y", 11)
     .attr("x", -10)
     .style("text-anchor","end")
     .text(function(d) {
@@ -985,31 +903,14 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   var leaves = nodes.filter(function (e) {
       return !e.children;
     });
-
-
-
-
-
-
-
-
-
-
   // ==============================================================
   // Début modif : graphe des résultats de sélection positive
   // ==============================================================
 
-  // ^2SVG
   var svg2 = d3.select("#svg2");
-  // svg2.attr("width", width)
-  //   .attr("height",  height);
-  svg2.attr("width", 0 + margin.left + margin.right + longueurProjAjouteeSvgX + seqNameOffset)
-  // svg2.attr("width", widthSVG + margin.left + margin.right + longueurProjAjouteeSvgX + seqNameOffset)
-    .attr("height",  heightSVG + margin.top + margin.down + 200);
-    // .attr("height",  heightSVG + margin.top + margin.down + 300);
-  // var g2 = svg2.append("g")
-  //     .attr("class", "align");
-  // $2SVG
+
+  svg2.attr("width", widthSVG + margin.right + longueurProjAjouteeSvgX)
+    .attr("height",  heightSVG + margin.top + margin.down +200);
 
   // Fonction de calcul de la statistique maximale dans les résultats
   function maxStat(results) {
@@ -1030,31 +931,17 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   var y = d3.scaleLinear()
     .domain([0, maxStat(psResultsDataset)])
     .range([psGraphHeight, 0]);
-
   // Ajout du graphe des résultats au SVG
-  // ^1SVG
-  // var psGraph = svg.append('g')
-  //   .attr('id', 'ps-graph')
-  //   // .attr('class', 'node')
-  //   // .attr('width', psGraphWidth + psGraphMargins.left + psGraphMargins.right)
-  //   // .attr('height', psGraphHeight + psGraphMargins.top + psGraphMargins.bottom)
-  //   .attr('transform', 'translate('+(psGraphMargins.left+projOffsetLeft)+', '+psGraphMargins.top+')');
-  //   // .attr('transform', 'translate(' + (psGraphMargins.left)+'px' + ',' + psGraphMargins.top + 'px'+')');
-  // $1SVG
-  // ^2SVG
+
   var psGraph = svg2.append('g')
     .attr('id', 'ps-graph')
-    // .attr('class', 'node')
-    // .attr('width', psGraphWidth + psGraphMargins.left + psGraphMargins.right)
-    // .attr('height', psGraphHeight + psGraphMargins.top + psGraphMargins.bottom)
     .attr('transform', 'translate('+psGraphMargins.left+', '+psGraphMargins.top+')');
-    // .attr('transform', 'translate(' + (psGraphMargins.left)+'px' + ',' + psGraphMargins.top + 'px'+')');
-  // $2SVG
 
   // Ajout de l'axe x au graphe
   psGraph.append('g')
     .attr('transform', 'translate(0,' + psGraphHeight + ')')
     .call(d3.axisBottom(x).ticks(psResultsDataset.length/5)); // graduations tous les 5 codons / AA
+
   // Ajout de l'axe y au graphe
   psGraph.append('g')
     .call(d3.axisLeft(y));
@@ -1065,25 +952,26 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .attr('y1', y(psThresholdHigh))
     .attr('x2', x(psResultsDataset.length+1))
     .attr('y2', y(psThresholdHigh))
-    .style('stroke', 'grey')
+    .style('stroke', '#E37957')
     .style('stroke-width', 2+'px')
     .style('stroke-dasharray', ('4, 4'));
+
   // Ajout du seuil inférieur au graphe (à y = seuil bas)
   psGraph.append('line')
     .attr('x1', x(1))
     .attr('y1', y(psThresholdLow))
     .attr('x2', x(psResultsDataset.length+1))
     .attr('y2', y(psThresholdLow))
-    .style('stroke', 'grey')
+    .style('stroke', '#E37957')
     .style('stroke-width', 2+'px')
     .style('stroke-dasharray', ('4, 4'));
 
   // // Suppression du graphe
   // psGraph.exit().remove();
-
   // Association des données aux futurs rectangles
   var rects = psGraph.selectAll('.psrects')
     .data(psResultsDataset);
+
   // Affichage des rectangles
   var i_rect = 1;
   rects.enter().append('rect')
@@ -1094,7 +982,6 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .attr('width', function(d) { return hStep; })
     .attr('height', function(d) { return y(0)-y(d.stat); })
     .attr('x', function(d) { return x(d.site); })
-    // .attr('x', function(d) { return x(d.site)-hStep; })
     .attr('y', function(d) { return y(d.stat); })
     .style('fill', function(d) {
       if (d.stat > psThresholdHigh) {
@@ -1110,19 +997,8 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .style('stroke', 'black')
     .style('stroke-width', 1+'px');
 
-  // // Suppression des rectangles
-  // rects.exit().remove();
-
   psGraph.on('click', function() {
     var coords = d3.mouse(this);
-    // console.log(coords);
-    // console.log(psResultsDataset[coords[0]]);
-    // const dnaSequencesNodes = d3.selectAll('.seqblock .dna-sequence')._groups[0];
-    // console.log(children);
-
-    // Array.prototype.forEach.call(children, child => {
-    //   console.log(child.text);
-    // });
   });
 
   // ==============================================================
@@ -1134,71 +1010,70 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // ==============================================================
 
   seq_dataset = [];
+  var seq_lg = xmlparser.flatTree(recTree.phyloxml.phylogeny.seqIDMax.lengthMax);
   var leaves_sequences = leaves.filter(function(d) {return(d.data.lastEvent.dnaAlign)});
   leaves_sequences.forEach (function (d,i) {
     var leaf_name = d.data.lastEvent.name;
     var dna_sequence = d.data.lastEvent.dnaAlign;
     var aa_sequence = d.data.lastEvent.aaAlign;
+    var lengthmax=d.data.lastEvent.lengthMax;
     var locnode = {
       name:d.data.name,
       y:d.y,
       dna:d.data.lastEvent.dnaAlign,
-      aa:d.data.lastEvent.aaAlign
+      aa:d.data.lastEvent.aaAlign,
     };
     seq_dataset.push(locnode);
   });
 
-  // // Ordonner les séquences avec un espacement régulier
-  // // en partant du y de la première
-  // seq_dataset.sort((a,b) => a.y - b.y);
-  // seq_dataset.forEach(function(d,i) {
-  //   d.y = seq_dataset[0].y + i*20;
-  // });
-  // // Fonction de calcul de la longueur maximale des noms de séquences
-  // function maxNameLength(seqDataset) {
-  //   var currentmax = seqDataset[0].name.length;
-  //   seqDataset.forEach(function(seq) {
-  //     currentmax = seq.name.length > currentmax ? seq.name.length : currentmax;
-  //   });
-  //   return currentmax;
-  // }
-  // var maxNameLgt = maxNameLength(seq_dataset);
 
-  // Ajout de la div qui contiendra l'alignement
-  // ^1SVG
-  // var seqDiv = d3.select('#treeAlign')
-  //   .append('g')
-  //   .attr('id', 'sequences-container');
-  // $1SVG
-  // ^2SVG
-  console.log('maxX:', maxX);
+
+
+
   var seqDiv = d3.select('#svg2')
     .append('g')
-      .attr("transform", "translate(" + (margin.right - minX - 300) + "," + (margin.top - minY + 200     + decalageProjSvgY) + ")")
-      .attr('id', 'sequences-container');
-  // $2SVG
+    .attr('id', 'sequences-container')
+    .attr("transform", "translate(" + (margin.right - minX - 300) + "," + (margin.top - minY + 200  + decalageProjSvgY) + ")")
 
   // Association des données aux futurs blocs de séquences
   var seqblocks = seqDiv.selectAll('.seqblock')
     .data(seq_dataset);
+
   // Création et positionnement des blocs de séquences
-  // console.log('Y :');
   var seqblocksEnter = seqblocks.enter().append('g')
     .attr('class', 'node seqblock')
     .attr('transform', function(d) {
-      // var transx = projOffsetLeft;
       var transx = psGraphMargins.left;
-      var transy = d.y;
-      // var transy = d.y + psGraphMargins.top + 550; // /!\ décalage
+      var transy = d.y ; // fonctionne seulement avec nodeHeight = 15 *amod*
       return 'translate('+transx+', '+transy+')';
     });
 
-  seqblocksEnter.append('text')
-    .attr('class', 'sequence-name')
-    .text(function(d) {
-      return d.name;
-    })
-    .attr('transform', 'translate('+-seqNameOffset+','+4+')');
+    seqblocksEnter.append("text")
+      .attr('class', 'sequence-name')
+      .text(function(d) {
+        return d.name;
+      })
+      .attr('transform', 'translate('+'-'+(Math.floor(seq_lg)+300)+','+5+')');
+
+  var maxYSequences = function(seqDataset) {
+    var currentmax = seqDataset[0].y;
+    seqDataset.forEach(function(seq) {
+      currentmax = seq.y > currentmax ? seq.y : currentmax;
+    });
+    return currentmax;
+  }
+
+  var maxYSeq = maxYSequences(seq_dataset);
+  var minYSequences = function(seqDataset) {
+    var currentmin = seqDataset[0].y;
+    seqDataset.forEach(function(seq) {
+      currentmin = seq.y < currentmin ? seq.y : currentmin;
+    });
+    return currentmin;
+  }
+
+  var minYSeq = minYSequences(seq_dataset);
+
 
   // Alignement : ajout des conteneurs au SVG
   var seqTextAA = seqblocksEnter.append('g')
@@ -1206,6 +1081,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       .style('display', function() {
         return displaySeqType == 'AA' ? 'block' : 'none';
       });
+
   var seqTextNuc = seqblocksEnter.append('g')
       .attr('class', 'dna-sequence')
       .style('display', function() {
@@ -1214,57 +1090,16 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
 
   // Alignement : ajout des rectangles (version séquence entière)
   var oneSeqAA = d3.select('.aa-sequence');
-  var allSeqAA = d3.selectAll('.aa-sequence')._groups[0];
-  console.log('allSeqAA:', allSeqAA);
-  var minYDisp = d3.min(allSeqAA, function(d) {
-    return d.__data__.y;
-  });
-  var maxYDisp = d3.max(allSeqAA, function(d) {
-    return d.__data__.y;
-  });
-  console.log('min Y disp:', minYDisp);
-  console.log('max Y disp:', maxYDisp);
-  // console.log('min Y seq:', minYSeq);
-  // console.log(oneSeqAA._groups[0][0].__data__.name);
-  // console.log(oneSeqAA);
-
-
-
-  // Ordonner les séquences avec un espacement régulier
-  // en partant du y de la première
-  // allSeqAA.sort((a,b) => a.y - b.y);
-  // oneSeqAA.forEach(function(d,i) {
-  //   d.y = seq_dataset[0].y + i*20;
-  // });
-  // console.log(d3.min(oneSeqAA, function(d) {
-  //   return d;
-  // }));
-
-  // Fonction de calcul de la longueur maximale des noms de séquences
-  // function maxNameLength(seqDataset) {
-  //   var currentmax = seqDataset[0].name.length;
-  //   seqDataset.forEach(function(seq) {
-  //     currentmax = seq.name.length > currentmax ? seq.name.length : currentmax;
-  //   });
-  //   return currentmax;
-  // }
-  // var maxNameLgt = maxNameLength(seq_dataset);
-
-
-
-  // var oneSeqDna = d3.select('.dna-sequence[display=block]');
   var oneSeqDna = d3.select('.dna-sequence');
   for (i=0; i<psResultsDataset.length; i++) {
     if (displaySeqType == 'AA') {
+
       // Ajout d'un rectangle coloré par AA
       oneSeqAA.append('rect')
         .attr('x', function(d) {return i*hStep;})
         .attr('width', hStep)
-        .attr('y', function(d) {return minYDisp - hStepBase - d.y;})
-        // .attr('y', function(d) {return minY - d.y - hStepBase;})
-        .attr('height', function(d) {
-          return maxYDisp - minYDisp + hStepBase*2;
-        })
+        .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
+        .attr('height', maxYSeq - minYSeq + hStepBase*2)
         .style('fill', () => {
           if (psResultsDataset[i].stat > psThresholdHigh) {
             return psThresholdHighBgColor;
@@ -1276,13 +1111,15 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
             return psMissingBgColor;
           }
         });
+
     } else {
+
       // Ajout d'un rectangle coloré par codon
       oneSeqDna.append('rect')
         .attr('x', function(d) {return i*hStep;})
         .attr('width', hStep)
-        .attr('y', function(d) {return minY - d.y - hStepBase;})
-        .attr('height', maxY - minY + hStepBase*2)
+        .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
+        .attr('height', maxYSeq - minYSeq + hStepBase*2)
         .style('fill', () => {
           if (psResultsDataset[i].stat > psThresholdHigh) {
             return psThresholdHighBgColor;
@@ -1294,44 +1131,29 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
             return psMissingBgColor;
           }
         });
+
     }
   }
+
   // Alignement : ajout des AA / codons (version séquence entière)
   seqTextAA.append('text')
     .style('letter-spacing', (hStepBase - 10)+'px') // Espacement des lettres pour correpondre au graphe
     .attr('x', function(d) {return 1;})
     .attr('y', function(d) {return Math.floor(hStepBase/3);})
     .text(function(d) {return d.aa;});
+
   seqTextNuc.append('text')
     .style('letter-spacing', (hStepBase - 10)+'px') // Espacement des lettres pour correpondre au graphe
     .attr('x', function(d) {return 1;})
     .attr('y', function(d) {return Math.floor(hStepBase/3);})
     .text(function(d) {return d.dna;});
 
+}
   // ==============================================================
   // Fin modif : blocs de séquences
   // ==============================================================
-  
 
 
-
-
-
-
-
-
-  // -------------------------------------------------------
-  // Centre sur la sequence requete lors du premier chargement
-  // ---------------------------------------------------------
-  // ***************************************************************************************
-  // if (firstLoad === 1 ) {
-  //   $( "div.demo" )
-  //   .animate({scrollTop: -minY + scrollref},(2000 + Math.abs(-minY +scrollref)/500),function() {});
-  // }
-
-  resizeSvgs();
-
-}
 // Fin de la fonction updateSvg
 // ----------------------------
 
@@ -1340,15 +1162,14 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
 
 // Fonction de test du support local.storage
 // ------------------------------------------
+
 // https://michalzalecki.com/why-using-localStorage-directly-is-a-bad-idea/
+
 function isStorageSupported(storage) {
   try {
     const key = "__some_random_key_you_are_not_going_to_use__";
     storage.setItem(key, key);
-  // console.log(key),
-  // console.log(storage.getItem(key));
     storage.removeItem(key);
-  // console.log(storage.getItem(key));
     return true;
   } catch (e) {
     return false;
@@ -1378,17 +1199,17 @@ function saveSVG(){
   img.src = 'data:image/svg+xml;base64,'+window.btoa(unescape(encodeURIComponent(svgStr)));
   window.open().document.write('<p>Please copy or save the the image <img src="' + img.src + '"/>');
 };
-
 function saveSVGTree(){
   $("a#tree").css('color', 'red');
   $("a#selecp").css('color', 'black');
 
   // get styles from all required stylesheets
   // http://www.coffeegnome.net/converting-svg-to-png-with-canvg/
+
   var style = "\n";
   // var requiredSheets = ['phylogram_d3.css', 'open_sans.css'];
-
   var img = new Image();
+
   // prepend style to svg
   const treeSvg = d3.select('#svg1');
   treeSvg.insert('defs',":first-child");
@@ -1403,21 +1224,29 @@ function saveSVGTree(){
 function saveSVGAlignment(){
   $("a#tree").css('color', 'black');
   $("a#selecp").css('color', 'red');
-  
-  $('.seqblock g text').css({
+
+  $('.aa-sequence text').css({
     'font-family':'Courier',
     'letter-spacing':(hStepBase - 9.6)+'px',
   });
-  $('.seqblock text').css({
+  $('.dna-sequence text').css({
+    'font-family':'Courier',
+    'letter-spacing':(hStepBase - 9.6)+'px',
+  });
+
+  $('.sequence-name').css({
     'font-family':'Courier',
   });
 
   // get styles from all required stylesheets
   // http://www.coffeegnome.net/converting-svg-to-png-with-canvg/
+
   var style = "\n";
+
   // var requiredSheets = ['phylogram_d3.css', 'open_sans.css'];
 
   var img = new Image();
+
   // prepend style to svg
   const alignmentSvg = d3.select('#svg2');
   alignmentSvg.insert('defs',":first-child");
@@ -1466,60 +1295,6 @@ function recuAncestors (todo, done) {
   }
 }
 
-// // Fonction d'affichage de la palette
-// // -----------------------------------
-// function affichePalette() {
-//   // Gestion de localStorage
-//   // var myStorage = window.localStorage;
-//   if (myStorage.getItem("ColorationProcessed") === null) {  // pas de coloration
-//     // Defintiion d'une palette
-//     // var selectedSpecies = "ARCHAEA::BECC43;EUKARYOTA::CC6096;BACTERIA::829863;BACTEROIDETES/CHLOROBI GROUP::18CCBA;BETAPROTEOBACTERIA::7C84CC;GAMMAPROTEOBACTERIA::2199CC;DELTA/EPSILON SUBDIVISIONS::CC667A;ALPHAPROTEOBACTERIA::BC97CC;FIRMICUTES::CC4A23;TENERICUTES::5849A3;ACTINOBACTERIA::F72D70;";
-//     var selectedSpecies = defaultPalette;
-//     myStorage.setItem("selectedSpecies",selectedSpecies);
-//     var allSpecies = [];
-//     var allSpeciesNoInternals = [];
-//     // Verification de la palette courante
-//     var selectedSpecArray =  selectedSpecies.split(";");
-//     var arrayLength = selectedSpecArray.length;
-//     var speciesPalette = [];
-//     var colorPalette = [];
-//     for (var i = 0; i < arrayLength-1; i++) {
-//       var specColor = selectedSpecArray[i].split("::");
-//       speciesPalette.push(specColor[0]);
-//       colorPalette.push(specColor[1]);
-//     }
-//     // Explore l'arbre d'espece pour fixer les couleurs des taxons
-//     var treeRoot = d3.hierarchy(cladeRootSpecies, function(d) {
-//       return d.clade;
-//     });
-//     treeRoot.eachBefore(function (d) {
-//       if (d.data.name.indexOf("(INTERNAL)") === -1) {
-//         allSpeciesNoInternals.push(d.data.name.trim());
-//       }
-//       allSpecies.push(d.data.name.trim());
-//       if  (speciesPalette.includes(d.data.name.trim())) {
-//         var index = speciesPalette.indexOf(d.data.name.trim());
-//         myStorage.setItem(d.data.name.trim(),"#"+colorPalette[index]);
-//         var nodes = d.descendants();
-//         nodes.forEach(function(n) {
-//           myStorage.setItem(n.data.name.trim(),"#"+colorPalette[index]);
-//           myStorage.setItem("phylum_"+n.data.name.trim(),speciesPalette[index]);
-//         });
-//       }
-//     });
-//     myStorage.setItem("ColorationProcessed","ok");
-//   }
-//   var selectedSpecies=myStorage.getItem("selectedSpecies");
-//   var selectedSpecArray =  selectedSpecies.split(";");
-//   var arrayLength = selectedSpecArray.length;
-//   $(testnav).append('<b>PALETTE:</b>');
-//   for (var i = 0; i < arrayLength-1; i++) {
-//     var specColor = selectedSpecArray[i].split("::");
-//     $(testnav).append('<div  style="color:#'+specColor[1]+'">'+specColor[0]+'</div>');
-//   }
-//   $(testnav).append('<a href=taxodico target=_blank>Edit</a>');
-// }
-
 // Fonction de coloration du resultat d'une recherche de  pattern
 // La variable pattern est ici un tableau du nom des feuilles qui ont matchés
 // --------------------------------------------------------------------------
@@ -1530,19 +1305,15 @@ function subnode(nodes, pattern, colPattern) {
   var n3;
   var selection = [];
   var racine = null;
+
   // Selection des feuilles
   var scrollref = 0;
   nodes.forEach(function (d, i){
-    
-    // console.log(d); // *m*
-    // if (d.height == 0) {
-    //   console.log('Feuille: '+d.data.name);
-    // }
-
     if (d.depth == 0) {
       racine = d;
     }
     if (d.data.lastEvent.crossref) {
+
       // Si la balise crossref est presente on
       // l'utilise plutot que le nom du gene
       var cross=d.data.lastEvent.crossref;
@@ -1591,7 +1362,6 @@ function subnode(nodes, pattern, colPattern) {
   });
   return scrollref;
 }
-
 // Fonction de calcul de la position  d'un noeud a partir des longueurs
 // de branch_length
 // --------------------------------------------------------------------
@@ -1625,7 +1395,6 @@ function phylogeny_setloss(treeRoot,offset) {
     }
   });
 }
-
 // Fonction ajoute nb sequences et especes
 // ---------------------------------------
 function  addNumberSeqSpec(treeRoot) {
@@ -1648,6 +1417,21 @@ function  addNumberSeqSpec(treeRoot) {
       uspecs=removeDuplicates(tmp);
       nbspe=uspecs.length;
       d.data.nbseqspe =  {nbSeq :nbseq,nbSpe :nbspe};
+    }
+  });
+}
+// Fonction qui collapse les noeuds d'une certaine profondeur
+// ----------------------------------------------------------
+function expandTree(treeRoot) {
+  treeRoot.each(function (d) {
+    if (d.data.nodeinfo) {
+      if (d.data.nodeinfo.status === "collapsed") {
+        if (d.data._clade) {
+          d.data.clade = d.data._clade;
+          d.data._clade = null;
+          d.data.nodeinfo = {status : "extended"};
+        }
+      }
     }
   });
 }
@@ -1679,6 +1463,7 @@ function getSpec (noeud) {
   }
 }
 
+
 // Fonction qui collapse les noeuds d'une certaine profondeur
 // ----------------------------------------------------------
 function expandTree(treeRoot) {
@@ -1707,23 +1492,28 @@ function collapseVeryBigTree(treeRoot,patterns) {
       acolapser.push(d)
       }
     });
+
     // Boucle sur les patterns
     patterns.forEach(function(p) {
+
       // Selection des feuilles de la pattern
       p.forEach(function(d,i) {
         var nomPattern= d.replace(/[\n\r]/g, '');
         var focusNode = null;
+
         // Recupere la feuille focus
+
         treeRoot.each(function (d,i ){
           if (d.data.name){
             var nomFeuille = d.data.name;
-            if (nomFeuille === nomPattern) {
-              focusNode = d;
-            }
+            focusNode = d;
+
           }
+
           // cas des crossref
           if (d.data.eventsRec) {
             if (d.data.eventsRec[0].crossref) {
+
               // Si la balise crossref est presente on
               // l'utilise plutot que le nom du gene
               var cross=d.data.eventsRec[0].crossref;
@@ -1739,10 +1529,13 @@ function collapseVeryBigTree(treeRoot,patterns) {
         });
         if (focusNode) {
           var parent = focusNode.parent;
+
           //Ouvre les freres de la feuille
           parent.each(function (d) {
+
             // aouvrir.push(d)
           });
+
           //ouvre les noeuds entre la feuille et la racine
           while (parent != null) {
             aouvrir.push(parent)
@@ -1778,7 +1571,6 @@ function collapseVeryBigTree(treeRoot,patterns) {
     }
   });
 }
-
   // Fonction  suppression d'un element unique dans un tableau
   // ----------------------------------------------------------
   function removeSingle(target_array) {
@@ -1840,11 +1632,9 @@ function collapseVeryBigTree(treeRoot,patterns) {
       scored_array.push(vscore);
       i = i + 1
     }
-    console.log(scored_array);
     scored_array.sort(function(a,b){
           scA=a.score;
           scB=b.score;
-          console.log("CLASSEMENT ["+scA+"] ["+scB+"]=");
           return scB - scA;
         });
     i = 0;
@@ -1858,34 +1648,6 @@ function collapseVeryBigTree(treeRoot,patterns) {
   // Actions sur les boutons
   // -----------------------
 
-  $('#display a').on( 'click', function( event ) {
-    var $target = $( event.currentTarget ),
-    val = $target.attr( 'data-value' ),
-    $inp = $target.find( 'input' ),
-    idx;
-    if ( ( idx = options.indexOf( val ) ) > -1 ) {
-      options.splice( idx, 1 );
-      setTimeout( function() { $inp.prop( 'checked', false ) }, 0);
-    }
-    else {
-      options.push( val );
-      setTimeout( function() { $inp.prop( 'checked', true ) }, 0);
-    }
-    $( event.target ).blur();
-    myStorage.setItem("options",options);
-    updateLayout(cladeRoot);
-    return false;
-  });
-
-  $('#display a').ready(function() {
-    stringOptions = myStorage.getItem("options");
-    if (stringOptions != null) {
-      options = stringOptions.split(",");
-      options.forEach(function (o) {
-        $('#'+o).attr('checked',true);
-      });
-    }
-  });
 
   $('#selectCrossref').on('click', function(event) {
     selectedCrossref=$( "#selectCrossref option:selected" ).text();
@@ -1893,7 +1655,6 @@ function collapseVeryBigTree(treeRoot,patterns) {
     myStorage.setItem("crossref",selectedCrossref);
     updateLayout(cladeRoot);
   });
-
   $('#selectCrossref').ready(function() {
       // selectedCrossref="HOGENOM";
     });
@@ -1958,106 +1719,63 @@ function collapseVeryBigTree(treeRoot,patterns) {
     updateLayout(cladeRoot);
   });
 
-  var stepHeight = 2;
-  var stepWidth = 10;
-
+  var step = 5;
   $('#moreWidth').on('click', function(event, dropdownData) {
-    nodeWidth += stepWidth;
+    nodeWidth += step;
     myStorage.setItem("width",nodeWidth);
     updateLayout(cladeRoot);
   });
 
   $('#lessWidth').on('click', function(event, dropdownData) {
-    nodeWidth -= stepWidth;
-    if  (nodeWidth  < stepWidth ) {
-      nodeWidth = stepWidth;
+    nodeWidth -= step;
+    if  (nodeWidth  < step ) {
+      nodeWidth = step;
     }
     myStorage.setItem("width",nodeWidth);
     updateLayout(cladeRoot);
   });
 
   $('#moreHeigth').on('click', function(event, dropdownData) {
-    nodeHeight += stepHeight;
+    nodeHeigth += step;
     updateLayout(cladeRoot);
   });
 
   $('#lessHeigth').on('click', function(event, dropdownData) {
-    nodeHeight -= stepHeight;
-    if  (nodeHeight  < 0 ) {
-      nodeHeight = 1;
+    nodeHeigth -= step;
+    if  (nodeHeigth  < 0 ) {
+      nodeHeigth = 1;
     }
     updateLayout(cladeRoot);
   });
 
-  $('#goLeft').on('click', function(event, dropdownData) {
-    x0Align -= 100;
-    updateLayout(cladeRoot);
-  });
-
-  $('#goRight').on('click', function(event, dropdownData) {
-    x0Align += 100;
-    updateLayout(cladeRoot);
-  });
 
 $('#export').on('click', function(event, dropdownData) {
     var target = event.toElement || event.relatedTarget || event.target || function () { throw "Failed to attach an event target!"; }
     myStorage.setItem("export",target.text);
     switch (target.text) {
       case "Tree":
+        $(".internal").css('font-size', '0.8rem');
         saveSVGTree();
         break;
       case "Alignment":
         saveSVGAlignment();
-        // $(".aa-sequence").css('font-size',  (hStep/6)+'rem');
-        // $(".dna-sequence").css('font-size', (hStep/18)+'rem');
-        $('.seqblock g text').css({
+        $('.aa-sequence text').css({
           'font-family':'Courier',
           'letter-spacing':(hStepBase - 10)+'px',
         });
+        $('.dna-sequence text').css({
+          'font-family':'Courier',
+          'letter-spacing':(hStepBase - 10)+'px',
+        });
+
         break;
       default:
     }
   });
-// $2SVG
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // ==============================================================
 // Début modif : jQuery
 // ==============================================================
-
-function resizeSvgs() {
-  $('div.demo').css({
-    'margin-top': $('nav').outerHeight(),
-    'width': $(window).width(),
-    'height': $(window).height() - $('nav').outerHeight() - 30,
-  });
-  // $('div#svgs-container').attr('height', $('.demo').outerHeight() - 34);
-  // $('div#tree-container').attr('height', $('.demo').outerHeight() - 34);
-  // $('#svg1').attr('height', $('.demo').outerHeight() - 34);
-  // $('div#alignment-container').attr('height', $('.demo').outerHeight() - 34);
-  // $('#svg2').attr('height', $('.demo').outerHeight() - 34);
-}
 
 // Actions à la fin du chargement de la page
 $(document).ready(function() {
@@ -2075,13 +1793,25 @@ $(document).ready(function() {
       $('a#nucleotid').css('color', 'black');
       break;
   }
-  
-  resizeSvgs();
+
+  $('div.demo').css({
+    'margin-top': $('nav').outerHeight(),
+    'width': $(window).width(),
+    'height': $(window).height() - $('nav').outerHeight() - 30,
+  });
+  $('#svg-container').attr('height', $('.demo').outerHeight() - 50);
+  $('#tree-container').attr('height', $('.demo').outerHeight() - 50);
+  $('#alignment-container').attr('height', $('.demo').outerHeight() - 50);
 
   // Gestion du redimensionnement de la fenêtre
   $(window).resize(function() {
-    resizeSvgs();
+    $('div.demo').css({
+      'margin-top': $('nav').outerHeight(),
+      'width': $(window).width(),
+      'height': $(window).height() - $('nav').outerHeight() - 30,
+    });
   });
+
 
   // Gestion du bouton pour le type d'alignement
   $('#alignement').on('click', function(event, dropdownData) {
@@ -2117,6 +1847,7 @@ $(document).ready(function() {
 
   // Gestion de la modification des seuils
   $('#ps-threshold-high, #ps-threshold-low').on('change', function(event) {
+
     // On a modifié un des seuils
     psThresholdsChanged = true;
 
@@ -2126,9 +1857,17 @@ $(document).ready(function() {
     console.log('> ', psHighVal, '>=', psLowVal);
     if (psHighVal < psLowVal) {
       if (event.currentTarget.id == 'ps-threshold-high') {
+
+        // On a descendu le seuil supérieur plus bas que le seuil inférieur
+        // ex : psHighVal = 0.95 | psLowVal = 1.0
+        // On veut donc redecsendre le seuil inférieur en conséquence
         $('#ps-threshold-low').val(psHighVal);
         psLowVal = psHighVal;
       } else {
+
+        // On a monté le seuil inférieur plus haut que le seuil supérieur
+        // ex : psHighVal = 1.0 | psLowVal = 1.05
+        // On veut donc remonter le seuil supérieur en conséquence
         $('#ps-threshold-high').val(psLowVal);
         psHighVal = psLowVal;
       }
@@ -2138,28 +1877,20 @@ $(document).ready(function() {
     psThresholdHigh = psHighVal;
     psThresholdLow = psLowVal;
     console.log('>> ', psThresholdHigh, '>=', psThresholdLow);
+  });
 
-    // Gestion du bouton "rafraîchir"
+  // Gestion du bouton "rafraîchir"
+  $('#refresh').click(function() {
     if (psThresholdsChanged) {
       console.log('Updating... (lower = '+psThresholdLow+' ; upper = '+psThresholdHigh+')');
       updateLayout(cladeRoot);
       psThresholdsChanged = false;
     }
   });
-
-  // // Gestion du bouton "rafraîchir"
-  // $('#refresh').click(function() {
-  //   if (psThresholdsChanged) {
-  //     console.log('Updating... (lower = '+psThresholdLow+' ; upper = '+psThresholdHigh+')');
-  //     updateLayout(cladeRoot);
-  //     psThresholdsChanged = false;
-  //   }
-  // });
 });
 
 // ==============================================================
 // Fin modif : jQuery
 // ==============================================================
-
 </script>
 </html>
