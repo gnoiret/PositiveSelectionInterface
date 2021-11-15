@@ -616,6 +616,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       scrollref = subnode(nodes,d,i);
     });
   }
+  // console.log('nodes:', nodes);
   var minX = d3.min(nodes, function(d) {
     return d.x;
   });
@@ -1213,15 +1214,57 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
 
   // Alignement : ajout des rectangles (version séquence entière)
   var oneSeqAA = d3.select('.aa-sequence');
+  var allSeqAA = d3.selectAll('.aa-sequence')._groups[0];
+  console.log('allSeqAA:', allSeqAA);
+  var minYDisp = d3.min(allSeqAA, function(d) {
+    return d.__data__.y;
+  });
+  var maxYDisp = d3.max(allSeqAA, function(d) {
+    return d.__data__.y;
+  });
+  console.log('min Y disp:', minYDisp);
+  console.log('max Y disp:', maxYDisp);
+  // console.log('min Y seq:', minYSeq);
+  // console.log(oneSeqAA._groups[0][0].__data__.name);
+  // console.log(oneSeqAA);
+
+
+
+  // Ordonner les séquences avec un espacement régulier
+  // en partant du y de la première
+  // allSeqAA.sort((a,b) => a.y - b.y);
+  // oneSeqAA.forEach(function(d,i) {
+  //   d.y = seq_dataset[0].y + i*20;
+  // });
+  // console.log(d3.min(oneSeqAA, function(d) {
+  //   return d;
+  // }));
+
+  // Fonction de calcul de la longueur maximale des noms de séquences
+  // function maxNameLength(seqDataset) {
+  //   var currentmax = seqDataset[0].name.length;
+  //   seqDataset.forEach(function(seq) {
+  //     currentmax = seq.name.length > currentmax ? seq.name.length : currentmax;
+  //   });
+  //   return currentmax;
+  // }
+  // var maxNameLgt = maxNameLength(seq_dataset);
+
+
+
+  // var oneSeqDna = d3.select('.dna-sequence[display=block]');
   var oneSeqDna = d3.select('.dna-sequence');
   for (i=0; i<psResultsDataset.length; i++) {
     if (displaySeqType == 'AA') {
       // Ajout d'un rectangle coloré par AA
-      oneSeqAA.append('rect')
+      seqDiv.append('rect')
         .attr('x', function(d) {return i*hStep;})
         .attr('width', hStep)
-        .attr('y', function(d) {return minY - d.y - hStepBase;})
-        .attr('height', maxY - minY + hStepBase*2)
+        .attr('y', function(d) {return minYDisp - hStepBase;})
+        // .attr('y', function(d) {return minY - d.y - hStepBase;})
+        .attr('height', function(d) {
+          return maxYDisp - minYDisp + hStepBase*2;
+        })
         .style('fill', () => {
           if (psResultsDataset[i].stat > psThresholdHigh) {
             return psThresholdHighBgColor;
