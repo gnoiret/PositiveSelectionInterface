@@ -16,7 +16,7 @@ Projet : développement d'une interface web pour la sélection positive
 
 ### Cloner le dépôt
 
-`git clone https://github.com/gnoiret/Projet_S1.git`
+`git clone http://pedago-service.univ-lyon1.fr:2325/csiharath/positive-selection/-/tree/main`
 
 ## Utilisation
 
