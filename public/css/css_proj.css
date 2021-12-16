@@ -1,0 +1,13 @@
+nav label {
+      font-weight: 400;
+      margin: 0 10px;
+}
+
+input[type=number] {
+      width: 80px;
+}
+form {
+      border: 1px solid black;
+      padding: 1rem;
+      /*color: red;*/
+}
