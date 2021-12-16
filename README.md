@@ -15,7 +15,7 @@ Project : development of an interface for positive selection
 
 ### Cloning the repository
 
-`git clone git@github.com:gennaBnh/Positive-Selection.git`
+`git clone git@pedago-service.univ-lyon1.fr:csiharath/positive-selection.git`
 
 ## Usage
 
