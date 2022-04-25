@@ -5,7 +5,7 @@ Project : development of an interface for positive selection
 
 ## Installation
 
-### Prerequisites
+### Requirements
 
 - [Python 3](https://www.python.org/downloads/)
 	- Bio
