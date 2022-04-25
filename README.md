@@ -1,4 +1,5 @@
-# Projet S1
+# Master 1 Bioinformatics Internship
+## Université Claude Bernard Lyon 1
 
 Project : development of an interface for positive selection
 
