@@ -184,36 +184,67 @@
     </header>
 
 
-  <main>
-    <div class="form">
-      <form method="post" action="/display" enctype="multipart/form-data">
-        <label class="btn btn-default btn-sm center-block btn-file">
-          <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Load xml file</i>
-          <input type="file" name="file" class="inputfile" style="display: none;" required>
-          <p class="filename"></p>
-        </label>
-        <input type="submit" value="Display with new xml file" id="submit">
-      </form>
-    </div>
-
-    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-    <script type="text/javascript">
-      $(document).ready(function() {
-        $('input[type="file"]').change(function(e) {
-          var file = e.target.files[0].name;
-          $(".filename").append(file)
+    <main>
+      <!-- <div class="form">
+        <form method="post" action="/display" enctype="multipart/form-data">
+          <label class="btn btn-default btn-sm center-block btn-file">
+            <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Tree file</i>
+            <input id="tree-file-input" type="file" name="tree-file" class="inputfile" style="display: none;" required />
+            <p class="filename"></p>
+          </label>
+          <label class="btn btn-default btn-sm center-block btn-file">
+            <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Alignment file</i>
+            <input id="alignment-file-input" type="file" name="alignment-file" class="inputfile" style="display: none;" required />
+            <p class="filename"></p>
+          </label>
+          <label class="btn btn-default btn-sm center-block btn-file">
+            <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Results file</i>
+            <input id="results-file-input" type="file" name="results-file" clas="inputfile" style="display: none;" required />
+            <p class="filename"></p>
+          </label>
+          <label for="statcol">Statistics column</label><input id="statcol" type="number" name="statcol" value="1" min="0" step="1" />
+          <label for="nostat">Missing statistics value</label><input id="nostat" type="number" name="nostat" value="-1" step="1" />
+          <label for="xml-name">XML name</label><input id="xml-name" type="text" name="xml-name" value="input_tree" />
+          <input type="submit" value="Display" id="submit" />
+        </form>
+      </div>
+      <script type="text/javascript">
+        $(document).ready(function() {
+          $('input[type="file"]').change(function(e) {
+            var file = e.target.files[0].name;
+            console.log('File changed on input with id: ' + e.target.id);
+            $("#" + e.target.id + " + .filename").html(file);
+          });
         });
-      });
-    </script>
+      </script> -->
 
-    <!-- Partie 1 -->
+      <!-- <div class="form">
+        <form method="post" action="/display" enctype="multipart/form-data">
+          <label class="btn btn-default btn-sm center-block btn-file">
+            <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Load xml file</i>
+            <input type="file" name="file" class="inputfile" style="display: none;" required>
+            <p class="filename"></p>
+          </label>
+          <input type="submit" value="Display with new xml file" id="submit">
+        </form>
+      </div>
+      <script type="text/javascript">
+        $(document).ready(function() {
+          $('input[type="file"]').change(function(e) {
+            var file = e.target.files[0].name;
+            $(".filename").append(file);
+          });
+        });
+      </script> -->
+
+      <!-- Partie 1 -->
 
       <!-- Exemple d'affichage -->
 
       <div class="container-fluid text-center">
         <h2 class="text-center"><span class="text-muted">A display example...</span></h2>
 
-        <img src="https://scontent-cdg2-1.xx.fbcdn.net/v/t1.15752-9/265855207_2902801066697686_749227564819002198_n.png?_nc_cat=107&ccb=1-5&_nc_sid=ae9488&_nc_ohc=nV1MAt4-u50AX9wuLs3&_nc_ht=scontent-cdg2-1.xx&oh=03_AVKQtyfameSeRoMMZtvYEOFg6H1fuXj3xPaH3CPian7OZA&oe=61DEAD2F" alt="exemple d'affichage" width="1050" height="500"/>
+        <img src="" alt="exemple d'affichage" width="1050" height="500"/>
       </div>
 
       <!-- Description des options d'affichage -->
@@ -231,47 +262,43 @@
           <p class="text-center">Increase/Decrease <br/> spaces between branches</p>
         </div>
 
-          <div class="col-lg-3" id="options">
-            <h5 class="Option text-center">AlignmentNature</h5>
-            <p class="text-center">Display of nucleotid <br/> or protein sequences</p>
-          </div>
+        <div class="col-lg-3" id="options">
+          <h5 class="Option text-center">AlignmentNature</h5>
+          <p class="text-center">Display of nucleotid <br/> or protein sequences</p>
+        </div>
 
-          <div class="col-lg-3" id="options">
-            <h5 class="Option">WidthSize +/- </h5>
-            <p class="text-center">Increase/Decrease <br/> the tree's width</p>
-          </div>
+        <div class="col-lg-3" id="options">
+          <h5 class="Option">WidthSize +/- </h5>
+          <p class="text-center">Increase/Decrease <br/> the tree's width</p>
+        </div>
 
         <!--  <div class="OptionsRow2"> -->
-            <div class="col-lg-3 " id="options">
-              <h5 class="Option">HeightSize +/- </h5>
-              <p class="text-center">Increase/Decrease <br/> the tree's height</p>
-            </div>
-
-            <div class="col-lg-3" id="options">
-              <h5 class="Option">ExportSVG</h5>
-              <p class="text-center">Results export <br/> in svg format</p>
-            </div>
-
-            <div class="col-lg-3" id="options">
-              <h5 class="Option">Upper / Lower threshold</h5>
-              <p class="text-center">Choice of upper/lower threshold<br/>of positive selection values</p>
-            </div>
-            </div>
+        <div class="col-lg-3 " id="options">
+          <h5 class="Option">HeightSize +/- </h5>
+          <p class="text-center">Increase/Decrease <br/> the tree's height</p>
         </div>
-          <hr class="featurette-divider">
 
+        <div class="col-lg-3" id="options">
+          <h5 class="Option">ExportSVG</h5>
+          <p class="text-center">Results export <br/> in svg format</p>
+        </div>
 
-    <!-- FOOTER -->
+        <div class="col-lg-3" id="options">
+          <h5 class="Option">Upper / Lower threshold</h5>
+          <p class="text-center">Choice of upper/lower threshold<br/>of positive selection values</p>
+        </div>
+        <!-- </div> -->
+      </div>
+      
+      <hr class="featurette-divider">
 
-    <footer class="container text-center">
-      <p class="float-end"><a href="#">Back to top</a></p>
-      <p>&copy; Master Bioinformatique, Université Lyon 1. </p>
-    </footer>
-  </main>
+      <footer class="container text-center">
+        <p class="float-end"><a href="#">Back to top</a></p>
+        <p>&copy; Master Bioinformatique, Université Lyon 1. </p>
+      </footer>
+    </main>
 
-  <!-- FIN FOOTER -->
-
-
+    <script src="public/jquery-3.6.0.min.js"></script>
     <script src="../assets/dist/js/bootstrap.bundle.min.js"></script>
 
   </body>

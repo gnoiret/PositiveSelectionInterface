@@ -2,32 +2,37 @@ var express = require('express');
 var router = express.Router();
 var multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
+// var upload = multer({
+//   storage: multer.diskStorage({
+//     destination: (req, file, callback) => {
+//       var type = req.params.type;
+//       var path = `./uploads/${type}`;
+//       fs.mkdirsSync(path);
+//       callback(null, path);
+//     },
+//     filename: (req, file, callback) => {
+//       //originalname is the uploaded file's name with extn
+//       callback(null, file.originalname);
+//     }
+//   })
+// });
+
 const browser = require('browser-detect');
 var bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 router.use(bodyParser.json()); // support json encoded bodies
-if (typeof localStorage === "undefined" || localStorage === null) {
-  var LocalStorage = require('node-localstorage').LocalStorage;
-  localStorage = new LocalStorage('./scratch');
-}
-const util = require('util')
+// if (typeof localStorage === "undefined" || localStorage === null) {
+//   var LocalStorage = require('node-localstorage').LocalStorage;
+//   localStorage = new LocalStorage('./scratch');
+// }
+const util = require('util');
 
-// =====================
-// Code perso
-// =====================
-
-var url = require('url');
-
-// =====================
-
-// =====================
-// Routages GET
-// =====================
+const url = require('url');
 
 // Home
 // ----
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'HOGENOM'});
+  res.render('index', {title: 'M1 Internship : Positive Selection Interface'});
 });
 
 // GET display
@@ -51,7 +56,7 @@ router.get('/display', function(req, res, next) {
     digester.digest(data, function(err, results) {
       if (err) {
         console.log(err);
-        return
+        return;
       }
       var JSONtree = JSON.stringify(results);
       // Séquence à mettre en valeur :
@@ -63,14 +68,11 @@ router.get('/display', function(req, res, next) {
 
 // GET taxodico
 // ------------
-router.get('/taxodico', function(req, res, next) {
-  console.log('Accès à /taxodico');
-  res.render('gettaxojson.ejs', {species:JSON.stringify([]),colour:JSON.stringify([])});
-});
+// router.get('/taxodico', function(req, res, next) {
+//   console.log('Accès à /taxodico');
+//   res.render('gettaxojson.ejs', {species:JSON.stringify([]),colour:JSON.stringify([])});
+// });
 
-// =====================
-// Routages POST
-// =====================
 router.post('/display', upload.single('file'), function(req, res, next) {
   console.log('Accès à /display');
   const fs = require('fs');
@@ -91,7 +93,7 @@ router.post('/display', upload.single('file'), function(req, res, next) {
     digester.digest(data, function(err, results) {
       if (err) {
         console.log(err);
-        return
+        return;
       }
       var JSONtree = JSON.stringify(results);
       // Séquence à mettre en valeur :
@@ -101,76 +103,12 @@ router.post('/display', upload.single('file'), function(req, res, next) {
   });
 });
 
-
-// ================
-// Début modifs
-// ================
-
-// GET test-affichage
-// -----------
-router.get('/test-affichage-graphe', function(req, res, next) {
-  var pathname = url.parse(req.url).pathname;
-  console.log('Accès à ' + pathname);
-  res.render('test_affichage_graphe.ejs');
-});
-
-
-// GET test-formulaire
+// GET test1
 // -----------
 router.get('/test-formulaire', function(req, res, next) {
   var pathname = url.parse(req.url).pathname;
   console.log('Accès à ' + pathname);
-  res.render('test_formulaire.ejs');
-});
-
-// GET test-affichage-fichier
-// -----------
-router.get('/test-affichage-fichier', function(req, res, next) {
-  var pathname = url.parse(req.url).pathname;
-  console.log('Accès à ' + pathname);
-
-  fs.readFile('input_tree.xml', 'utf8' , (err, data) => {
-    if (err) {
-      res.render('error.ejs', {message:"Erreur de lecture",error:err});
-    }
-    var xml_digester = require("xml-digester");
-    var handler = new xml_digester.OrderedElementsHandler("eventType");
-    var options = {
-      "handler": [{
-        "path": "eventsRec/*",
-        "handler": handler
-      }]
-    };
-    var digester = xml_digester.XmlDigester(options);
-    digester.digest(data, function(err, results) {
-      if (err) {
-        console.log(err);
-        return
-      }
-      var JSONtree = JSON.stringify(results);
-      // Séquence à mettre en valeur :
-      var JSONpattern = JSON.stringify("0:NM_001193307dot1_hom_Sap_SAMD9");
-      res.render('displaytree.ejs', {arbre:JSONtree,pattern:JSONpattern});
-    });
-  });
-
-  // var mydata = ''
-  // const fs = require('fs');
-  // fs.readFile('routes/uploads/upload-fichier-test-formulaire.txt', 'utf8', (err, data) => {
-  //   if (err) {
-  //     console.log('Error', err);
-  //   }
-  //   if (data) {
-  //     mydata = data;
-  //     var stat_results = JSON.stringify(mydata);
-  //     console.log('--------- Results: ' + stat_results);
-  //     res.render('test_affichage_fichier.ejs', {resultats:stat_results});
-  //   }
-  //   console.log('Data: ' + data);
-  //   console.log('Mydata: ' + mydata);
-  // })
-  // // var mavar = JSON.parse('[[1,0.2],[2,0.33],[3,1.0]]');
-  // // var stat_results = JSON.stringify('1:0.2 2:0.33 3:1.0 4:0.33 5:0.2');
+  res.render('test1.ejs');
 });
 
 const formidable = require('formidable');
@@ -211,8 +149,62 @@ router.post('/submit-test', function(req, res) {
     });
 });
 
-// ================
-// Fin modifs
-// ================
+// GET test-affichage
+// -----------
+// router.get('/test-affichage-graphe', function(req, res, next) {
+//   var pathname = url.parse(req.url).pathname;
+//   console.log('Accès à ' + pathname);
+//   res.render('test_affichage_graphe.ejs');
+// });
+
+// GET test-affichage-fichier
+// -----------
+// router.get('/test-affichage-fichier', function(req, res, next) {
+//   var pathname = url.parse(req.url).pathname;
+//   console.log('Accès à ' + pathname);
+
+//   fs.readFile('input_tree.xml', 'utf8' , (err, data) => {
+//     if (err) {
+//       res.render('error.ejs', {message:"Erreur de lecture",error:err});
+//     }
+//     var xml_digester = require("xml-digester");
+//     var handler = new xml_digester.OrderedElementsHandler("eventType");
+//     var options = {
+//       "handler": [{
+//         "path": "eventsRec/*",
+//         "handler": handler
+//       }]
+//     };
+//     var digester = xml_digester.XmlDigester(options);
+//     digester.digest(data, function(err, results) {
+//       if (err) {
+//         console.log(err);
+//         return
+//       }
+//       var JSONtree = JSON.stringify(results);
+//       // Séquence à mettre en valeur :
+//       var JSONpattern = JSON.stringify("0:NM_001193307dot1_hom_Sap_SAMD9");
+//       res.render('displaytree.ejs', {arbre:JSONtree,pattern:JSONpattern});
+//     });
+//   });
+
+  // var mydata = ''
+  // const fs = require('fs');
+  // fs.readFile('routes/uploads/upload-fichier-test-formulaire.txt', 'utf8', (err, data) => {
+  //   if (err) {
+  //     console.log('Error', err);
+  //   }
+  //   if (data) {
+  //     mydata = data;
+  //     var stat_results = JSON.stringify(mydata);
+  //     console.log('--------- Results: ' + stat_results);
+  //     res.render('test_affichage_fichier.ejs', {resultats:stat_results});
+  //   }
+  //   console.log('Data: ' + data);
+  //   console.log('Mydata: ' + mydata);
+  // })
+  // // var mavar = JSON.parse('[[1,0.2],[2,0.33],[3,1.0]]');
+  // // var stat_results = JSON.stringify('1:0.2 2:0.33 3:1.0 4:0.33 5:0.2');
+// });
 
 module.exports = router;

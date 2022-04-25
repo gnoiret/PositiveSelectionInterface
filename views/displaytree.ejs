@@ -3,7 +3,6 @@
 <head>
   <meta charset="utf-8">
   <title>Affichage des données</title>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
   <!-- Optional theme -->
@@ -211,7 +210,7 @@
   var cladeRoot;
   var layout = d3.layout.cladogram();   // Fonction  D3 qui transforme les donnees en cladograme
   var nodeWidth = 80;                  // Largeur
-  var nodeHeigth = 15;                  // Hauteur
+  var nodeHeight = 15;                  // Hauteur
   var x0Align = 350;                  // Cordonee horizonatle de l'alignement
   var stringWidth;                      // Largeur affichage arbre
   var tagSimpleGene = false;            // True si arbre de gene de type PhyloXML, False si arbre de gene de type RecPhyloXML
@@ -393,7 +392,7 @@ function updateLayout(cRoot,firstLoad=0) {
       }
     }
   });
-  layout.nodeSize([nodeWidth, nodeHeigth]); // *i*
+  layout.nodeSize([nodeWidth, nodeHeight]); // *i*
   layout(treeRoot);
   // Traitement des distances dans le cas d'un arbre de gene de type phyloxml
   if (tagSimpleGene) {
@@ -436,7 +435,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     lengthLinkLoss : config.lengthLinkLoss || 10,
     linkStrokeSize : config.linkStrokeSize || 2,
     nodeWidth : config.nodeWidth || 30,
-    nodeHeigth : config.nodeHeigth || 30,
+    nodeHeight : config.nodeHeight || 30,
     margin : config.margin || { top: 10, down: 20, left: 500  , right: 50},
     color : config.color || {
       speciation : "#2F4F4F",
@@ -872,7 +871,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   psGraph.append('line')
     .attr('x1', x(1))
     .attr('y1', y(psThresholdLow))
-    .attr('x2', x(psResultsDataset.length+1))
+    .attr('x2', x(psResultsDataset.length+1.5))
     .attr('y2', y(psThresholdLow))
     // .style('stroke', '#E37957')
     .style('stroke', psThresholdLowBgColor)
@@ -882,7 +881,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   psGraph.append('line')
     .attr('x1', x(1))
     .attr('y1', y(psThresholdHigh))
-    .attr('x2', x(psResultsDataset.length+1))
+    .attr('x2', x(psResultsDataset.length+1.5))
     .attr('y2', y(psThresholdHigh))
     // .style('stroke', '#E37957')
     .style('stroke', psThresholdHighBgColor)
@@ -1578,15 +1577,14 @@ function collapseVeryBigTree(treeRoot,patterns) {
     updateLayout(cladeRoot);
   });
   $('#moreHeigth').on('click', function(event, dropdownData) {
-    nodeHeigth += step;
+    nodeHeight += step;
     updateLayout(cladeRoot);
   });
   $('#lessHeigth').on('click', function(event, dropdownData) {
-    nodeHeigth -= step;
-    if  (nodeHeigth  < 0 ) {
-      nodeHeigth = 1;
+    if (nodeHeight - step >= 15 ) {
+      nodeHeight -= step;
+      updateLayout(cladeRoot);
     }
-    updateLayout(cladeRoot);
   });
 $('#export').on('click', function(event, dropdownData) {
     var target = event.toElement || event.relatedTarget || event.target || function () { throw "Failed to attach an event target!"; }
