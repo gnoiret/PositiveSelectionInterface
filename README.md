@@ -31,7 +31,7 @@ It will be set to 1 by default (0-based) in order to skip a line header, but you
 with the `-c`/`--col` option.
 - In case some positions have no result associated with them, a replacement value of -1 will be
 applied by default. This value can be changed with the `-n`/`--nostat` option.
-- The output XML can be renamed with the `-o`/`--output` option.
+- The .XML file output can be renamed with the `-o`/`--output` option.
 
 #### Generating an XML file for the interface - example : 
 
