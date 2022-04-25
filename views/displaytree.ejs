@@ -10,6 +10,7 @@
   <!-- Page CSS personnalisée -->
   <link rel="stylesheet" href="/css/css_proj.css">
   <!-- Latest compiled and minified JavaScript -->
+  <script src="public/jquery-3.6.0.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
   <script src='./d3.js' charset="utf-8"></script>
   <style media="screen">
@@ -1608,9 +1609,7 @@ $('#export').on('click', function(event, dropdownData) {
       default:
     }
   });
-// ==============================================================
-// Début modif : jQuery
-// ==============================================================
+
 // Actions à la fin du chargement de la page
 $(document).ready(function() {
   switch (displaySeqType) {
@@ -1708,8 +1707,5 @@ $(document).ready(function() {
     }
   });
 });
-// ==============================================================
-// Fin modif : jQuery
-// ==============================================================
 </script>
 </html>
