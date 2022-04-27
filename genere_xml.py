@@ -67,6 +67,8 @@ args = parser.parse_args()
 
 # def dna_to_prot(dna_seq:str):
 def nuc_acid_to_prot(dna_seq:str):
+    """Converts a DNA/RNA sequence into a proteic sequence."""
+
     matches = {
         'AAA':'K', 'AAC':'N', 'AAG':'K', 'AAT':'N',
         'ACA':'T', 'ACC':'T', 'ACG':'T', 'ACT':'T',
@@ -87,6 +89,21 @@ def nuc_acid_to_prot(dna_seq:str):
         'TCA':'S', 'TCC':'S', 'TCG':'S', 'TCT':'S',
         'TGA':'*', 'TGC':'C', 'TGG':'W', 'TGT':'C',
         'TTA':'L', 'TTC':'F', 'TTG':'L', 'TTT':'F',
+
+        'AAA':'K', 'AAC':'N', 'AAG':'K', 'AAU':'N',
+        'ACA':'T', 'ACC':'T', 'ACG':'T', 'ACU':'T',
+        'AGA':'R', 'AGC':'S', 'AGG':'R', 'AGU':'S',
+        'AUA':'I', 'AUC':'I', 'AUG':'M', 'AUU':'I',
+
+        'CAA':'Q', 'CAC':'H', 'CAG':'Q', 'CAU':'H',
+        'CCA':'P', 'CCC':'P', 'CCG':'P', 'CCU':'P',
+        'CGA':'R', 'CGC':'R', 'CGG':'R', 'CGU':'R',
+        'CUA':'L', 'CUC':'L', 'CUG':'L', 'CUU':'L',
+
+        'GAA':'E', 'GAC':'D', 'GAG':'E', 'GAU':'D',
+        'GCA':'A', 'GCC':'A', 'GCG':'A', 'GCU':'A',
+        'GGA':'G', 'GGC':'G', 'GGG':'G', 'GGU':'G',
+        'GUA':'V', 'GUC':'V', 'GUG':'V', 'GUU':'V',
 
         'UAA':'*', 'UAC':'Y', 'UAG':'*', 'UAU':'Y',
         'UCA':'S', 'UCC':'S', 'UCG':'S', 'UCU':'S',
