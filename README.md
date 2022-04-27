@@ -11,49 +11,79 @@ contains a Newick-formatted tree file, a FASTA alignment file and a results file
 organised in columns (with site numbers as the first one), the Python script used to generate
 the .XML file used by the interface will work.
 
-## Installation
+## Usage
 
-### Requirements
+### Uploading your files
 
-- [Python 3](https://www.python.org/downloads/)
-	- Bio
-	- ete3
-	- lxml
-- [Node.js](https://nodejs.org/fr/)
-	- npm
+On the homepage, upload your three files on the required fields:
 
-### Cloning the repository
+- Newick-formatted tree
+- FASTA alignment
+- statistical results
 
-`git clone git@pedago-service.univ-lyon1.fr:csiharath/positive-selection.git`
+### Other fields
+
+If your data requires specific parameters, you are free to change several options: 
+
+- which column to use for the results
+- which value should be given to sites that do not have one in the results file
+
+Once you are done, just click the *Display* button and the visualization will be available.
+
+## Visualization page
+
+The layout is as follows:
+
+- tree on the left
+- results graph and alignment on the right
+
+# Master 1 Bioinformatics Internship
+## Université Claude Bernard Lyon 1
+
+Improvement of an interface for positive selection
+
+## Introduction
+
+This interface was developed to visualize data pertaining to positive selection on genes.
+However, it can be used for a broader range of purposes. As long as the data
+contains a Newick-formatted tree file, a FASTA alignment file and a results file
+organised in columns (with site numbers as the first one), the Python script used to generate
+the .XML file used by the interface will work.
 
 ## Usage
 
-### Generating an XML file for the interface
+### Uploading your files
 
-In order to create the XML file the interface needs, use the command
+On the homepage, upload your three files on the required fields:
 
-`python3 genere_xml.py -t <tree_file> -a <alignment_file> -s <results_file> -c <results_column>`
+- Newick-formatted tree
+- FASTA alignment
+- statistical results
 
-- You may choose which column of results should be considered when creating the XML file.
-It will be set to 1 by default (0-based) in order to skip a line header, but you can change this
-with the `-c`/`--col` option.
-- In case some positions have no result associated with them, a replacement value of -1 will be
-applied by default. This value can be changed with the `-n`/`--nostat` option.
-- The .XML file output can be renamed with the `-o`/`--output` option.
+![Image formulaire](image.png)
 
-#### Generating an XML file for the interface - example : 
+### Other fields
 
-An example with the files in the folder 'data' : 
+If your data requires specific parameters, you are free to change several options: 
 
-`python3 genere_xml.py -t data/example_tree.tree -a data/example_alignment.fasta -s data/example_results.info -c 8`
+- which column to use for the results
+- which value should be given to sites that do not have one in the results file
 
-### Launching the server
+Once you are done, just click the *Display* button and the visualization will be available.
 
-Simply use `npm start` and the interface will be available at the configured address.
+![Image formulaire](image.png)
 
-The address ([http://127.0.0.1:8888/](http://localhost:8888/) by default) is defined in *selpos.js*.
+## Visualization page
 
-```
-const PORT = 8888;
-const HOST = '127.0.0.1';
-```
+The layout is as follows:
+
+- tree on the left
+- results graph and alignment on the right
+
+![Image données](image.png)
+
+Parameters include:
+
+- which sequence type to display (proteic / nucleic)
+- upper and lower thresholds
+    - if you only want one threshold to display, you may "merge" them by increasing the lower threshold or decreasing the upper threshold
