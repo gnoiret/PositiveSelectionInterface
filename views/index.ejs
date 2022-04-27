@@ -180,6 +180,9 @@
         <h1 class="text-center">Web interface for positive selection</h1>
         </div>
       </div>
+      <nav>
+        <a href="test-formulaire">Formulaires de test</a>
+      </nav>
 
     </header>
 
@@ -189,17 +192,17 @@
         <form method="post" action="/display" enctype="multipart/form-data">
           <label class="btn btn-default btn-sm center-block btn-file">
             <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Tree file</i>
-            <input id="tree-file-input" type="file" name="tree-file" class="inputfile" style="display: none;" required />
+            <input id="tree-input" type="file" name="file_tree" class="inputfile" style="display: none;" required />
             <p class="filename"></p>
           </label>
           <label class="btn btn-default btn-sm center-block btn-file">
             <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Alignment file</i>
-            <input id="alignment-file-input" type="file" name="alignment-file" class="inputfile" style="display: none;" required />
+            <input id="alignment-input" type="file" name="file_alignment" class="inputfile" style="display: none;" required />
             <p class="filename"></p>
           </label>
           <label class="btn btn-default btn-sm center-block btn-file">
             <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Results file</i>
-            <input id="results-file-input" type="file" name="results-file" clas="inputfile" style="display: none;" required />
+            <input id="results-input" type="file" name="file_results" clas="inputfile" style="display: none;" required />
             <p class="filename"></p>
           </label>
           <label for="statcol">Statistics column</label><input id="statcol" type="number" name="statcol" value="1" min="0" step="1" />

@@ -66,14 +66,8 @@ router.get('/display', function(req, res, next) {
     });
   });
 });
-
-// GET taxodico
+// POST display
 // ------------
-// router.get('/taxodico', function(req, res, next) {
-//   console.log('Accès à /taxodico');
-//   res.render('gettaxojson.ejs', {species:JSON.stringify([]),colour:JSON.stringify([])});
-// });
-
 router.post('/display', upload.single('file'), function(req, res, next) {
   console.log('Accès à /display');
   const fs = require('fs');
@@ -104,14 +98,28 @@ router.post('/display', upload.single('file'), function(req, res, next) {
   });
 });
 
+// GET test-formulaire
+// -----------
+router.get('/test-formulaire', function(req, res, next) {
+  var pathname = url.parse(req.url).pathname;
+  console.log('Accès à ' + pathname);
+  res.render('test1.ejs');
+});
 
-router.post("/upload_files", upload.array("files"), uploadFiles);
-function uploadFiles(req, res) {
-    console.log(req.body);
-    console.log(req.files);
-    res.json({ message: "Successfully uploaded files" });
-}
-
+// POST upload_files
+// -----------
+// router.post("/upload_files", upload.array(['file_tree', 'file_alignment', 'file_results']), uploadFiles);
+router.post("/upload_files", upload.array('files'), (req, res) => {
+  console.log('coucou');
+  console.log('req.body');  
+  console.log('req.files');
+  res.json({ message: "Successfully uploaded files" });
+});
+// function uploadFiles {
+//   console.log(req.body);
+//   console.log(req.files);
+//   res.json({ message: "Successfully uploaded files" });
+// }
 
 // POST submit-test
 // -----------
@@ -149,14 +157,6 @@ function uploadFiles(req, res) {
   //   res.end();
   // });
 // });
-
-// GET test1
-// -----------
-router.get('/test-formulaire', function(req, res, next) {
-  var pathname = url.parse(req.url).pathname;
-  console.log('Accès à ' + pathname);
-  res.render('test1.ejs');
-});
 
 // const fs = require('fs');
 // // var mavar = JSON.parse('[[1,0.2],[2,0.33],[3,1.0]]');
@@ -212,5 +212,12 @@ router.get('/test-formulaire', function(req, res, next) {
 //       res.render('displaytree.ejs', {arbre:JSONtree,pattern:JSONpattern});
 //     });
 //   });
+
+// GET taxodico
+// ------------
+// router.get('/taxodico', function(req, res, next) {
+//   console.log('Accès à /taxodico');
+//   res.render('gettaxojson.ejs', {species:JSON.stringify([]),colour:JSON.stringify([])});
+// });
 
 module.exports = router;

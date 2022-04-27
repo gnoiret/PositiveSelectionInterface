@@ -7,24 +7,24 @@
             <% include ../partials/header %>
         </header>
 
-        <h3>Formulaire simple</h3>
+        <!-- <h3>Formulaire simple</h3>
         <form method="post" action="/upload_files">
             <label for="texte">Du texte :</label><input type="text" name="texte" id="texte" required/>
             <input type="submit" value="Envoyer"/>
+        </form> -->
+
+        <h3>Fichiers multiples</h3>
+        <form id="form2" method="post" action="/upload_files" enctype="multipart/form-data">
+            <label for="files">Fichier test :</label><input type="file" name="files" id="files" multiple required />
+            <button type="submit">Envoyer</button>
         </form>
 
-        <h3>Formulaire de test</h3>
-        <form method="post" action="/upload_files" enctype="multipart/form-data">
-            <label for="single_uploadd_file">Fichier test :</label><input type="file" name="single_uploadd_file" id="single_uploadd_file" required/>
-            <input type="submit" name="single_uploadd_file" value="Envoyer"/>
-        </form>
-
-        <h3>Futur formulaire</h3>
+        <h3>Plusieurs fichiers simples</h3>
         <form id="form3" method="post" action="/upload_files" enctype="multipart/form-data">
-            <label for="file1">Alignement</label><input type="file" name="file1" id="file1" required/>
-            <label for="file2">Arbre</label><input type="file" name="file2" id="file2" required/>
-            <label for="file3">Résultats</label><input type="file" name="file3" id="file3" required/>
-            <input type="submit" value="Envoyer"/>
+            <label for="file_tree">Arbre</label><input type="file" name="file_tree" id="file_tree" required />
+            <label for="file_alignment">Alignement</label><input type="file" name="file_alignment" id="file_alignment" required />
+            <label for="file_results">Résultats</label><input type="file" name="file_results" id="file_results" required />
+            <button type="submit">Envoyer</button>
         </form>
 
         <footer>
@@ -39,13 +39,12 @@
 
             function submitForm(e) {
                 e.preventDefault();
-                const files = [document.getElementById("file1"), document.getElementById("file2"), document.getElementById("file3")];
                 // const name = document.getElementById("name");
-                // const files = document.getElementById("files");
+                const files = document.getElementById("files");
                 const formData = new FormData();
                 // formData.append("name", name.value);
                 for (let i = 0; i < files.length; i ++) {
-                    formData.append("files", files[i]);
+                    formData.append("files", files.files[i]);
                 }
                 fetch("http://localhost:8888/upload_files", {
                     method: 'POST',
@@ -57,7 +56,6 @@
                 .then((res) => console.log(res))
                 .catch((err) => ("Error occured", err));
 
-                
                 console.log(files);
 
             }
