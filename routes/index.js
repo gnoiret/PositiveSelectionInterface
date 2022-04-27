@@ -1,7 +1,20 @@
-var express = require('express');
-var router = express.Router();
-var multer = require('multer');
+const express = require('express');
+const router = express.Router();
+const formidable = require('formidable');
+const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
+const util = require('util');
+const url = require('url');
+const path = require('path');
+const browser = require('browser-detect');
+const bodyParser = require('body-parser');
+router.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+router.use(bodyParser.json()); // support json encoded bodies
+if (typeof localStorage === "undefined" || localStorage === null) {
+  var LocalStorage = require('node-localstorage').LocalStorage;
+  localStorage = new LocalStorage('./scratch');
+}
+
 // var upload = multer({
 //   storage: multer.diskStorage({
 //     destination: (req, file, callback) => {
@@ -17,22 +30,10 @@ const upload = multer({ dest: 'uploads/' });
 //   })
 // });
 
-const browser = require('browser-detect');
-var bodyParser = require('body-parser');
-router.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
-router.use(bodyParser.json()); // support json encoded bodies
-// if (typeof localStorage === "undefined" || localStorage === null) {
-//   var LocalStorage = require('node-localstorage').LocalStorage;
-//   localStorage = new LocalStorage('./scratch');
-// }
-const util = require('util');
-
-const url = require('url');
-
 // Home
 // ----
 router.get('/', function(req, res, next) {
-  res.render('index', {title: 'M1 Internship : Positive Selection Interface'});
+  res.render('index.ejs', {title: 'M1 Internship : Positive Selection Interface'});
 });
 
 // GET display
@@ -103,6 +104,52 @@ router.post('/display', upload.single('file'), function(req, res, next) {
   });
 });
 
+
+router.post("/upload_files", upload.array("files"), uploadFiles);
+function uploadFiles(req, res) {
+    console.log(req.body);
+    console.log(req.files);
+    res.json({ message: "Successfully uploaded files" });
+}
+
+
+// POST submit-test
+// -----------
+// router.post('/submit-test', function(req, res) {
+//   var pathname = url.parse(req.url).pathname;
+//   console.log('Accès à ' + pathname);
+  // console.log(req, res);
+  // console.log('texte : '+req.body.texte);
+  // new formidable.IncomingForm().parse(req)
+  // .on('error', (err) => {
+  //   console.log('Error', err);
+  //   throw err;
+  // })
+  // .on('aborted', () => {
+  //   console.log('File upload aborted by the user');
+  // })
+  // .on('field', (name, field) => {
+  //   console.log('Field', name, field);
+  // })
+  // .on('fileBegin', (name, file) => {
+  //   console.log('Old path:', file.path);
+  //   file.name = 'upload-' + file.name;
+  //   file.path = __dirname + '/uploads/' + file.name;
+  //   console.log('New name:', file.name);
+  //   console.log('New path:', file.path);
+  // })
+  // .on('file', (name, file) => {
+  //   // console.log('File', name, file);
+  //   console.log('File', file.name, 'received, here is some information about it:');
+  //   console.log('Size:', file.size, 'bytes');
+  //   console.log('Type:', file.type);
+  //   console.log('Path:', file.path)
+  // })
+  // .on('end', () => {
+  //   res.end();
+  // });
+// });
+
 // GET test1
 // -----------
 router.get('/test-formulaire', function(req, res, next) {
@@ -111,43 +158,21 @@ router.get('/test-formulaire', function(req, res, next) {
   res.render('test1.ejs');
 });
 
-const formidable = require('formidable');
-// POST submit-test
-// -----------
-router.post('/submit-test', function(req, res) {
-  var pathname = url.parse(req.url).pathname;
-  console.log('Accès à ' + pathname);
-  // console.log(req);
-  // console.log('texte : '+req.body.u_texte);
-  new formidable.IncomingForm().parse(req)
-    .on('field', (name, field) => {
-      console.log('Field', name, field);
-    })
-    .on('fileBegin', (name, file) => {
-      console.log('Old path:', file.path);
-      file.name = 'upload-' + file.name;
-      file.path = __dirname + '/uploads/' + file.name;
-      console.log('New name:', file.name);
-      console.log('New path:', file.path);
-    })
-    .on('file', (name, file) => {
-      // console.log('File', name, file);
-      console.log('File', file.name, 'received, here is some information about it:');
-      console.log('Size:', file.size, 'bytes');
-      console.log('Type:', file.type);
-      console.log('Path:', file.path)
-    })
-    .on('aborted', () => {
-      console.log('File upload aborted by the user');
-    })
-    .on('error', (err) => {
-      console.log('Error', err);
-      throw err;
-    })
-    .on('end', () => {
-      res.end();
-    });
-});
+// const fs = require('fs');
+// // var mavar = JSON.parse('[[1,0.2],[2,0.33],[3,1.0]]');
+// // var stat_results = JSON.stringify('1:0.2 2:0.33 3:1.0 4:0.33 5:0.2');
+// fs.readFile('routes/uploads/upload-fichier-test-formulaire.txt', 'utf8', (err, data) => {
+//   if (err) {
+//     console.log('Error:', err);
+//     return;
+//   }
+//   console.log('Data: ', data);
+//   // if (data) {
+//   //   var stat_results = JSON.stringify(data);
+//   //   console.log('--------- Results: ' + stat_results);
+//   //   res.render('test_affichage_fichier.ejs', {resultats:stat_results});
+//   // }
+// });
 
 // GET test-affichage
 // -----------
@@ -187,24 +212,5 @@ router.post('/submit-test', function(req, res) {
 //       res.render('displaytree.ejs', {arbre:JSONtree,pattern:JSONpattern});
 //     });
 //   });
-
-  // var mydata = ''
-  // const fs = require('fs');
-  // fs.readFile('routes/uploads/upload-fichier-test-formulaire.txt', 'utf8', (err, data) => {
-  //   if (err) {
-  //     console.log('Error', err);
-  //   }
-  //   if (data) {
-  //     mydata = data;
-  //     var stat_results = JSON.stringify(mydata);
-  //     console.log('--------- Results: ' + stat_results);
-  //     res.render('test_affichage_fichier.ejs', {resultats:stat_results});
-  //   }
-  //   console.log('Data: ' + data);
-  //   console.log('Mydata: ' + mydata);
-  // })
-  // // var mavar = JSON.parse('[[1,0.2],[2,0.33],[3,1.0]]');
-  // // var stat_results = JSON.stringify('1:0.2 2:0.33 3:1.0 4:0.33 5:0.2');
-// });
 
 module.exports = router;

@@ -10,7 +10,7 @@
   <!-- Page CSS personnalisée -->
   <link rel="stylesheet" href="/css/css_proj.css">
   <!-- Latest compiled and minified JavaScript -->
-  <script src="public/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
   <script src='./d3.js' charset="utf-8"></script>
   <style media="screen">
@@ -231,24 +231,17 @@
   var patterns= [];
   var div;
   var myStorage = window.localStorage;    // utilisation de localStorage pour consrever les preferences
-  // ==============================================================
-  // Début modif : variables globales
-  // ==============================================================
   var displaySeqType = 'AA';
   var hStepBase = 12;
   var alignmentLetterSpacing = hStepBase - 9.998;
   var psThresholdHigh = $('#ps-threshold-high').val() || 1.0;
   var psThresholdLow = $('#ps-threshold-low').val() || 0.3;
-  var psThresholdHighBgColor = "#6665FC";
-  var psThresholdLowBgColor = "#f7dc6f";
+  var psThresholdHighBgColor = "#FC6565";
+  var psThresholdLowBgColor = "#F7DC6F";
   var psBelowThresholdBgColor = "beige";
-  var psMissingBgColor = "#aaa";
-  // var projOffsetLeft = 700;
+  var psMissingBgColor = "#aaaaaa";
   var psThresholdsChanged = false;
   var seq_lg = xmlparser.flatTree(recTree.phyloxml.phylogeny.maxSeqIdLength)*10;
-  // ==============================================================
-  // Fin modif : variables globales
-  // ==============================================================
   if (!isStorageSupported(myStorage)) {
     console.log("window.localStorage problem");
     $(testnav).append('It seems that <b>window.localStorage</b> is full or is not supported by your browser<br>Please check this <a href="/clear/">here</a> ');

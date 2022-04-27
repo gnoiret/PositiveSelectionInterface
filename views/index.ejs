@@ -5,14 +5,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <title>Homepage</title>
+    <!-- <title>Homepage</title> -->
+    <title><%= title %></title>
 
     <!-- Bootstrap core CSS -->
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"rel="stylesheet">
-
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet" />
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <style>
 
@@ -166,8 +167,6 @@
       }
     </style>
 
-    <script src="public/jquery-3.6.0.min.js"></script>
-
     <!-- Custom styles for this template -->
 
   </head>
@@ -212,9 +211,9 @@
       <script type="text/javascript">
         $(document).ready(function() {
           $('input[type="file"]').change(function(e) {
-            var file = e.target.files[0].name;
+            var filename = e.target.files[0].name;
             console.log('File changed on input with id: ' + e.target.id);
-            $("#" + e.target.id + " + .filename").html(file);
+            $("#" + e.target.id + " + .filename").html(filename);
           });
         });
       </script>
@@ -245,7 +244,8 @@
       <div class="container-fluid text-center">
         <h2 class="text-center"><span class="text-muted">A display example...</span></h2>
 
-        <img src="" alt="exemple d'affichage" width="1050" height="500"/>
+        <!-- <img src="public/ExempleAffichage.png" alt="exemple d'affichage" width="1050" height="500"/> -->
+        <img src="media/ExempleAffichage.png" alt="exemple d'affichage" />
       </div>
 
       <!-- Description des options d'affichage -->
@@ -298,9 +298,6 @@
         <p>&copy; Master Bioinformatique, Université Lyon 1. </p>
       </footer>
     </main>
-
-    <!-- <script src="public/jquery-3.6.0.min.js"></script> -->
-    <!-- <script src="../assets/dist/js/bootstrap.bundle.min.js"></script> -->
 
   </body>
 </html>
