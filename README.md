@@ -49,4 +49,4 @@ Parameters include:
 - upper and lower thresholds
     - if you only want one threshold to display, you may "merge" them by increasing the lower threshold or decreasing the upper threshold
 
-(...)
+(etc.)
