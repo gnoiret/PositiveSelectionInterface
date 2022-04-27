@@ -1,7 +1,15 @@
 # Master 1 Bioinformatics Internship
 ## Université Claude Bernard Lyon 1
 
-Project : development of an interface for positive selection
+Improvement of an interface for positive selection
+
+## Introduction
+
+This interface was developed to visualize data pertaining to positive selection on genes.
+However, it can be used for a broader range of purposes. As long as the data
+contains a Newick-formatted tree file, a FASTA alignment file and a results file
+organised in columns (with site numbers as the first one), the Python script used to generate
+the .XML file used by the interface will work.
 
 ## Installation
 
