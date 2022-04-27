@@ -12,14 +12,3 @@ exec('python3 genere_xml.py -t '+fname_tree+' -a '+fname_alignment+' -s '+fname_
     // console.log(`${stdout}`);// Récupérer l'arbre XML
 
 });
-
-// exec('ls -la', (error, stdout, stderr) => {
-//     if (error) {
-//         console.log(`error: ${error.message}`);
-//     }
-//     if (stderr) {
-//         console.log(`error: ${stderr}`);
-//     }
-//     console.log(`${stdout}`);
-// });
-

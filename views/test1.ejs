@@ -13,52 +13,22 @@
             <input type="submit" value="Envoyer"/>
         </form> -->
 
-        <h3>Fichiers multiples</h3>
+        <!-- <h3>Fichiers multiples</h3>
         <form id="form2" method="post" action="/upload_files" enctype="multipart/form-data">
-            <label for="files">Fichier test :</label><input type="file" name="files" id="files" multiple required />
+            <label for="files">Fichier test :</label><input type="file" name="files" id="files" maxCount="3" multiple required />
             <button type="submit">Envoyer</button>
-        </form>
+        </form> -->
 
         <h3>Plusieurs fichiers simples</h3>
         <form id="form3" method="post" action="/upload_files" enctype="multipart/form-data">
-            <label for="file_tree">Arbre</label><input type="file" name="file_tree" id="file_tree" required />
-            <label for="file_alignment">Alignement</label><input type="file" name="file_alignment" id="file_alignment" required />
-            <label for="file_results">Résultats</label><input type="file" name="file_results" id="file_results" required />
+            <label for="file_t">Arbre</label><input type="file" name="file_t" id="file_t" required />
+            <label for="file_a">Alignement</label><input type="file" name="file_a" id="file_a" required />
+            <label for="file_r">Résultats</label><input type="file" name="file_r" id="file_r" required />
             <button type="submit">Envoyer</button>
         </form>
 
         <footer>
             <% include ../partials/footer %>
         </footer>
-
-        <script>
-            // script.js
-            const form = document.getElementById("form3");
-
-            form.addEventListener("submit", submitForm);
-
-            function submitForm(e) {
-                e.preventDefault();
-                // const name = document.getElementById("name");
-                const files = document.getElementById("files");
-                const formData = new FormData();
-                // formData.append("name", name.value);
-                for (let i = 0; i < files.length; i ++) {
-                    formData.append("files", files.files[i]);
-                }
-                fetch("http://localhost:8888/upload_files", {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                    "Content-Type": "multipart/form-data"
-                    }
-                })
-                .then((res) => console.log(res))
-                .catch((err) => ("Error occured", err));
-
-                console.log(files);
-
-            }
-        </script>
     </body>
 </html>

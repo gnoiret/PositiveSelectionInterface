@@ -8,6 +8,7 @@ const url = require('url');
 const path = require('path');
 const browser = require('browser-detect');
 const bodyParser = require('body-parser');
+const {exec} = require('child_process');
 router.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 router.use(bodyParser.json()); // support json encoded bodies
 if (typeof localStorage === "undefined" || localStorage === null) {
@@ -15,7 +16,7 @@ if (typeof localStorage === "undefined" || localStorage === null) {
   localStorage = new LocalStorage('./scratch');
 }
 
-// var upload = multer({
+// const upload = multer({
 //   storage: multer.diskStorage({
 //     destination: (req, file, callback) => {
 //       var type = req.params.type;
@@ -36,36 +37,36 @@ router.get('/', function(req, res, next) {
   res.render('index.ejs', {title: 'M1 Internship : Positive Selection Interface'});
 });
 
-// GET display
-// -----------
-router.get('/display', function(req, res, next) {
-  console.log('Accès à /display');
-  const fs = require('fs');
-  fs.readFile('input_tree.xml', 'utf8' , (err, data) => {
-    if (err) {
-      res.render('error.ejs', {message:"Erreur de lecture",error:err});
-    }
-    var xml_digester = require("xml-digester");
-    var handler = new xml_digester.OrderedElementsHandler("eventType");
-    var options = {
-      "handler": [{
-        "path": "eventsRec/*",
-        "handler": handler
-      }]
-    };
-    var digester = xml_digester.XmlDigester(options);
-    digester.digest(data, function(err, results) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      var JSONtree = JSON.stringify(results);
-      // Séquence à mettre en valeur :
-      var JSONpattern = JSON.stringify("0:NM_001193307dot1_hom_Sap_SAMD9");
-      res.render('displaytree.ejs', {arbre:JSONtree,pattern:JSONpattern});
-    });
-  });
-});
+// // GET display
+// // -----------
+// router.get('/display', function(req, res, next) {
+//   console.log('Accès à /display');
+//   const fs = require('fs');
+//   fs.readFile('input_tree.xml', 'utf8' , (err, data) => {
+//     if (err) {
+//       res.render('error.ejs', {message:"Erreur de lecture",error:err});
+//     }
+//     var xml_digester = require("xml-digester");
+//     var handler = new xml_digester.OrderedElementsHandler("eventType");
+//     var options = {
+//       "handler": [{
+//         "path": "eventsRec/*",
+//         "handler": handler
+//       }]
+//     };
+//     var digester = xml_digester.XmlDigester(options);
+//     digester.digest(data, function(err, results) {
+//       if (err) {
+//         console.log(err);
+//         return;
+//       }
+//       var JSONtree = JSON.stringify(results);
+//       // Séquence à mettre en valeur :
+//       var JSONpattern = JSON.stringify("0:NM_001193307dot1_hom_Sap_SAMD9");
+//       res.render('displaytree.ejs', {arbre:JSONtree,pattern:JSONpattern});
+//     });
+//   });
+// });
 // POST display
 // ------------
 router.post('/display', upload.single('file'), function(req, res, next) {
@@ -91,12 +92,42 @@ router.post('/display', upload.single('file'), function(req, res, next) {
         return;
       }
       var JSONtree = JSON.stringify(results);
+      // console.log(JSONtree);
       // Séquence à mettre en valeur :
       var JSONpattern = JSON.stringify("0:NM_001193307dot1_hom_Sap_SAMD9");
       res.render('displaytree.ejs', {arbre:JSONtree,pattern:JSONpattern});
     });
   });
 });
+// router.post('/display', upload.single('file'), function(req, res) {
+//   console.log('Accès à /display');
+//   const fs = require('fs');
+//   const fname = 'uploads/' + req.file.filename
+//   fs.readFile(fname, 'utf8' , (err, data) => {
+//     if (err) {
+//       res.render('error.ejs', {message:"Erreur de lecture",error:err});
+//     }
+//     var xml_digester = require("xml-digester");
+//     var handler = new xml_digester.OrderedElementsHandler("eventType");
+//     var options = {
+//       "handler": [{
+//         "path": "eventsRec/*",
+//         "handler": handler
+//       }]
+//     };
+//     var digester = xml_digester.XmlDigester(options);
+//     digester.digest(data, function(err, results) {
+//       if (err) {
+//         console.log(err);
+//         return;
+//       }
+//       var JSONtree = JSON.stringify(results);
+//       // Séquence à mettre en valeur :
+//       var JSONpattern = JSON.stringify("0:NM_001193307dot1_hom_Sap_SAMD9");
+//       res.render('displaytree.ejs', {arbre:JSONtree,pattern:JSONpattern});
+//     });
+//   });
+// });
 
 // GET test-formulaire
 // -----------
@@ -108,13 +139,44 @@ router.get('/test-formulaire', function(req, res, next) {
 
 // POST upload_files
 // -----------
-// router.post("/upload_files", upload.array(['file_tree', 'file_alignment', 'file_results']), uploadFiles);
-router.post("/upload_files", upload.array('files'), (req, res) => {
-  console.log('coucou');
-  console.log('req.body');  
-  console.log('req.files');
-  res.json({ message: "Successfully uploaded files" });
+router.post("/upload_files", upload.fields([{name: 'file_t', maxCount: 1}, {name: 'file_a', maxCount: 1}, {name: 'file_r', maxCount: 1}]), (req, res) => {
+  console.log(req.files);
+  // res.json({ message: "Successfully uploaded files" });
+
+  if (req.files.length === 3) {
+    // Faire tourner genere_xml.py avec exec()
+    fname_xml = fname_tree.substring(0, 11) + fname_tree.substring(0, 11) + fname_tree.substring(0, 11)+'.xml';
+    exec('python3 genere_xml.py -t '+fname_tree+' -a '+fname_alignment+' -s '+fname_tree+' -o '+fname_xml+' -c '+statcol+' -n '+nostat,
+    (error, stdout, stderr) => {
+      if (error) {
+        console.log(`error: ${error.message}`);
+      }
+      if (stderr) {
+        console.log(`error: ${stderr}`);
+      }
+      console.log(`${stdout}`);
+      
+      // Récupérer l'arbre XML
+      // fname_xml
+
+    });
+  }
+  res.render('displaytree.ejs', {arbre:JSONtree,pattern:JSONpattern});
 });
+// router.post("/upload_files", upload.fields('files'), (req, res) => {
+//   console.log(req.body);
+//   console.log(req.files);
+//   if (req.files.length === 3) {
+//     console.log("J'ai reçu exactement 3 fichiers ! ("+req.files.length+")");
+//   } else {
+//     console.log("Je n'ai pas reçu 3 fichiers. ("+req.files.length+")");
+//     var err = "Wrong file amount";
+//     throw err;
+//   }
+//   // res.json({ message: "Successfully uploaded files" });
+//   // res.render('test1.ejs');
+//   res.redirect('/test-formulaire');
+// });
 // function uploadFiles {
 //   console.log(req.body);
 //   console.log(req.files);
