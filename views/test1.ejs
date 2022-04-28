@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-    <% include ../partials/head %>
     <body class="container">
-
+        <head>
+            <% include ../partials/head %>
+        </head>
+        
         <header>
             <% include ../partials/header %>
         </header>
@@ -30,38 +32,75 @@
             <button type="submit">Envoyer</button>
         </form> -->
 
-        <div class="form">
+        <!-- <div class="form">
             <form method="post" action="/upload_files" enctype="multipart/form-data">
-              <label class="btn btn-default btn-sm center-block btn-file">
+                <label class="btn btn-default btn-sm center-block btn-file">
                 <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Tree file</i>
                 <input id="tree-file-input" type="file" name="file_t" class="inputfile" style="display: none;" required />
                 <p class="filename"></p>
-              </label>
-              <label class="btn btn-default btn-sm center-block btn-file">
+                </label>
+                <label class="btn btn-default btn-sm center-block btn-file">
                 <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Alignment file</i>
                 <input id="alignment-file-input" type="file" name="file_a" class="inputfile" style="display: none;" required />
                 <p class="filename"></p>
-              </label>
-              <label class="btn btn-default btn-sm center-block btn-file">
+                </label>
+                <label class="btn btn-default btn-sm center-block btn-file">
                 <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Results file</i>
                 <input id="results-file-input" type="file" name="file_r" clas="inputfile" style="display: none;" required />
                 <p class="filename"></p>
-              </label>
-              <label for="statcol">Statistics column</label><input id="statcol" type="number" name="statcol" value="1" min="0" step="1" />
-              <label for="nostat">Missing statistics value</label><input id="nostat" type="number" name="nostat" value="-1" step="1" />
-              <label for="xml-name">XML name</label><input id="xml-name" type="text" name="xml-name" value="input_tree" />
-              <input type="submit" value="Display" id="submit" />
+                </label>
+                <label for="statcol">Statistics column</label><input id="statcol" type="number" name="statcol" value="1" min="0" step="1" />
+                <label for="nostat">Missing statistics value</label><input id="nostat" type="number" name="nostat" value="-1" step="1" />
+                <label for="xml-name">XML name</label><input id="xml-name" type="text" name="xml-name" value="input_tree" />
+                <input type="submit" value="Display" id="submit" />
             </form>
-          </div>
-          <script type="text/javascript">
-            $(document).ready(function() {
-              $('input[type="file"]').change(function(e) {
-                var filename = e.target.files[0].name;
-                console.log('File changed on input with id: ' + e.target.id);
-                $("#" + e.target.id + " + .filename").html(filename);
-              });
+        </div>
+        <script type="text/javascript">
+        $(document).ready(function() {
+            $('input[type="file"]').change(function(e) {
+            var filename = e.target.files[0].name;
+            console.log('File changed on input with id: ' + e.target.id);
+            $("#" + e.target.id + " + .filename").html(filename);
             });
-          </script>
+        });
+        </script> -->
+
+        <div class="form">
+            <form method="post" action="/upload_files" enctype="multipart/form-data">
+                <label class="btn btn-default btn-sm center-block btn-file">
+                <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Tree file</i>
+                <input id="tree-file-input" type="file" name="file_t" class="inputfile" style="display: none;" required />
+                <p class="filename"></p>
+                </label>
+
+                <label class="btn btn-default btn-sm center-block btn-file">
+                <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Alignment file</i>
+                <input id="alignment-file-input" type="file" name="file_a" class="inputfile" style="display: none;" required />
+                <p class="filename"></p>
+                </label>
+
+                <label class="btn btn-default btn-sm center-block btn-file">
+                <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Results file</i>
+                <input id="results-file-input" type="file" name="file_r" clas="inputfile" style="display: none;" required />
+                <p class="filename"></p>
+                </label>
+
+                <label for="statcol">Statistics column</label><input id="statcol" type="number" name="statcol" value="1" min="0" step="1" />
+
+                <label for="nostat">Missing statistics value</label><input id="nostat" type="number" name="nostat" value="-1" step="1" />
+
+                <input type="submit" value="Display" id="submit" />
+            </form>
+        </div>
+        <script type="text/javascript">
+        $(document).ready(function() {
+            $('input[type="file"]').change(function(e) {
+            var filename = e.target.files[0].name;
+            console.log('File changed on input with id: ' + e.target.id);
+            $("#" + e.target.id + " + .filename").html(filename);
+            });
+        });
+        </script>
 
         <footer>
             <% include ../partials/footer %>

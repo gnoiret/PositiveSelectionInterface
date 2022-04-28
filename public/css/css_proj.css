@@ -9,5 +9,163 @@ input[type=number] {
 form {
       border: 1px solid black;
       padding: 1rem;
-      /*color: red;*/
 }
+
+
+
+
+
+
+
+
+
+/* 
+.bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+
+
+      body {
+        padding-top: 0rem;
+        padding-bottom: 3rem;
+        color: #5a5a5a;
+      }
+
+      footer {
+        padding-top: 1rem;
+        padding-bottom: 3rem;
+      }
+
+
+      h1{
+          padding-bottom: 0px;
+      }
+
+      h2{
+        font-weight: 300;
+        padding-bottom: 30px;
+      }
+
+      h5{
+          color: #708090;
+      }
+
+      
+
+      .Option{
+        text-decoration:none;
+        padding: 5px 0px;
+        padding-bottom: 1px;
+        text-align: center;
+      }
+
+      .Option:after {
+        content: '';
+        display: block;
+        margin: auto;
+        height: 1px;
+        width: 0;
+        background: transparent;
+        transition: width .5s ease, background-color .5s ease;
+      }
+
+      .Option:hover:after {
+        width: 90%;
+        background: lightgrey;
+      }
+
+      
+
+
+
+      
+
+      .featurette-divider {
+        padding-bottom: 2rem;
+      }
+
+      
+      .featurette-heading {
+        font-weight: 300;
+        line-height: 1;
+        letter-spacing: -.05rem;
+      }
+      .featurette {
+        padding-left: 5rem;
+      }
+
+
+      
+
+      @media (min-width: 40em) {
+        
+
+        .featurette-heading {
+          font-size: 40px;
+        }
+      }
+
+      @media (min-width: 62em) {
+        .featurette-heading {
+          margin-top: 10rem;
+        }
+      }
+
+      p {
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+
+      #options{
+        padding-bottom: 10px;
+      }
+
+      
+
+      .form{
+        margin: 0 auto;
+        margin-top: 40px;
+        margin-bottom: 40px;
+        width: 250px; 
+      }
+
+      label {
+        text-align: center;
+        padding-top: 20px;
+        display: inline-block;
+        cursor: pointer;
+      }
+
+      .inputfile {
+        font-size: 1em;
+        font-weight: 700;
+        border-radius : 10px;
+        display: inline-block;
+        cursor: pointer;
+      }
+
+      #submit{
+        text-align: center;
+        margin-top: 15px;
+        margin-left:10%;
+        width: 200px;
+        background-color: #ffffff;
+        border-radius: 5px;
+      }
+
+      #submit:hover {
+          background-color: #dddddd;
+      } */
+
+
+
