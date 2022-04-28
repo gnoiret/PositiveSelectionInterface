@@ -141,27 +141,84 @@ router.get('/test-formulaire', function(req, res, next) {
 // -----------
 router.post("/upload_files", upload.fields([{name: 'file_t', maxCount: 1}, {name: 'file_a', maxCount: 1}, {name: 'file_r', maxCount: 1}]), (req, res) => {
   console.log(req.files);
-  // res.json({ message: "Successfully uploaded files" });
 
-  if (req.files.length === 3) {
-    // Faire tourner genere_xml.py avec exec()
-    fname_xml = fname_tree.substring(0, 11) + fname_tree.substring(0, 11) + fname_tree.substring(0, 11)+'.xml';
-    exec('python3 genere_xml.py -t '+fname_tree+' -a '+fname_alignment+' -s '+fname_tree+' -o '+fname_xml+' -c '+statcol+' -n '+nostat,
-    (error, stdout, stderr) => {
-      if (error) {
-        console.log(`error: ${error.message}`);
-      }
-      if (stderr) {
-        console.log(`error: ${stderr}`);
-      }
-      console.log(`${stdout}`);
-      
-      // Récupérer l'arbre XML
-      // fname_xml
+  const upload_dir = 'uploads/';
+  const xml_dir = 'uploads/xml/';
+  const fname_tree = req.files.file_t[0].filename;
+  const fname_alignment = req.files.file_a[0].filename;
+  const fname_results = req.files.file_r[0].filename;
+  const fname_xml = fname_tree.substring(0, 10)
+                  + fname_alignment.substring(0, 10)
+                  + fname_results.substring(0, 10)+'.xml';
+  const full_path_xml = xml_dir + fname_xml;
+  const statcol = '8';
+  const nostat = '-1';
 
+  console.log('Tree: ' + fname_tree + '\n' +
+  'Alignment: ' + fname_alignment + '\n' +
+  'Results: ' + fname_results + '\n' +
+  'Future XML file: ' + fname_xml);
+
+  // console.log(req.files);
+  // console.log('req.files.length: '+req.files.length);
+
+  console.log('Coucou ! '+req.files.length);
+  // Faire tourner genere_xml.py avec exec()
+  exec('python3 genere_xml.py'
+      +' -t '+upload_dir+fname_tree
+      +' -a '+upload_dir+fname_alignment
+      +' -s '+upload_dir+fname_results
+      +' -o '+xml_dir+fname_xml
+      +' -c '+statcol
+      +' -n '+nostat,
+  (error, stdout, stderr) => {
+    if (error) {
+      console.log(`error: ${error.message}`);
+    }
+    if (stderr) {
+      console.log(`error: ${stderr}`);
+    }
+    console.log(`${stdout}`);
+    
+    // Lire l'arbre XML en JSON et afficher les données
+    const fs = require('fs');
+    // const fname =  + req.file.filename
+    const fname = full_path_xml;
+    fs.readFile(fname, 'utf8' , (err, data) => {
+      if (err) {
+        res.render('error.ejs', {message:"Erreur de lecture",error:err});
+      }
+      var xml_digester = require("xml-digester");
+      var handler = new xml_digester.OrderedElementsHandler("eventType");
+      var options = {
+        "handler": [{
+          "path": "eventsRec/*",
+          "handler": handler
+        }]
+      };
+      var digester = xml_digester.XmlDigester(options);
+      console.log('coucou 1');
+      digester.digest(data, function(err, results) {
+        console.log('coucou 2');
+        if (err) {
+          console.log(err);
+          return;
+        }
+        console.log('coucou 3');
+        var JSONtree = JSON.stringify(results);
+        console.log('coucou 4');
+        // console.log(JSONtree);
+        // Séquence à mettre en valeur :
+        var JSONpattern = JSON.stringify("0:NM_001193307dot1_hom_Sap_SAMD9");
+        console.log('coucou 5');
+        res.render('displaytree.ejs', {arbre:JSONtree,pattern:JSONpattern});
+      });
     });
-  }
-  res.render('displaytree.ejs', {arbre:JSONtree,pattern:JSONpattern});
+    // res.json({ message: "Successfully uploaded files" });
+    // res.json({ message: "Successfully uploaded files", tree: fname_tree, alignment: fname_alignment, results: fname_results });
+    // res.render('displaytree.ejs', {arbre:JSONtree,pattern:JSONpattern});
+
+  });
 });
 // router.post("/upload_files", upload.fields('files'), (req, res) => {
 //   console.log(req.body);

@@ -340,7 +340,8 @@ else:
         output_name = args.treeFile[::-1].split('.', 1)[1][::-1]
     else:
         output_name = args.treeFile
-xmloutputfile = open(output_name+".xml","w")
+# xmloutputfile = open(output_name+".xml","w")
+xmloutputfile = open(output_name,"w")
 
 for line in treefile:
     tline = re.split(' ',line)
