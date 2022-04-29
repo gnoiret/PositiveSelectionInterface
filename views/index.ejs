@@ -180,6 +180,22 @@
     </header>
 
     <main>
+      <div>
+        <h3>Tree</h3>
+        <p id="tree-file-content"></p>
+      </div>
+      <div>
+        <div>
+          <h3>Alignment</h3>
+          <p id="alignment-file-content"></p>
+        </div>
+      </div>
+      <div>
+        <div>
+          <h3>Results</h3>
+          <p id="results-file-content"></p>
+        </div>
+      </div>
       <div class="form">
         <form method="post" action="/upload_files" enctype="multipart/form-data">
           <div class="form-group">
@@ -214,42 +230,16 @@
           <!-- <div class="form-group"> -->
             <label for="nostat">Missing statistics value</label>
             <input id="nostat" class="form-control" type="number" name="nostat" value="-1" step="1" required />
-          <!-- </div> -->
-          <!-- <div class="form-group"> -->
-            <label for="nostat">Missing statistics value</label>
-            <input id="nostat" class="form-control" type="number" name="nostat" value="-1" step="1" required />
           </div>
 
           <button type="submit" id="submit">Display</button>
         </form>
       </div>
 
-      <!-- <div class="form">
-        <form method="post" action="/display" enctype="multipart/form-data">
-          <label class="btn btn-default btn-sm center-block btn-file">
-            <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Load xml file</i>
-            <input type="file" name="file" class="inputfile" style="display: none;" required>
-            <p class="filename"></p>
-          </label>
-          <input type="submit" value="Display with new xml file" id="submit">
-        </form>
-      </div>
-      <script type="text/javascript">
-        $(document).ready(function() {
-          $('input[type="file"]').change(function(e) {
-            var file = e.target.files[0].name;
-            $(".filename").append(file);
-          });
-        });
-      </script> -->
-
-      <!-- Partie 1 -->
-
       <!-- Exemple d'affichage -->
 
       <div class="container-fluid text-center">
-        <h2 class="text-center"><span class="text-muted">A display example...</span></h2>
-
+        <h2 class="text-center"><span class="text-muted">An example of display...</span></h2>
         <!-- <img src="public/ExempleAffichage.png" alt="exemple d'affichage" width="1050" height="500"/> -->
         <!-- <img src="media/ExempleAffichage.png" alt="exemple d'affichage" /> -->
       </div>
@@ -257,7 +247,7 @@
       <!-- Description des options d'affichage -->
 
       <div class="container-fluid text-center">
-        <h2 class="text-center"><span class="text-muted">... and its various options :</span></h2>
+        <h2 class="text-center"><span class="text-muted">...and its various options</span></h2>
 
         <div class="col-lg-3">
           <h5 class="Option">On click</h5>
@@ -279,7 +269,6 @@
           <p class="text-center">Increase/Decrease <br/> the tree's width</p>
         </div>
 
-        <!--  <div class="OptionsRow2"> -->
         <div class="col-lg-3 " id="options">
           <h5 class="Option">HeightSize +/- </h5>
           <p class="text-center">Increase/Decrease <br/> the tree's height</p>
@@ -294,7 +283,6 @@
           <h5 class="Option">Upper / Lower threshold</h5>
           <p class="text-center">Choice of upper/lower threshold<br/>of positive selection values</p>
         </div>
-        <!-- </div> -->
       </div>
       
       <hr class="featurette-divider">
@@ -308,25 +296,60 @@
   </body>
   <script type="text/javascript">
   $(document).ready(function() {
-    // if ($('[id$="-file-input"]').val() != '') {
-    //   // console.log($(this).attr('id') + ' is not empty');
-    //   console.log($(this));
-    //   // ✅
-    // }
     $('[id$="-file-input"]').each(function(i, elt) {
-      console.log(i, elt.id);
+      // console.log(i, elt.id);
       if ($('#'+elt.id).val() != '') {
-        console.log(elt.id+' has file '+$('#'+elt.id)[0].files[0].name);
-        console.log('Filename: '+$('#'+elt.id)[0].files[0].name);
+        // console.log(elt.id+' has file '+$('#'+elt.id)[0].files[0].name);
         $("#"+elt.id+" + .filename").html('✅ '+$('#'+elt.id)[0].files[0].name);
+        
+        // var treeFile = document.getElementById('tree-file-input').files[0];
+        // // var alignmentFile = document.getElementById('alignment-file-input').files[0];
+        // // var resultsFile = document.getElementById('results-file-input').files[0];
+        // var treeContent = document.getElementById('tree-file-content');
+        // // var alignmentContent = document.getElementById('alignment-file-content');
+        // // var resultsContent = document.getElementById('results-file-content');
+        // var treeReader = new FileReader();
+        // treeReader.onload = function(event) { treeContent.innerHTML = treeReader.result; };
+        // treeReader.readAsText(selectedFile);
+
       } else {
-        console.log(elt.id + ' is empty');
+        // console.log(elt.id + ' is empty');
+        $("#"+elt.id+" + .filename").html('❌');
       }
     });
     $('input[type="file"]').change(function(e) {
       var filename = e.target.files[0].name;
       console.log('File changed on input with id: ' + e.target.id);
-      $("#"+e.target.id+" + .filename").html(filename);
+
+      var selectedFile = document.getElementById(e.target.id).files[0];
+      var content = document.getElementById(e.target.id.split('-')[0]+'-file-content');
+      var reader = new FileReader();
+      reader.onload = function(event) {
+        content.innerHTML = reader.result.substring(0, 100);
+        var treeRegex = new RegExp('^[\(][\w0-9\-_,:\(\);]+');
+        var alignmentRegex = new RegExp('^>.*\n[ACGTU\-]+');
+        var resultsRegex = new RegExp('[0-9]+((\t| )[\-]?[0-9]+[\.]?[0-9]+)+');
+        console.log(reader.result);
+        var isMatch = null;
+        if (e.target.id.substring(0, 4) === 'tree') {
+          isMatch = treeRegex.test(reader.result);
+        } else if (e.target.id.substring(0, 4) === 'alig') {
+          isMatch = alignmentRegex.test(reader.result);
+        } else if (e.target.id.substring(0, 4) === 'resu') {
+          isMatch = resultsRegex.test(reader.result);
+        } else {
+          console.log('Unrecognized ID: '+e.target.id);
+        }
+        console.log(isMatch);
+        if (isMatch) {
+          $("#"+e.target.id+" + .filename").html('✅ '+filename); 
+        } else {
+          $("#"+e.target.id+" + .filename").html('❌ '+filename); 
+        }
+      };
+      reader.readAsText(selectedFile);
+      
+      // $("#"+e.target.id+" + .filename").html('✅ '+filename);      
     });
   });
   </script>
