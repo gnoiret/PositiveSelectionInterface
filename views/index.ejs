@@ -318,7 +318,7 @@
       if ($('#'+elt.id).val() != '') {
         console.log(elt.id+' has file '+$('#'+elt.id)[0].files[0].name);
         console.log('Filename: '+$('#'+elt.id)[0].files[0].name);
-        $("#"+elt.id+" + .filename").html($('#'+elt.id)[0].files[0].name);
+        $("#"+elt.id+" + .filename").html('✅ '+$('#'+elt.id)[0].files[0].name);
       } else {
         console.log(elt.id + ' is empty');
       }
