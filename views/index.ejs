@@ -179,36 +179,48 @@
       </div>
     </header>
 
-
     <main>
       <div class="form">
         <form method="post" action="/upload_files" enctype="multipart/form-data">
-          <label class="btn btn-default btn-sm center-block btn-file">
-            <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Tree file</i>
-            <input id="tree-file-input" type="file" name="file_t" class="inputfile" style="display: none;" required />
-            <p class="filename"></p>
-            <div id="tree-file-check-mark"></div>
-          </label>
+          <div class="form-group">
+            <label class="btn btn-default btn-sm center-block btn-file">
+              <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Tree file</i>
+              <input id="tree-file-input" type="file" name="file_t" class="inputfile" style="display: none;" required />
+              <p class="filename"></p>
+              <div id="tree-file-check-mark"></div>
+            </label>
+          <!-- </div> -->
+          <!-- <div class="form-group"> -->
+            <label class="btn btn-default btn-sm center-block btn-file">
+              <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Alignment file</i>
+              <input id="alignment-file-input" type="file" name="file_a" class="inputfile" style="display: none;" required />
+              <p class="filename"></p>
+              <div id="alignment-file-check-mark"></div>
+            </label>
+          <!-- </div> -->
+          <!-- <div class="form-group"> -->
+            <label class="btn btn-default btn-sm center-block btn-file">
+              <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Results file</i>
+              <input id="results-file-input" type="file" name="file_r" clas="inputfile" style="display: none;" required />
+              <p class="filename"></p>
+              <div id="results-file-check-mark"></div>
+            </label>
+          </div>
           
-          <label class="btn btn-default btn-sm center-block btn-file">
-            <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Alignment file</i>
-            <input id="alignment-file-input" type="file" name="file_a" class="inputfile" style="display: none;" required />
-            <p class="filename"></p>
-            <div id="alignment-file-check-mark"></div>
-          </label>
-          
-          <label class="btn btn-default btn-sm center-block btn-file">
-            <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Results file</i>
-            <input id="results-file-input" type="file" name="file_r" clas="inputfile" style="display: none;" required />
-            <p class="filename"></p>
-            <div id="results-file-check-mark"></div>
-          </label>
+          <div class="form-group">
+            <label for="statcol">Statistics column</label>
+            <input id="statcol" class="form-control" type="number" name="statcol" value="1" min="0" step="1" required />
+          <!-- </div> -->
+          <!-- <div class="form-group"> -->
+            <label for="nostat">Missing statistics value</label>
+            <input id="nostat" class="form-control" type="number" name="nostat" value="-1" step="1" required />
+          <!-- </div> -->
+          <!-- <div class="form-group"> -->
+            <label for="nostat">Missing statistics value</label>
+            <input id="nostat" class="form-control" type="number" name="nostat" value="-1" step="1" required />
+          </div>
 
-          <label for="statcol">Statistics column</label><input id="statcol" type="number" name="statcol" value="1" min="0" step="1" />
-
-          <label for="nostat">Missing statistics value</label><input id="nostat" type="number" name="nostat" value="-1" step="1" />
-
-          <input type="submit" value="Display" id="submit" />
+          <button type="submit" id="submit">Display</button>
         </form>
       </div>
 
@@ -289,7 +301,7 @@
 
       <footer class="container text-center">
         <p class="float-end"><a href="#">Back to top</a></p>
-        <p>&copy; Master Bioinformatique, Université Lyon 1. </p>
+        <!-- <p>&copy; Master Bioinformatique, Université Lyon 1. </p> -->
       </footer>
     </main>
 
