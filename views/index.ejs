@@ -177,6 +177,9 @@
         <h1 class="text-center">Web interface for positive selection</h1>
         </div>
       </div>
+      <nav>
+        <a href="test-arbre">test-arbre</a>
+      </nav>
     </header>
 
     <main>
@@ -205,16 +208,12 @@
               <p class="filename"></p>
               <div id="tree-file-check-mark"></div>
             </label>
-          <!-- </div> -->
-          <!-- <div class="form-group"> -->
             <label class="btn btn-default btn-sm center-block btn-file">
               <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Alignment file</i>
               <input id="alignment-file-input" type="file" name="file_a" class="inputfile" style="display: none;" required />
               <p class="filename"></p>
               <div id="alignment-file-check-mark"></div>
             </label>
-          <!-- </div> -->
-          <!-- <div class="form-group"> -->
             <label class="btn btn-default btn-sm center-block btn-file">
               <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Results file</i>
               <input id="results-file-input" type="file" name="file_r" clas="inputfile" style="display: none;" required />
@@ -226,8 +225,6 @@
           <div class="form-group">
             <label for="statcol">Statistics column</label>
             <input id="statcol" class="form-control" type="number" name="statcol" value="1" min="0" step="1" required />
-          <!-- </div> -->
-          <!-- <div class="form-group"> -->
             <label for="nostat">Missing statistics value</label>
             <input id="nostat" class="form-control" type="number" name="nostat" value="-1" step="1" required />
           </div>
@@ -294,7 +291,7 @@
 
       <footer class="container text-center">
         <p class="float-end"><a href="#">Back to top</a></p>
-        <!-- <p>&copy; Master Bioinformatique, Université Lyon 1. </p> -->
+        <p>Université Lyon 1 - Master Bioinformatique</p>
       </footer>
     </main>
 
@@ -302,23 +299,9 @@
   <script type="text/javascript">
   $(document).ready(function() {
     $('[id$="-file-input"]').each(function(i, elt) {
-      // console.log(i, elt.id);
       if ($('#'+elt.id).val() != '') {
-        // console.log(elt.id+' has file '+$('#'+elt.id)[0].files[0].name);
         $("#"+elt.id+" + .filename").html(''+$('#'+elt.id)[0].files[0].name);
-        
-        // var treeFile = document.getElementById('tree-file-input').files[0];
-        // // var alignmentFile = document.getElementById('alignment-file-input').files[0];
-        // // var resultsFile = document.getElementById('results-file-input').files[0];
-        // var treeContent = document.getElementById('tree-file-content');
-        // // var alignmentContent = document.getElementById('alignment-file-content');
-        // // var resultsContent = document.getElementById('results-file-content');
-        // var treeReader = new FileReader();
-        // treeReader.onload = function(event) { treeContent.innerHTML = treeReader.result; };
-        // treeReader.readAsText(selectedFile);
-
       } else {
-        // console.log(elt.id + ' is empty');
         $("#"+elt.id+" + .filename").html('');
       }
     });
@@ -353,16 +336,12 @@
           $("#"+e.target.id+" + .filename").html('❌ '+filename); 
         }
         content.innerHTML = '';
-        // content.innerHTML = reader.result.substring(0, 100);
-        console.log(lines);
         for (var i = 0; i < Math.min(lines.length, 4); i ++) {
           content.innerHTML += lines[i].substring(0, 80)+'<br>';
           console.log(lines[i].substring(0, 80));
         }
       };
       reader.readAsText(selectedFile);
-      
-      // $("#"+e.target.id+" + .filename").html('✅ '+filename);      
     });
   });
   </script>
