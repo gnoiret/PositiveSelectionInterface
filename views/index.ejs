@@ -232,10 +232,10 @@
             <input id="nostat" class="form-control" type="number" name="nostat" value="-1" step="1" required />
           </div>
           
-          <div class="form-group">
+          <!-- <div class="form-group">
             <input id="is-sitebranch" class="col-xs-3 pull-left" type="checkbox" name="is-sitebranch" />
             <label class="col-xs-9" for="is-sitebranch">Statistics column</label>
-          </div>
+          </div> -->
 
           <button type="submit" id="submit">Display</button>
         </form>
@@ -305,7 +305,7 @@
       // console.log(i, elt.id);
       if ($('#'+elt.id).val() != '') {
         // console.log(elt.id+' has file '+$('#'+elt.id)[0].files[0].name);
-        $("#"+elt.id+" + .filename").html('✅ '+$('#'+elt.id)[0].files[0].name);
+        $("#"+elt.id+" + .filename").html(''+$('#'+elt.id)[0].files[0].name);
         
         // var treeFile = document.getElementById('tree-file-input').files[0];
         // // var alignmentFile = document.getElementById('alignment-file-input').files[0];
@@ -319,9 +319,10 @@
 
       } else {
         // console.log(elt.id + ' is empty');
-        $("#"+elt.id+" + .filename").html('❌');
+        $("#"+elt.id+" + .filename").html('');
       }
     });
+    
     $('input[type="file"]').change(function(e) {
       var filename = e.target.files[0].name;
       console.log('File changed on input with id: ' + e.target.id);
