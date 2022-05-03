@@ -231,6 +231,11 @@
             <label for="nostat">Missing statistics value</label>
             <input id="nostat" class="form-control" type="number" name="nostat" value="-1" step="1" required />
           </div>
+          
+          <div class="form-group">
+            <input id="is-sitebranch" class="col-xs-3 pull-left" type="checkbox" name="is-sitebranch" />
+            <label class="col-xs-9" for="is-sitebranch">Statistics column</label>
+          </div>
 
           <button type="submit" id="submit">Display</button>
         </form>
@@ -325,7 +330,7 @@
       var content = document.getElementById(e.target.id.split('-')[0]+'-file-content');
       var reader = new FileReader();
       reader.onload = function(event) {
-        content.innerHTML = reader.result.substring(0, 100);
+        var lines = this.result.split('\n');
         var treeRegex = new RegExp('^[\(][\w0-9\-_,:\(\);]+');
         var alignmentRegex = new RegExp('^>.*\n[ACGTU\-]+');
         var resultsRegex = new RegExp('[0-9]+((\t| )[\-]?[0-9]+[\.]?[0-9]+)+');
@@ -345,6 +350,13 @@
           $("#"+e.target.id+" + .filename").html('✅ '+filename); 
         } else {
           $("#"+e.target.id+" + .filename").html('❌ '+filename); 
+        }
+        content.innerHTML = '';
+        // content.innerHTML = reader.result.substring(0, 100);
+        console.log(lines);
+        for (var i = 0; i < Math.min(lines.length, 4); i ++) {
+          content.innerHTML += lines[i].substring(0, 80)+'<br>';
+          console.log(lines[i].substring(0, 80));
         }
       };
       reader.readAsText(selectedFile);
