@@ -66,6 +66,7 @@ router.post("/upload_files", upload.fields([{name: 'file_t', maxCount: 1}, {name
   // console.log('req.files.length: '+req.files.length);
 
   // Faire tourner genere_xml.py avec exec()
+  console.log('Generating PhyloXML tree...');
   exec('python3 genere_xml.py'
       +' -t '+upload_dir+fname_tree
       +' -a '+upload_dir+fname_alignment

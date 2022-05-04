@@ -49,9 +49,13 @@ parser.add_argument('-t', '--tree', dest='treeFile', action='store',\
 parser.add_argument('-a', '--align', dest='alignmentFile', action='store',\
     required=True,\
     help='file containing an alignment in FASTA format')
-parser.add_argument('-s', '--stats', dest='resultsFile', action='store',\
+parser.add_argument('-r', '--results', dest='resultsFile', action='store',\
     required=True,\
     help='file containing the results')
+parser.add_argument('-s', '--sep', dest='sep', action='store',\
+    required=False,\
+    default='\t',\
+    help='column separator')
 parser.add_argument('-c', '--col', dest='statcol', action='store', type=int,\
     default=1,\
     help='index of the results column to use')
@@ -66,8 +70,8 @@ args = parser.parse_args()
 
 
 # def dna_to_prot(dna_seq:str):
-def nuc_acid_to_prot(dna_seq:str):
-    """Converts a DNA/RNA sequence into a proteic sequence."""
+def nuc_acid_to_prot(nuc_seq:str):
+    '''Converts a DNA/RNA sequence into a proteic sequence.'''
 
     matches = {
         'AAA':'K', 'AAC':'N', 'AAG':'K', 'AAT':'N',
@@ -107,11 +111,9 @@ def nuc_acid_to_prot(dna_seq:str):
         '---':'-'
     }
     aa = ''
-    # if len(dna_seq)%3 == 0:
-    codons = [dna_seq[i:i+3].upper() for i in range(0, len(dna_seq), 3)]
+    codons = [nuc_seq[i:i+3].upper() for i in range(0, len(nuc_seq), 3)]
     for codon in codons:
         if len(codon) == 3:
-            # codon = codon.replace('U', 'T')
             try:
                 aa += matches[codon]
             except KeyError:
@@ -120,46 +122,47 @@ def nuc_acid_to_prot(dna_seq:str):
         else:
             print(f"Ignored: {codon} (not a codon)")
     return aa
-    # else:
-    #     print("Inorrect sequence length")
-    #     return False
 
 
 def loadAlignment(alignmentFile):
     """Loads a FASTA alignment."""
+
     alignmentDict = {}
-    seq_idMax = 0
+    maxSeqIdLength = 0
     with open(alignmentFile, 'r') as af:
         for line in af:
             if line[0] == '>': # FASTA header
                 seq_id = line.strip('\n')[1:]
-                if len(seq_id) > seq_idMax:
-                    seq_idMax = len(seq_id)
+                if len(seq_id) > maxSeqIdLength:
+                    maxSeqIdLength = len(seq_id)
                 alignmentDict[seq_id] = ''
             else: # sequence
                 aligned_seq = line.strip('\n')
                 alignmentDict[seq_id] = aligned_seq
-    return alignmentDict, seq_idMax
+    return alignmentDict, maxSeqIdLength
 
 
-def loadResults(resultsFile, statcol=1, nostat_value=-1.0):
-    """Loads statistics. <statcol> defines the 0-based index
-    of the column to use (1 by default)."""
+def loadResultsSites(resultsFile, statcol=1, nostat_value=-1.0, sep='\t'):
+    """Loads site results from column with index <statcol>."""
+
     resultsDict = {}
     with open(resultsFile, 'r') as f:
         i = 0
         for line in f:
+            line = line.strip('\n').split(args.sep)
+            # if line[0] 
+            if i < 10:
+                print(line)
             if i > 0: # avoid column headers
-                line = line.strip('\n').split('\t')
                 try:
                     site = int(line[0])
                     res = float(line[statcol])
                 except ValueError:
                     print(f"Conversion failed in line\n\t{line}")
                 else:
-                    while not i == site: # in case there is no statistic for
+                    while i < site: # in case there is no statistic for
                     # a site, define an aberrant value
-                        print(f'Site {i} missing')
+                        print(f'Site {i} missing (current line: site {site})')
                         resultsDict[i] = nostat_value
                         i += 1
                     resultsDict[i] = res
@@ -206,7 +209,8 @@ def createPhyloXML(fam,newick):
             else:
                 nv_arbre+=newick[i]
         newick = nv_arbre
-    # print(newick)
+    
+    print(newick)
     handle = StringIO(newick)
     trees = Phylo.read(handle, 'newick')
     #Write a sequence of Tree objects to the given file or handle
@@ -286,6 +290,7 @@ def createPhyloXML(fam,newick):
                 leaf.append(crossref)
             evrec.append(leaf)
             element.append(evrec)
+    
     print ("Number of leaves : ")
     print (nbfeuille)
     nbspecies = len(famspecies)
@@ -316,12 +321,12 @@ sys.setrecursionlimit(15000)
 # print(sys.getrecursionlimit())
 
 print ("Loading alignment... ")
-alignmentDict =  loadAlignment(args.alignmentFile)[0]
-maxSeqIdLength = loadAlignment(args.alignmentFile)[1]
+loadedAlignment = loadAlignment(args.alignmentFile)
+alignmentDict, maxSeqIdLength = loadedAlignment[0], loadedAlignment[1]
 print ("OK")
 
 print ("Loading results... ")
-resultsText =  loadResults(args.resultsFile, args.statcol, args.nostat)
+resultsText =  loadResultsSites(args.resultsFile, args.statcol, args.nostat)
 print ("OK")
 
 #Creates empty phyloxml document
