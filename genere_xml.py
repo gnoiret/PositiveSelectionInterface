@@ -56,6 +56,9 @@ parser.add_argument('-s', '--sep', dest='sep', action='store',\
     required=False,\
     default='\t',\
     help='column separator')
+parser.add_argument('-x', '--sitebranch', dest='isSitebranch', action='store_true',\
+    required=False,\
+    help='view site-branch data')
 parser.add_argument('-c', '--col', dest='statcol', action='store', type=int,\
     default=1,\
     help='index of the results column to use')

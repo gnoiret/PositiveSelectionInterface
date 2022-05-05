@@ -61,6 +61,14 @@ router.post("/upload_files", upload.fields([
   const full_path_xml = xml_dir + fname_xml;
   const statcol = req.body.statcol;
   const nostat = req.body.nostat;
+  const sitebranch = req.body.sitebranch;
+
+  console.log('sitebranch:', sitebranch);
+  if (sitebranch != undefined) {
+    console.log('sitebranch');
+  } else {
+    console.log('not sitebranch');
+  }
 
   console.log('Tree: ' + fname_tree + '\n' +
   'Alignment: ' + fname_alignment + '\n' +
@@ -82,6 +90,21 @@ router.post("/upload_files", upload.fields([
   (error, stdout, stderr) => {
     if (error) {
       console.log(`error: ${error.message}`);
+    } else {
+      exec('rm'
+        +' '+upload_dir+fname_tree
+        +' '+upload_dir+fname_alignment
+        +' '+upload_dir+fname_results,
+        (error, stdout, stderr) => {
+          if (error) {
+            console.log(`error: ${error.message}`);
+          }
+          if (stderr) {
+            console.log(`error: ${stderr}`);
+          }
+          console.log(`${stdout}`);
+        }
+      )
     }
     if (stderr) {
       console.log(`error: ${stderr}`);

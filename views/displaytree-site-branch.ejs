@@ -186,6 +186,18 @@
       <!-- Champs Seuils sup. et inf. -->
       <label for="ps-threshold-low"  style="font-size: 12px;">Lower threshold:</label><input type="number" id="ps-threshold-low" min="0.0" step="0.05" placeholder="PS Threshold" value="0.9" style="width: 5em; font-size: 12px;"/>
       <label for="ps-threshold-high" style="font-size: 12px;">Upper threshold:</label><input type="number" id="ps-threshold-high" min="0.0" step="0.05" placeholder="PS Threshold" value="1.0" style="width: 5em; font-size: 12px;"/>
+      
+      <!-- Mode de sélection branche / clade -->
+      <div class="btn-group" role="group" id="selection-mode">
+        <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="selection mode">
+          Selection Mode
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+          <li><a href="#" id="selection-mode-branch">Branch</a></li>
+          <li><a href="#" id="selection-mode-clade">Clade</a></li>
+        </ul>
+      </div>
   </nav>
   <!-- <div  class="testnav" id="testnav" ></div> -->
     <div id="svg-container">
@@ -1064,53 +1076,53 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       });
   
   // Alignement : ajout des rectangles (version site-branche)
-  var aaSequence = d3.select('.aa-sequence');
-  var nucSequence = d3.select('.dna-sequence');
+  var aaSequences = d3.selectAll('.aa-sequence');
+  var nucSequences = d3.selectAll('.dna-sequence');
 
-  // Alignement : ajout des rectangles (version séquence entière)
-  var aaSequence = d3.select('.aa-sequence');
-  var nucSequence = d3.select('.dna-sequence');
-  // console.log('First site ID', psResultsDataset[0].site);
-  for (i = psResultsDataset[0].site; i < psResultsDataset.length; i ++) {
-    if (displaySeqType == 'AA') {
-      // Ajout d'un rectangle coloré par AA
-      aaSequence.append('rect')
-        .attr('x', function(d) {return i*hStep;})
-        .attr('width', hStep)
-        .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
-        .attr('height', maxYSeq - minYSeq + hStepBase*2)
-        .style('fill', () => {
-          if (psResultsDataset[i].stat > psThresholdHigh) {
-            return psThresholdHighBgColor;
-          } else if (psResultsDataset[i].stat > psThresholdLow) {
-            return psThresholdLowBgColor;
-          } else if (psResultsDataset[i].stat > 0) {
-            return psBelowThresholdBgColor;
-          } else {
-            return psMissingBgColor;
-          }
-        });
-    } else {
+  console.log(aaSequences);
+  
+  for (seq_i = 0; seq_i < aaSequences.length; seq_i ++) {
+    for (site_i = psResultsDataset[0].site; site_i < psResultsDataset.length; site_i ++) {
+      if (displaySeqType == 'AA') {
+        // Ajout d'un rectangle coloré par AA
+        aaSequences.append('rect')
+          .attr('x', function(d) {return site_i*hStep;})
+          .attr('y', function(d) {return d.y;})
+          .attr('width', hStep)
+          .attr('height', hStep)
+          .style('fill', () => {
+            if (psResultsDataset[site_i].stat > psThresholdHigh) {
+              return psThresholdHighBgColor;
+            } else if (psResultsDataset[site_i].stat > psThresholdLow) {
+              return psThresholdLowBgColor;
+            } else if (psResultsDataset[site_i].stat > 0) {
+              return psBelowThresholdBgColor;
+            } else {
+              return psMissingBgColor;
+            }
+          });
+      } else {
       // Ajout d'un rectangle coloré par codon
-      nucSequence.append('rect')
-        .attr('x', function(d) {return i*hStep;})
-        .attr('width', hStep)
-        .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
-        .attr('height', maxYSeq - minYSeq + hStepBase*2)
+      nucSequences.append('rect')
+          .attr('x', function(d) {return site_i*hStep;})
+          .attr('y', function(d) {return d.y;})
+          .attr('width', hStep)
+          .attr('height', hStep)
         .style('fill', () => {
-          if (psResultsDataset[i].stat > psThresholdHigh) {
+          if (psResultsDataset[site_i].stat > psThresholdHigh) {
             return psThresholdHighBgColor;
-          } else if (psResultsDataset[i].stat > psThresholdLow) {
+          } else if (psResultsDataset[site_i].stat > psThresholdLow) {
             return psThresholdLowBgColor;
-          } else if (psResultsDataset[i].stat > 0) {
+          } else if (psResultsDataset[site_i].stat > 0) {
             return psBelowThresholdBgColor;
           } else {
             return psMissingBgColor;
           }
         });
+      }
     }
   }
-  
+
   // Alignement : ajout des AA / codons (version séquence entière)
   seqTextAA.append('text')
     .style('letter-spacing', (alignmentLetterSpacing)+'px') // Espacement des lettres pour correpondre au graphe
@@ -1122,6 +1134,62 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .attr('x', function(d) {return 1;})
     .attr('y', function(d) {return Math.floor(hStepBase/3);})
     .text(function(d) {return d.dna;});
+
+  // // Alignement : ajout des rectangles (version séquence entière)
+  // var aaSequenceUnique = d3.select('.aa-sequence');
+  // var nucSequenceUnique = d3.select('.dna-sequence');
+  // // console.log('First site ID', psResultsDataset[0].site);
+  // for (i = psResultsDataset[0].site; i < psResultsDataset.length; i ++) {
+  //   if (displaySeqType == 'AA') {
+  //     // Ajout d'un rectangle coloré par AA
+  //     aaSequenceUnique.append('rect')
+  //       .attr('x', function(d) {return i*hStep;})
+  //       .attr('width', hStep)
+  //       .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
+  //       .attr('height', maxYSeq - minYSeq + hStepBase*2)
+  //       .style('fill', () => {
+  //         if (psResultsDataset[i].stat > psThresholdHigh) {
+  //           return psThresholdHighBgColor;
+  //         } else if (psResultsDataset[i].stat > psThresholdLow) {
+  //           return psThresholdLowBgColor;
+  //         } else if (psResultsDataset[i].stat > 0) {
+  //           return psBelowThresholdBgColor;
+  //         } else {
+  //           return psMissingBgColor;
+  //         }
+  //       });
+  //   } else {
+  //     // Ajout d'un rectangle coloré par codon
+  //     nucSequenceUnique.append('rect')
+  //       .attr('x', function(d) {return i*hStep;})
+  //       .attr('width', hStep)
+  //       .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
+  //       .attr('height', maxYSeq - minYSeq + hStepBase*2)
+  //       .style('fill', () => {
+  //         if (psResultsDataset[i].stat > psThresholdHigh) {
+  //           return psThresholdHighBgColor;
+  //         } else if (psResultsDataset[i].stat > psThresholdLow) {
+  //           return psThresholdLowBgColor;
+  //         } else if (psResultsDataset[i].stat > 0) {
+  //           return psBelowThresholdBgColor;
+  //         } else {
+  //           return psMissingBgColor;
+  //         }
+  //       });
+  //   }
+  // }
+  //
+  // // Alignement : ajout des AA / codons (version séquence entière)
+  // seqTextAA.append('text')
+  //   .style('letter-spacing', (alignmentLetterSpacing)+'px') // Espacement des lettres pour correpondre au graphe
+  //   .attr('x', function(d) {return 1;})
+  //   .attr('y', function(d) {return Math.floor(hStepBase/3);})
+  //   .text(function(d) {return d.aa;});
+  // seqTextNuc.append('text')
+  //   .style('letter-spacing', (alignmentLetterSpacing)+'px') // Espacement des lettres pour correpondre au graphe
+  //   .attr('x', function(d) {return 1;})
+  //   .attr('y', function(d) {return Math.floor(hStepBase/3);})
+  //   .text(function(d) {return d.dna;});
 
   // ==============================================================
   // Fin modif : blocs de séquences
