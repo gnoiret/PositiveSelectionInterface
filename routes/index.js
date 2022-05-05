@@ -42,7 +42,12 @@ router.get('/', function(req, res, next) {
 
 // POST upload_files
 // -----------
-router.post("/upload_files", upload.fields([{name: 'file_t', maxCount: 1}, {name: 'file_a', maxCount: 1}, {name: 'file_r', maxCount: 1}]), (req, res) => {
+router.post("/upload_files", upload.fields([
+  {name: 'file_t', maxCount: 1}, 
+  {name: 'file_a', maxCount: 1}, 
+  {name: 'file_r', maxCount: 1}
+]), 
+(req, res) => {
   console.log('Uploading files...');
   console.log(req.body);
   console.log(req.files);

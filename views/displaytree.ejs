@@ -427,13 +427,14 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   var results = xmlparser.flatTree(recTree.phyloxml.phylogeny.statistics.results);
   results = results.split(' ');
   var psResultsDataset = [];
-  var site = 0;
-  var stat = 0.0;
-  results.forEach(function(d,i) {
+  // var site = 0;
+  // var stat = 0.0;
+  results.forEach(function (d,i) {
     d = d.split(':');
     result = {site:parseInt(d[0]), stat:parseFloat(d[1])};
     psResultsDataset.push(result);
   });
+  // console.log(psResultsDataset);
   var psGraphMargins = {top: 20, right: 50, bottom: 50, left: 50+seq_lg};
   var psGraphWidth = psResultsDataset.length*hStep;
   var psGraphHeight = 150;
@@ -476,7 +477,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   }
   var nodes = treeRoot.descendants();
   var links = treeRoot.links();
-  console.log(nodes);
+  // console.log(nodes);
 
   // Coloration du pattern si il existe
   if ((pattern != "none") && (pattern !== ' ') && (pattern !== undefined)) {
@@ -510,7 +511,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   svg1.attr("height", heightSVG + margin.top + margin.down+400      + ajustementY);
   g.attr("transform", "translate(" + (margin.right - minX - 250) + "," + (margin.top - minY + 200     + decalageY) + ")");
 
-  console.log(links);
+  // console.log(links);
 
   // ====================
   //  D3: Objets LINK
@@ -577,10 +578,10 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       // console.log(d.target);
       var selLinks = g.selectAll('.link');
       selLinks.style('stroke-width', '10');
-      console.log('d');
-      console.log(d);
-      console.log('selLinks');
-      console.log(selLinks);
+      // console.log('d');
+      // console.log(d);
+      // console.log('selLinks');
+      // console.log(selLinks);
 
       var pattIndex =  d.target.data.lastEvent.pattern;
       if (pattIndex !== undefined) {
@@ -880,12 +881,12 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   var leaves = nodes.filter(function (e) {
       return !e.children;
     });
-  // ==============================================================
-  // Début modif : graphe des résultats de sélection positive
-  // ==============================================================
+  // ============================================================
+  // | Début modif : graphe des résultats de sélection positive |
+  // ============================================================
   var svg2 = d3.select("#svg2");
   svg2.attr("width", widthSVG + margin.right + ajustementX + 400)
-    .attr("height",  heightSVG + margin.top + margin.down +200);
+    .attr("height",  heightSVG + margin.top + margin.down + 200);
   // Fonction de calcul de la statistique maximale dans les résultats
   function maxStat(results) {
     var currentmax = results[0].stat;
@@ -894,7 +895,24 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         currentmax = res.stat;
       }
     });
-    return currentmax;
+    if (currentmax >= 2) {
+      return 2;
+    } else {
+      return currentmax;
+    }
+  }
+  function minStat(results) {
+    var currentmin = results[0].stat;
+    results.forEach(function(res) {
+      if (res.stat < currentmin) {
+        currentmin = res.stat;
+      }
+    });
+    if (currentmin <= 0) {
+      return currentmin;
+    } else {
+      return 0;
+    }
   }
   // Définition de l'échelle pour l'axe x
   var x = d3.scaleLinear()
@@ -915,7 +933,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // Ajout de l'axe y au graphe
   psGraph.append('g')
     .call(d3.axisLeft(y));
-  // Ajout du seuil inférieur au graphe (à y = seuil bas)
+  // Ajout du seuil inférieur au graphe
   psGraph.append('line')
     .attr('x1', x(1))
     .attr('y1', y(psThresholdLow))
@@ -925,7 +943,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     // .style('stroke', psThresholdLowBgColor)
     .style('stroke-width', 2+'px')
     .style('stroke-dasharray', ('4, 4'));
-  // Ajout du seuil supérieur au graphe (à y = seuil haut)
+  // Ajout du seuil supérieur au graphe
   psGraph.append('line')
     .attr('x1', x(1))
     .attr('y1', y(psThresholdHigh))
@@ -935,8 +953,12 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     // .style('stroke', psThresholdHighBgColor)
     .style('stroke-width', 2+'px')
     .style('stroke-dasharray', ('4, 4'));
+  
   // // Suppression du graphe
   // psGraph.exit().remove();
+
+  // Calcul du décalage des sites pour le positionnement des rectangles
+  var siteOffset = 1 - psResultsDataset[0].site;
   // Association des données aux futurs rectangles
   var rects = psGraph.selectAll('.psrects')
     .data(psResultsDataset);
@@ -944,31 +966,34 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   rects.enter().append('rect')
     .attr('class', 'psrects')
     .attr('title', function(d) {
-      return d.site;
+      return d.site;  
     })
     .attr('width', function(d) { return hStep; })
-    .attr('height', function(d) { return y(0)-y(d.stat); })
-    .attr('x', function(d) { return x(d.site); })
+    .attr('height', function(d) { return y(0) - y(d.stat); })
+    .attr('x', function(d) { return x(d.site + siteOffset); })
     .attr('y', function(d) { return y(d.stat); })
     .style('fill', function(d) {
-      if (d.stat > psThresholdHigh) {
+      if (d.stat >= psThresholdHigh) {
         return psThresholdHighBgColor;
-      } else if (d.stat > psThresholdLow) {
+      } else if (d.stat >= psThresholdLow) {
         return psThresholdLowBgColor;
-      } else if (d.stat > 0) {
+      } else if (d.stat >= 0) {
         return psBelowThresholdBgColor;
       } else {
         return psMissingBgColor;
       }
     })
-    .style('stroke', 'black')
+    .style('stroke', '#000000')
     .style('stroke-width', 1+'px');
-  psGraph.on('click', function() {
-    var coords = d3.mouse(this);
+  
+  psGraph.on('click', function(event) {
+    // var coords = d3.mouse(this);
+    console.log(event.target.title);
   });
-  // ==============================================================
-  // Fin modif : graphe des résultats de sélection positive
-  // ==============================================================
+  // ==========================================================
+  // | Fin modif : graphe des résultats de sélection positive |
+  // ==========================================================
+  
   // ==============================================================
   // Début modif : blocs de séquences
   // ==============================================================
@@ -1038,7 +1063,8 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // Alignement : ajout des rectangles (version séquence entière)
   var oneSeqAA = d3.select('.aa-sequence');
   var oneSeqDna = d3.select('.dna-sequence');
-  for (i=0; i<psResultsDataset.length; i++) {
+  // console.log('First site ID', psResultsDataset[0].site);
+  for (i=psResultsDataset[0].site; i<psResultsDataset.length; i++) {
     if (displaySeqType == 'AA') {
       // Ajout d'un rectangle coloré par AA
       oneSeqAA.append('rect')
@@ -1132,8 +1158,8 @@ function isStorageSupported(storage) {
 //   window.open().document.write('<p>Please copy or save the the image <img src="' + img.src + '"/>');
 // };
 function saveSVGTree(){
-  $("a#tree").css('color', 'red');
-  $("a#selecp").css('color', 'black');
+  $("a#tree").css('color', '#FF0000');
+  $("a#selecp").css('color', '#000000');
   // get styles from all required stylesheets
   // http://www.coffeegnome.net/converting-svg-to-png-with-canvg/
   var style = "\n";
@@ -1151,8 +1177,8 @@ function saveSVGTree(){
   window.open().document.write('<p>Please copy or save the the image (it may not display if it is too large) <img src="' + img.src + '"/>');
 };
 function saveSVGAlignment(){
-  $("a#tree").css('color', 'black');
-  $("a#selecp").css('color', 'red');
+  $("a#tree").css('color', '#000000');
+  $("a#selecp").css('color', '#FF0000');
   // Application de styles pour l'export
   $('.seqblock text').css({
     'font-family':'Courier',
@@ -1557,13 +1583,13 @@ function collapseVeryBigTree(treeRoot,patterns) {
   $('#action').ready(function() {
     switch (myStorage.getItem("action")) {
       case "Switch children":
-        $('#switch').css('color','red');
+        $('#switch').css('color','#FF0000');
         break;
       case "Collapse/Expand":
-        $('#collapse').css('color','red');
+        $('#collapse').css('color','#FF0000');
         break;
       case "Sub Tree/Upper Tree":
-        $('#subtree').css('color','red');
+        $('#subtree').css('color','#FF0000');
         break;
       default:
     }
@@ -1574,23 +1600,23 @@ function collapseVeryBigTree(treeRoot,patterns) {
     switch (target.text) {
       case "Switch children":
         action = svgEvents.switchChildren;
-        $('#switch').css('color','red');
-        $('#collapse').css('color','black');
-        $('#subtree').css('color','black');
+        $('#switch').css('color','#FF0000');
+        $('#collapse').css('color','#000000');
+        $('#subtree').css('color','#000000');
         updateLayout(cladeRoot);
         break;
       case "Collapse/Expand":
         action = svgEvents.collapse;
-        $('#switch').css('color','black');
-        $('#collapse').css('color','red');
-        $('#subtree').css('color','black');
+        $('#switch').css('color','#000000');
+        $('#collapse').css('color','#FF0000');
+        $('#subtree').css('color','#000000');
         updateLayout(cladeRoot);
         break;
       case "Sub Tree/Upper Tree":
         action = svgEvents.focus;
-        $('#switch').css('color','black');
-        $('#collapse').css('color','black');
-        $('#subtree').css('color','red');
+        $('#switch').css('color','#000000');
+        $('#collapse').css('color','#000000');
+        $('#subtree').css('color','#FF0000');
         updateLayout(cladeRoot);
         break;
       default:
@@ -1661,16 +1687,16 @@ $('#export').on('click', function(event, dropdownData) {
 $(document).ready(function() {
   switch (displaySeqType) {
     case 'AA':
-      $('a#aminoacid').css('color', 'red');
-      $('a#nucleotid').css('color', 'black');
+      $('a#aminoacid').css('color', '#FF0000');
+      $('a#nucleotid').css('color', '#000000');
       break;
     case 'Nuc':
-      $('a#aminoacid').css('color', 'black');
-      $('a#nucleotid').css('color', 'red');
+      $('a#aminoacid').css('color', '#000000');
+      $('a#nucleotid').css('color', '#FF0000');
       break;
     default:
-      $('a#aminoacid').css('color', 'black');
-      $('a#nucleotid').css('color', 'black');
+      $('a#aminoacid').css('color', '#000000');
+      $('a#nucleotid').css('color', '#000000');
       break;
   }
   $('div.demo').css({
@@ -1697,23 +1723,23 @@ $(document).ready(function() {
       case "Codons":
         if (displaySeqType != 'Nuc') {
           displaySeqType = "Nuc";
-          console.log("current display: AA, switching to Nuc");
+          console.log("Displaying codons");
           $(".aa-sequence").css("display", "none");
           $(".dna-sequence").css("display", "block");
           $("#toggle-seqtype").html("Current display: "+displaySeqType);
-          $("#nucleotid").css('color', 'red');
-          $("#aminoacid").css('color', 'black');
+          $("#nucleotid").css('color', '#FF0000');
+          $("#aminoacid").css('color', '#000000');
           updateLayout(cladeRoot);
         }
         break;
       case "Amino Acids":
         if (displaySeqType != 'AA') {
           displaySeqType = "AA";
-          console.log("current display: Nuc, switching to AA");
+          console.log("Displaying amino acids");
           $(".dna-sequence").css("display", "none");
           $(".aa-sequence").css("display", "block");
-          $("#nucleotid").css('color', 'black');
-          $("#aminoacid").css('color', 'red');
+          $("#nucleotid").css('color', '#000000');
+          $("#aminoacid").css('color', '#FF0000');
           updateLayout(cladeRoot);
         }
         break;
@@ -1725,9 +1751,9 @@ $(document).ready(function() {
     // On a modifié un des seuils
     psThresholdsChanged = true;
     // Correction des valeurs en présence d'incohérences
-    var psHighVal = $('#ps-threshold-high').val();
-    var psLowVal = $('#ps-threshold-low').val();
-    console.log('> ', psHighVal, '>=', psLowVal);
+    var psHighVal = parseInt($('#ps-threshold-high').val());
+    var psLowVal = parseInt($('#ps-threshold-low').val());
+    // console.log('Thresholds:', psHighVal, '>=', psLowVal);
     if (psHighVal < psLowVal) {
       if (event.currentTarget.id == 'ps-threshold-high') {
         // On a descendu le seuil supérieur plus bas que le seuil inférieur
