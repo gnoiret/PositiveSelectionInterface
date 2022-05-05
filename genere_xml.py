@@ -117,8 +117,9 @@ def nuc_acid_to_prot(nuc_seq:str):
             try:
                 aa += matches[codon]
             except KeyError:
-                print(f"Unknown codon: {codon}")
-                return False
+                print(f"Unknown codon: {codon}, adding 'X' to sequence")
+                aa += 'X'
+                # return False
         else:
             print(f"Ignored: {codon} (not a codon)")
     return aa
@@ -147,25 +148,26 @@ def loadResultsSites(resultsFile, statcol=1, nostat_value=-1.0, sep='\t'):
 
     resultsDict = {}
     with open(resultsFile, 'r') as f:
-        i = 0
+        i = -1
         for line in f:
             line = line.strip('\n').split(args.sep)
-            # if line[0] 
-            if i < 10:
-                print(line)
-            if i > 0: # avoid column headers
+            if re.search('^[0-9]+$', line[0]): # results line
                 try:
                     site = int(line[0])
                     res = float(line[statcol])
                 except ValueError:
-                    print(f"Conversion failed in line\n\t{line}")
+                    print(f"Conversion failed in line {line}")
                 else:
+                    if i == -1:
+                        i = site
                     while i < site: # in case there is no statistic for
-                    # a site, define an aberrant value
+                    # a site, give it a default value
                         print(f'Site {i} missing (current line: site {site})')
                         resultsDict[i] = nostat_value
                         i += 1
                     resultsDict[i] = res
+            else: # other line (e.g. header)
+                print(line)  
             i += 1
 
     resultsText = ''
