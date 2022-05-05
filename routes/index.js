@@ -70,7 +70,7 @@ router.post("/upload_files", upload.fields([{name: 'file_t', maxCount: 1}, {name
   exec('python3 genere_xml.py'
       +' -t '+upload_dir+fname_tree
       +' -a '+upload_dir+fname_alignment
-      +' -s '+upload_dir+fname_results
+      +' -r '+upload_dir+fname_results
       +' -o '+xml_dir+fname_xml
       +' -c '+statcol
       +' -n '+nostat,
