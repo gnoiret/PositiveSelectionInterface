@@ -181,6 +181,63 @@ def loadResultsSites(resultsFile, statcol=1, nostat_value=-1.0, sep='\t'):
     return resultsText
 
 
+def loadResultsSiteBranch(resultsFile, nostat_value=-1.0, sep='\t'):
+    """Loads site-branch results."""
+
+    # resultsDict = {}
+    d_cols = {}
+    column_lists = []
+    with open(resultsFile, 'r') as f:
+        headers = f.readline().strip().split(sep)
+        for header in headers:
+            column_lists.append([header])
+        # print(column_lists)
+
+        for line in f:
+            line = line.strip().split(sep)
+            for i in range(len(line)):
+                column_lists[i].append(line[i])
+        # print(column_lists[0])
+
+        d_cols = {}
+        for col_list in column_lists:
+            d_cols[col_list[0]] = col_list[1:]
+            # for i in range(len(col_list)):
+            #     d_cols[col_list[0]] = [column_lists[0][]]
+        print(d_cols['sites'])
+
+    #     i = -1
+    #     for line in f:
+    #         line = line.strip().split(sep)
+    #         if re.search('^[0-9]+$', line[0]): # results line
+    #             try:
+    #                 site = int(line[0])
+    #                 res = float(line[statcol])
+    #             except ValueError:
+    #                 print(f'Conversion failed in line {line}')
+    #             else:
+    #                 if i == -1:
+    #                     i = site
+    #                 while i < site: # in case there is no statistic for
+    #                 # a site, give it a default value
+    #                     print(f'Site {i} missing (current line: site {site})')
+    #                     resultsDict[i] = nostat_value
+    #                     i += 1
+    #                 resultsDict[i] = res
+    #         else: # other line (e.g. header)
+    #             print(line)  
+    #         i += 1
+
+    d_results_text = {}
+    for col, res_list in d_cols.items():
+        d_results_text[col] = ''
+        d_results_text[col] += f'{key}:{item}'
+        if key != max(d_cols.keys()):
+            d_results_text += ' '
+    return d_results_text
+    # return False
+
+
 def loadDico(fileDico):
     """
     Fonction qui prend un fichier d'alignement en entree et retourne un dictionnaire des noms d'espece des sequences
@@ -215,7 +272,7 @@ def createPhyloXML(fam,newick):
                 nv_arbre+=newick[i]
         newick = nv_arbre
     
-    print(newick)
+    # print(newick)
     handle = StringIO(newick)
     trees = Phylo.read(handle, 'newick')
     #Write a sequence of Tree objects to the given file or handle
@@ -331,7 +388,8 @@ alignmentDict, maxSeqIdLength = loadedAlignment[0], loadedAlignment[1]
 print ("OK")
 
 print ("Loading results... ")
-resultsText =  loadResultsSites(args.resultsFile, args.statcol, args.nostat)
+# resultsText =  loadResultsSites(args.resultsFile, args.statcol, args.nostat, sep=args.sep)
+resultsText =  loadResultsSiteBranch(args.resultsFile, sep=args.sep)
 print ("OK")
 
 #Creates empty phyloxml document
@@ -363,7 +421,7 @@ for line in treefile:
         fam = ''
     phyloxmltree = createPhyloXML(fam,newick)
     xmloutputfile.write(phyloxmltree)
-    print ("Famille "+fam+" OK")
+    print("Famille "+fam+" OK")
 
 treefile.close()
 xmloutputfile.close()
