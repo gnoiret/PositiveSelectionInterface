@@ -1091,11 +1091,11 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
           .attr('width', hStep)
           .attr('height', hStep)
           .style('fill', () => {
-            if (psResultsDataset[site_i].stat > psThresholdHigh) {
+            if (psResultsDataset[site_i].stat >= psThresholdHigh) {
               return psThresholdHighBgColor;
-            } else if (psResultsDataset[site_i].stat > psThresholdLow) {
+            } else if (psResultsDataset[site_i].stat >= psThresholdLow) {
               return psThresholdLowBgColor;
-            } else if (psResultsDataset[site_i].stat > 0) {
+            } else if (psResultsDataset[site_i].stat >= 0) {
               return psBelowThresholdBgColor;
             } else {
               return psMissingBgColor;
@@ -1109,11 +1109,11 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
           .attr('width', hStep)
           .attr('height', hStep)
         .style('fill', () => {
-          if (psResultsDataset[site_i].stat > psThresholdHigh) {
+          if (psResultsDataset[site_i].stat >= psThresholdHigh) {
             return psThresholdHighBgColor;
-          } else if (psResultsDataset[site_i].stat > psThresholdLow) {
+          } else if (psResultsDataset[site_i].stat >= psThresholdLow) {
             return psThresholdLowBgColor;
-          } else if (psResultsDataset[site_i].stat > 0) {
+          } else if (psResultsDataset[site_i].stat >= 0) {
             return psBelowThresholdBgColor;
           } else {
             return psMissingBgColor;
