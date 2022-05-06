@@ -34,7 +34,6 @@ import sqlite3
 import zlib
 import base64
 
-
 # args = docopt(__doc__)
 # tree = args["<treeFile>"]
 # alignment = args["<alignmentFile>"]
@@ -199,12 +198,23 @@ def loadResultsSiteBranch(resultsFile, nostat_value=-1.0, sep='\t'):
                 column_lists[i].append(line[i])
         # print(column_lists[0])
 
-        d_cols = {}
-        for col_list in column_lists:
-            d_cols[col_list[0]] = col_list[1:]
-            # for i in range(len(col_list)):
-            #     d_cols[col_list[0]] = [column_lists[0][]]
-        print(d_cols['sites'])
+        for column in column_lists:
+            d_cols[column[0]] = column[1:]
+
+        position_header = 'sites'
+        d_cols_2 = dict(d_cols)
+        # print(d_cols_2)
+
+        for col_key in d_cols:
+            # print('clé', col_key, 'de longueur', len(d_cols[col_key]))
+            if col_key != position_header:
+                col_text = f'{col_key}('
+                for i in range(len(d_cols[position_header])):
+                    col_text += f'{d_cols[position_header][i]}:{d_cols[col_key][i]} '
+                # col_text = col_text[:-1]
+                col_text += '\b)'
+                d_cols_2[col_key] = col_text
+            # print(col_key, d_cols_2[col_key], '\n')
 
     #     i = -1
     #     for line in f:
@@ -228,14 +238,14 @@ def loadResultsSiteBranch(resultsFile, nostat_value=-1.0, sep='\t'):
     #             print(line)  
     #         i += 1
 
-    d_results_text = {}
-    for col, res_list in d_cols.items():
-        d_results_text[col] = ''
-        d_results_text[col] += f'{key}:{item}'
-        if key != max(d_cols.keys()):
-            d_results_text += ' '
-    return d_results_text
-    # return False
+    results_text = ''
+    for col in d_cols_2:
+        if col != position_header:
+            # print(d_cols_2[col])
+            results_text += d_cols_2[col]+'\n'
+    results_text = results_text[:-1]
+    print(results_text)
+    return results_text
 
 
 def loadDico(fileDico):
@@ -389,7 +399,7 @@ print ("OK")
 
 print ("Loading results... ")
 # resultsText =  loadResultsSites(args.resultsFile, args.statcol, args.nostat, sep=args.sep)
-resultsText =  loadResultsSiteBranch(args.resultsFile, sep=args.sep)
+resultsText = loadResultsSiteBranch(args.resultsFile, sep=args.sep)
 print ("OK")
 
 #Creates empty phyloxml document
