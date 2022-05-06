@@ -1080,11 +1080,11 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
         .attr('height', maxYSeq - minYSeq + hStepBase*2)
         .style('fill', () => {
-          if (psResultsDataset[i].stat > psThresholdHigh) {
+          if (psResultsDataset[i].stat >= psThresholdHigh) {
             return psThresholdHighBgColor;
-          } else if (psResultsDataset[i].stat > psThresholdLow) {
+          } else if (psResultsDataset[i].stat >= psThresholdLow) {
             return psThresholdLowBgColor;
-          } else if (psResultsDataset[i].stat > 0) {
+          } else if (psResultsDataset[i].stat >= 0) {
             return psBelowThresholdBgColor;
           } else {
             return psMissingBgColor;
@@ -1098,11 +1098,11 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
         .attr('height', maxYSeq - minYSeq + hStepBase*2)
         .style('fill', () => {
-          if (psResultsDataset[i].stat > psThresholdHigh) {
+          if (psResultsDataset[i].stat >= psThresholdHigh) {
             return psThresholdHighBgColor;
-          } else if (psResultsDataset[i].stat > psThresholdLow) {
+          } else if (psResultsDataset[i].stat >= psThresholdLow) {
             return psThresholdLowBgColor;
-          } else if (psResultsDataset[i].stat > 0) {
+          } else if (psResultsDataset[i].stat >= 0) {
             return psBelowThresholdBgColor;
           } else {
             return psMissingBgColor;
