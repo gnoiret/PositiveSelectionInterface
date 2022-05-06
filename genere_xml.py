@@ -316,6 +316,8 @@ def createPhyloXML(fam,newick):
     famspecies = {}
 
     for element in clade[0].iter('clade'): # pour chaque id de séquence
+        print('coucou')
+        # print(element)
         enom=element.find('name')
         if (enom is not None) :
             nbfeuille = nbfeuille + 1
@@ -333,6 +335,7 @@ def createPhyloXML(fam,newick):
                 seq_alg = ""
 
             evrec = etree.Element("eventsRec")
+            branchres = etree.Element("branchStats")
             leaf = etree.Element("leaf")
             if 'crossdico' in globals():
                 crossref = etree.Element("crossref")
@@ -395,11 +398,12 @@ sys.setrecursionlimit(15000)
 print ("Loading alignment... ")
 loadedAlignment = loadAlignment(args.alignmentFile)
 alignmentDict, maxSeqIdLength = loadedAlignment[0], loadedAlignment[1]
+print('maxSeqIdLength:', maxSeqIdLength)
 print ("OK")
 
 print ("Loading results... ")
-# resultsText =  loadResultsSites(args.resultsFile, args.statcol, args.nostat, sep=args.sep)
-resultsText = loadResultsSiteBranch(args.resultsFile, sep=args.sep)
+resultsText =  loadResultsSites(args.resultsFile, args.statcol, args.nostat, sep=args.sep)
+# resultsText = loadResultsSiteBranch(args.resultsFile, sep=args.sep)
 print ("OK")
 
 #Creates empty phyloxml document
