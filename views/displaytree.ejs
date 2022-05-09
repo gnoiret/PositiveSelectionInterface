@@ -1062,10 +1062,6 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       .style('display', function() {
         return displaySeqType == 'Nuc' ? 'block' : 'none';
       });
-  
-  // Alignement : ajout des rectangles (version site-branche)
-  var aaSequence = d3.select('.aa-sequence');
-  var nucSequence = d3.select('.dna-sequence');
 
   // Alignement : ajout des rectangles (version séquence entière)
   var aaSequence = d3.select('.aa-sequence');

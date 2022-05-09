@@ -20,7 +20,7 @@ import random
 import os
 from Bio import Phylo
 from io import StringIO
-import time
+# import time
 from ete3 import Phyloxml, phyloxml
 
 from lxml import etree
@@ -30,9 +30,9 @@ from xml.dom import minidom
 from lxml.etree import XMLParser, parse
 
 # from docopt import docopt
-import sqlite3
-import zlib
-import base64
+# import sqlite3
+# import zlib
+# import base64
 
 # args = docopt(__doc__)
 # tree = args["<treeFile>"]
@@ -407,7 +407,7 @@ resultsText =  loadResultsSites(args.resultsFile, args.statcol, args.nostat, sep
 print ("OK")
 
 #Creates empty phyloxml document
-#project = Phyloxml()   a decommenter si on veut un fichier xml unique
+project = Phyloxml()   # a decommenter si on veut un fichier xml unique
 
 # Loads Species name dico
 dico = loadDico(args.alignmentFile)
