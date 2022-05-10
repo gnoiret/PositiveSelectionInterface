@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
   <!-- Optional theme -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-  <!-- Page CSS personnalisée -->
+  <!-- Custom CSS -->
   <link rel="stylesheet" href="/css/css_proj.css">
 
   <!-- Latest compiled and minified JavaScript -->
@@ -17,186 +17,93 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
   <!-- <script src='./d3.js' charset="utf-8"></script> -->
   <script src="https://d3js.org/d3.v4.min.js"></script>
-
-  <style media="screen">
-    .node {
-      cursor: pointer;
-    }
-    .block {
-      cursor: pointer;
-    }
-    .cblock {
-      cursor: none;
-    }
-    .slink {
-      stroke: red;
-      stroke-width: 10px;
-      opacity: 0.3;
-      fill: none;
-    }
-    .internal {
-        font: 10px sans-serif;
-    }
-    div.tooltip {
-      position: absolute;
-      text-align: center;
-      width:auto;
-      height: auto;
-      padding: 10px;
-      font: 16px sans-serif;
-      background: lightsteelblue;
-      border: 10px;
-      border-radius: 8px;
-      pointer-events: none;
-    }
-    div.legend {
-      position: absolute;
-      text-align: left;
-      width: 450px;
-      height: 28px;
-      padding: 2px;
-      font: 24px sans-serif;
-      border: 0px;
-      border-radius: 8px;
-      pointer-events: none;
-    }
-    div.dblegend {
-      position: absolute;
-      text-align: left;
-      padding: 2px;
-      font: 12px sans-serif;
-      border: 2px;
-      border-radius: 1px;
-      pointer-events: none;
-    }
-    div.testnav {
-      position: sticky;
-      text-align: left;
-      top:150px;
-      left:50px;
-      width: 250px;
-      height: 28px;
-      padding: 2px;
-      font: 12px sans-serif;
-      border: 0px;
-      border-radius: 8px;
-    }
-    .testnav  a:hover {color:red;}
-    div.demo {
-      margin-top: 150px;
-      position: relative;
-      width: 100%;
-      min-height: 100%;
-      overflow-y: visible;
-      overflow-x: hidden;
-    }
-    .dropdown-menu {
-      height: auto;
-      max-height: 200px;
-      overflow-x: hidden;
-    }
-    .node.seqblock {
-      cursor: default;
-    }
-    .seqblock text {
-      font-family: 'Courier';
-      font-size: 16px;
-    }
-    .seqblock g text {
-      color: #000;
-      cursor: text;
-      font-family: 'Courier';
-      font-size: 16.667px;
-      letter-spacing: calc(12px - 9.998px);
-    }
-  </style>
+  
 <% include ../partials/head %>
 </head>
 
 <body>
-  <div class="demo">
-    <nav id="main-nav" class="navbar navbar-default navbar-fixed-top">
-      <% include ../partials/header %>
-      <!-- Division pour eventuel bouton crossref -->
-      <div class="btn-group" id="crossref">
-      </div>
-      <!-- Bouton Action -->
-      <div class="btn-group" role="group" id="action">
-        <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="Choose action on node"  >
-          On click
-          <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-          <li><a href="#" id="switch">Switch children</a></li>
-          <li><a href="#" id="collapse">Collapse/Expand</a></li>
-          <li><a href="#" id="subtree">Sub Tree/Upper Tree</a></li>
-        </ul>
-      </div>
-      <!-- Bouton Collapse -->
-      <button type="button" class="btn btn-default btn-sm" aria-label="Collapse" data-toggle="tooltip" data-placement="top" title="Collapse the tree" id="globalcollapse">
-        <span>Compact tree</span>
-      </button>
-      <!-- Bouton Exapand all -->
-      <button type="button" class="btn btn-default btn-sm" aria-label="Expand"  data-toggle="tooltip" data-placement="top" title="Expand the tree (takes time on big trees!)" id="globalexpand">
-        <span>Expand tree</span>
-      </button>
-      <!-- Bouton Increase width -->
-      <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="moreWidth"  data-toggle="tooltip" data-placement="top" title="Increase tree width">
-        <span>widthSize</span>
-        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-      </button>
-      <!-- Bouton Reduce width -->
-      <button type="button" class="btn btn-default  btn-sm  " aria-label="Left Align" id="lessWidth"  data-toggle="tooltip" data-placement="top" title="Reduce tree width">
-        <span>widthSize</span>
-        <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
-      </button>
-      <!-- Bouton Increase height -->
-      <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="moreHeigth"  data-toggle="tooltip" data-placement="top" title="Increase tree height">
-        <span>heightSize</span>
-        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-      </button>
-      <!-- Bouton Reduce height -->
-      <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="lessHeigth"  data-toggle="tooltip" data-placement="top" title="Reduce tree height">
-        <span>heightSize</span>
-        <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
-      </button>
-      <!-- Début modif -->
-      <!-- Bouton  Alignement -->
-      <div class="btn-group" role="group" id="alignement">
-        <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="Choose type of alignment"  >
-          AlignmentNature
-          <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-          <li><a href="#" id="aminoacid">Amino Acids</a></li>
-          <li><a href="#" id="nucleotid">Codons</a></li>
-        </ul>
-      </div>
-      <!-- Bouton  Export -->
-      <div class="btn-group" role="group" id="export">
-        <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="export figure">
-          Export
-          <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-          <li><a href="#" id="tree">Tree</a></li>
-          <li><a href="#" id="selecp">Alignment</a></li>
-        </ul>
-      </div>
-      <!-- Champs Seuils sup. et inf. -->
-      <label for="ps-threshold-low"  style="font-size: 12px;">Lower threshold:</label><input type="number" id="ps-threshold-low" min="0.0" step="0.05" placeholder="PS Threshold" value="0.9" style="width: 5em; font-size: 12px;"/>
-      <label for="ps-threshold-high" style="font-size: 12px;">Upper threshold:</label><input type="number" id="ps-threshold-high" min="0.0" step="0.05" placeholder="PS Threshold" value="1.0" style="width: 5em; font-size: 12px;"/>
-  </nav>
-  <!-- <div  class="testnav" id="testnav" ></div> -->
-    <div id="svg-container">
-      <div  style="border:2px solid lightgrey; float: left; overflow-y: auto; width: 40%;" id="tree-container">
-        <svg id="svg1"></svg>
-      </div>
-      <div style="border:2px solid lightgrey; overflow-x: auto; overflow-y: auto;" id="alignment-container" >
-        <svg id="svg2"></svg>
-      </div>
+  <div id="demo">
+  <nav id="main-nav" class="navbar navbar-default navbar-fixed-top">
+    <% include ../partials/header %>
+    <!-- Division pour eventuel bouton crossref -->
+    <div class="btn-group" id="crossref">
     </div>
-  </div> <!-- <demo > -->
+    <!-- Bouton Action -->
+    <div class="btn-group" role="group" id="action">
+      <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="Choose action on node"  >
+        On click
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu">
+        <li><a href="#" id="switch">Switch children</a></li>
+        <li><a href="#" id="collapse">Collapse/Expand</a></li>
+        <li><a href="#" id="subtree">Sub Tree/Upper Tree</a></li>
+      </ul>
+    </div>
+    <!-- Bouton Collapse -->
+    <button type="button" class="btn btn-default btn-sm" aria-label="Collapse" data-toggle="tooltip" data-placement="top" title="Collapse the tree" id="globalcollapse">
+      <span>Compact tree</span>
+    </button>
+    <!-- Bouton Exapand all -->
+    <button type="button" class="btn btn-default btn-sm" aria-label="Expand"  data-toggle="tooltip" data-placement="top" title="Expand the tree (takes time on big trees!)" id="globalexpand">
+      <span>Expand tree</span>
+    </button>
+    <!-- Bouton Reduce width -->
+    <button type="button" class="btn btn-default  btn-sm  " aria-label="Left Align" id="lessWidth"  data-toggle="tooltip" data-placement="top" title="Reduce tree width">
+      <span>width</span>
+      <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+    </button>
+    <!-- Bouton Increase width -->
+    <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="moreWidth"  data-toggle="tooltip" data-placement="top" title="Increase tree width">
+      <span>width</span>
+      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+    </button>
+    <!-- Bouton Reduce height -->
+    <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="lessHeigth"  data-toggle="tooltip" data-placement="top" title="Reduce tree height">
+      <span>height</span>
+      <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+    </button>
+    <!-- Bouton Increase height -->
+    <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="moreHeigth"  data-toggle="tooltip" data-placement="top" title="Increase tree height">
+      <span>height</span>
+      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+    </button>
+    <!-- Début modif -->
+    <!-- Bouton  Alignement -->
+    <div class="btn-group" role="group" id="alignement">
+      <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="Choose type of alignment"  >
+        AlignmentNature
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu">
+        <li><a href="#" id="aminoacid">Amino Acids</a></li>
+        <li><a href="#" id="nucleotid">Codons</a></li>
+      </ul>
+    </div>
+    <!-- Bouton  Export -->
+    <div class="btn-group" role="group" id="export">
+      <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="export figure">
+        Export
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu">
+        <li><a href="#" id="tree">Tree</a></li>
+        <li><a href="#" id="selecp">Alignment</a></li>
+      </ul>
+    </div>
+    <!-- Champs Seuils sup. et inf. -->
+    <label for="ps-threshold-low"  style="font-size: 12px;">Lower threshold:</label><input type="number" id="ps-threshold-low" min="0.0" step="0.05" placeholder="PS Threshold" value="0.9" style="width: 5em; font-size: 12px;"/>
+    <label for="ps-threshold-high" style="font-size: 12px;">Upper threshold:</label><input type="number" id="ps-threshold-high" min="0.0" step="0.05" placeholder="PS Threshold" value="1.0" style="width: 5em; font-size: 12px;"/>
+  </nav>
+  <div id="svg-container">
+    <div  style="border:2px solid lightgrey; float: left; overflow-y: auto; width: 40%;" id="tree-container">
+      <svg id="svg1"></svg>
+    </div>
+    <div style="border:2px solid lightgrey; overflow-x: auto; overflow-y: auto;" id="alignment-container" >
+      <svg id="svg2"></svg>
+    </div>
+  </div>
+  </div>
 </body>
 
 <script src="xmltree.js" charset="utf-8"></script>
@@ -1250,6 +1157,7 @@ function recuAncestors (todo, done) {
     return (done, [])
   }
 }
+
 // Fonction de coloration du resultat d'une recherche de  pattern
 // La variable pattern est ici un tableau du nom des feuilles qui ont matchés
 // --------------------------------------------------------------------------
@@ -1315,6 +1223,7 @@ function subnode(nodes, pattern, colPattern) {
   });
   return scrollref;
 }
+
 // Fonction de calcul de la position  d'un noeud a partir des longueurs
 // de branch_length
 // --------------------------------------------------------------------
@@ -1327,6 +1236,7 @@ function phylo(n) {
   }
   return dist;
 }
+
 // Fonction pour utiliser les lobgueurs de branchede lors de l'affichage
 // d'un arbre
 // ----------------------------------------------------------------------
@@ -1336,6 +1246,7 @@ function phylogeny(treeRoot,offset) {
     d.x = phylodist*offset;
   });
 }
+
 // Fonction qui decale la position x d'un "loss"
 // ---------------------------------------------
 function phylogeny_setloss(treeRoot,offset) {
@@ -1346,6 +1257,7 @@ function phylogeny_setloss(treeRoot,offset) {
     }
   });
 }
+
 // Fonction ajoute nb sequences et especes
 // ---------------------------------------
 function  addNumberSeqSpec(treeRoot) {
@@ -1371,6 +1283,7 @@ function  addNumberSeqSpec(treeRoot) {
     }
   });
 }
+
 // Fonction qui collapse les noeuds d'une certaine profondeur
 // ----------------------------------------------------------
 function expandTree(treeRoot) {
@@ -1386,6 +1299,7 @@ function expandTree(treeRoot) {
     }
   });
 }
+
 // Fonction recupere especes
 // -------------------------
 function getSpec (noeud) {
@@ -1413,6 +1327,7 @@ function getSpec (noeud) {
     return specs;
   }
 }
+
 // Fonction qui collapse les noeuds d'une certaine profondeur
 // ----------------------------------------------------------
 function expandTree(treeRoot) {
@@ -1428,6 +1343,7 @@ function expandTree(treeRoot) {
     }
   });
 }
+
 // Fonction qui collapse les noeuds d'une certaine profondeur
 // ----------------------------------------------------------
 function collapseVeryBigTree(treeRoot,patterns) {
@@ -1714,17 +1630,24 @@ $(document).ready(function() {
   $('div.demo').css({
     'margin-top': $('nav').outerHeight(),
     'width': $(window).width(),
-    'height': $(window).height() - $('nav').outerHeight() - 30,
+    'height': $(window).height() - $('nav').outerHeight() - 100,
   });
   $('#svg-container').attr('height', $('.demo').outerHeight() - 50);
   $('#tree-container').attr('height', $('.demo').outerHeight() - 50);
   $('#alignment-container').attr('height', $('.demo').outerHeight() - 50);
   // Gestion du redimensionnement de la fenêtre
-  $(window).resize(function() {
-    $('div.demo').css({
+  $(window).ready(function() {
+    $('#svg-container').css({
       'margin-top': $('nav').outerHeight(),
       'width': $(window).width(),
       'height': $(window).height() - $('nav').outerHeight() - 30,
+    });
+  });
+  $(window).resize(function() {
+    $('#svg-container').css({
+      'margin-top': $('nav').outerHeight(),
+      'width': $(window).width(),
+      'height': $(window).height() - $('nav').outerHeight() - 1200,
     });
   });
   // Gestion du bouton pour le type d'alignement
