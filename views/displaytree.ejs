@@ -24,7 +24,6 @@
 </head>
 
 <body>
-  <div id="demo">
   <nav id="main-nav" class="navbar navbar-default navbar-fixed-top">
     <% include ../partials/header %>
     <!-- Division pour eventuel bouton crossref -->
@@ -97,14 +96,15 @@
     <label for="ps-threshold-low"  style="font-size: 12px;">Lower threshold:</label><input type="number" id="ps-threshold-low" min="0.0" step="0.05" placeholder="PS Threshold" value="0.9" style="width: 5em; font-size: 12px;"/>
     <label for="ps-threshold-high" style="font-size: 12px;">Upper threshold:</label><input type="number" id="ps-threshold-high" min="0.0" step="0.05" placeholder="PS Threshold" value="1.0" style="width: 5em; font-size: 12px;"/>
   </nav>
-  <div id="svg-container">
-    <div  style="border:2px solid lightgrey; float: left; overflow-y: auto; width: 40%;" id="tree-container">
-      <svg id="svg1"></svg>
+  <div id="demo">
+    <div id="svg-container">
+      <div  style="border:2px solid lightgrey; float: left; overflow-y: auto; width: 40%;" id="tree-container">
+        <svg id="svg1"></svg>
+      </div>
+      <div style="border:2px solid lightgrey; overflow-x: auto; overflow-y: auto;" id="alignment-container" >
+        <svg id="svg2"></svg>
+      </div>
     </div>
-    <div style="border:2px solid lightgrey; overflow-x: auto; overflow-y: auto;" id="alignment-container" >
-      <svg id="svg2"></svg>
-    </div>
-  </div>
   </div>
 </body>
 
@@ -811,6 +811,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     } else {
       return currentmax;
     }
+    return currentmax;
   }
   function minStat(results) {
     var currentmin = results[0].stat;
@@ -1233,15 +1234,16 @@ function phylo(n) {
   var dist = 0.0;
   if (n && n.data.branch_length != null) {
     var p = n.parent;
-    dist = parseFloat(n.data.branch_length) + phylo(p);
+    dist = Math.log(parseFloat(n.data.branch_length)+1.1) + phylo(p);
+    // dist = parseFloat(n.data.branch_length) + phylo(p);
     return dist;
   }
   return dist;
 }
 
-// Fonction pour utiliser les lobgueurs de branchede lors de l'affichage
+// Fonction pour utiliser les longueurs de branches lors de l'affichage
 // d'un arbre
-// ----------------------------------------------------------------------
+// --------------------------------------------------------------------
 function phylogeny(treeRoot,offset) {
   treeRoot.each(function (d) {
     var phylodist = phylo(d);
@@ -1631,12 +1633,12 @@ $(document).ready(function() {
   }
   $('div.demo').css({
     'margin-top': $('nav').outerHeight(),
-    'width': $(window).width(),
-    'height': $(window).height() - $('nav').outerHeight() - 100,
+    // 'width': $(window).width(),
+    // 'height': $(window).height() - $('nav').outerHeight() - 100,
   });
-  $('#svg-container').attr('height', $('.demo').outerHeight() - 50);
-  $('#tree-container').attr('height', $('.demo').outerHeight() - 50);
-  $('#alignment-container').attr('height', $('.demo').outerHeight() - 50);
+  // $('#svg-container').attr('height', $('.demo').outerHeight() - 50);
+  // $('#tree-container').attr('height', $('.demo').outerHeight() - 50);
+  // $('#alignment-container').attr('height', $('.demo').outerHeight() - 50);
   // Gestion du redimensionnement de la fenêtre
   $(window).ready(function() {
     $('#svg-container').css({
@@ -1688,8 +1690,8 @@ $(document).ready(function() {
     // On a modifié un des seuils
     psThresholdsChanged = true;
     // Correction des valeurs en présence d'incohérences
-    var psHighVal = parseInt($('#ps-threshold-high').val());
-    var psLowVal = parseInt($('#ps-threshold-low').val());
+    var psHighVal = parseFloat($('#ps-threshold-high').val());
+    var psLowVal = parseFloat($('#ps-threshold-low').val());
     // console.log('Thresholds:', psHighVal, '>=', psLowVal);
     if (psHighVal < psLowVal) {
       if (event.currentTarget.id == 'ps-threshold-high') {
