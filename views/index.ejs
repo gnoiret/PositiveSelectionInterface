@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
 
@@ -12,12 +12,15 @@
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/css_proj.css">
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
     <style>
 
-      .bd-placeholder-img {
+      /* .bd-placeholder-img {
         font-size: 1.125rem;
         text-anchor: middle;
         -webkit-user-select: none;
@@ -57,8 +60,6 @@
           color: #708090;
       }
 
-      /* Ajout de l'effet souligné */
-
       .Option{
         text-decoration:none;
         padding: 5px 0px;
@@ -81,18 +82,13 @@
         background: lightgrey;
       }
 
-      /* Fin de l'ajout de l'effet souligné */
 
 
-
-      /* Featurettes
-      ------------------------- */
 
       .featurette-divider {
         padding-bottom: 2rem;
       }
 
-      /* Thin out the marketing headings */
       .featurette-heading {
         font-weight: 300;
         line-height: 1;
@@ -103,12 +99,8 @@
       }
 
 
-      /* RESPONSIVE CSS
-      -------------------------------------------------- */
 
       @media (min-width: 40em) {
-        /* Bump up size of carousel content */
-
         .featurette-heading {
           font-size: 40px;
         }
@@ -129,7 +121,6 @@
         padding-bottom: 10px;
       }
 
-      /* Formulaire */
 
       .form{
         margin: 0 auto;
@@ -164,7 +155,7 @@
 
       #submit:hover {
           background-color: #dddddd;
-      }
+      } */
     </style>
 
     <!-- Custom styles for this template -->
@@ -178,27 +169,14 @@
         </div>
       </div>
       <nav>
-        <a href="test-arbre">test-arbre</a>
+        <!-- <a href="test-arbre">test-arbre</a> -->
       </nav>
     </header>
 
     <main>
-      <div>
-        <h3>Tree</h3>
-        <p id="tree-file-content"></p>
-      </div>
-      <div>
-        <div>
-          <h3>Alignment</h3>
-          <p id="alignment-file-content"></p>
-        </div>
-      </div>
-      <div>
-        <div>
-          <h3>Results</h3>
-          <p id="results-file-content"></p>
-        </div>
-      </div>
+      <!-- <div><h3>Tree</h3><p id="tree-file-content"></p></div> -->
+      <!-- <div><h3>Alignment</h3><p id="alignment-file-content"></p></div> -->
+      <!-- <div><h3>Results</h3><p id="results-file-content"></p></div> -->
       <div class="form">
         <form method="post" action="/upload_files" enctype="multipart/form-data">
           <div class="form-group">
@@ -336,7 +314,7 @@
         if (isMatch) {
           $("#"+e.target.id+" + .filename").html('✅ '+filename); 
         } else {
-          $("#"+e.target.id+" + .filename").html('❌ '+filename); 
+          $("#"+e.target.id+" + .filename").html('⚠️ '+filename); 
         }
         content.innerHTML = '';
         for (var i = 0; i < Math.min(lines.length, 4); i ++) {
