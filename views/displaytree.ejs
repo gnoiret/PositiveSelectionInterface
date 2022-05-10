@@ -1276,7 +1276,7 @@ function  addNumberSeqSpec(treeRoot) {
       var fils = d.children;
       fils.forEach(function (d){
         nbseq = nbseq + d.data.nbseqspe.nbSeq;
-        // nbspe = nbspe + d.data.nbseqspe.nbSpe;
+        nbspe = nbspe + d.data.nbseqspe.nbSpe;
         var spec = getSpec(d);
         specs = specs.concat(spec);
       })
