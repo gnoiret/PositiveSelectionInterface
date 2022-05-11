@@ -162,14 +162,14 @@ def loadAlignment(alignmentFile):
     return alignmentDict, maxSeqIdLength
 
 
-def loadResultsSites(resultsFile, statcol=1, nostat_value=-1.0, sep=args.sep):
+def loadResultsSites(resultsFile, statcol=1, nostat_value=-1.0, sep='\t'):
     """Loads site results from column with index <statcol>."""
 
     resultsDict = {}
     with open(resultsFile, 'r') as f:
         i = -1
         for line in f:
-            line = line.strip('\n').split(args.sep)
+            line = line.strip('\n').split(sep)
             if re.search('^[0-9]+$', line[0]): # results line
                 try:
                     site = int(line[0])
@@ -198,7 +198,7 @@ def loadResultsSites(resultsFile, statcol=1, nostat_value=-1.0, sep=args.sep):
     return resultsText
 
 
-def loadResultsSiteBranch(resultsFile, sep=args.sep):
+def loadResultsSiteBranch(resultsFile, sep='\t'):
     """Loads site-branch results."""
 
     d_cols = {}
@@ -228,8 +228,8 @@ def loadResultsSiteBranch(resultsFile, sep=args.sep):
                 col_text = ''
                 for i in range(len(d_cols[position_header])):
                     col_text += f'{d_cols[position_header][i]}:{d_cols[col_key][i]} '
-                    # '1:0.1248 2:0.12381 ...'
-                col_text += '\b' # remove last space
+                    # col_text: '1:0.1248 2:0.12381 ...'
+                col_text = col_text[:-1] # remove last space
                 d_cols_2[col_key] = col_text
                 # d_cols_2: {1: '1:0.1248 2:0.12381 ...', ...}
 
@@ -243,7 +243,7 @@ def loadResultsSiteBranch(resultsFile, sep=args.sep):
     return d_cols_2
 
 
-def getColnames(file, sep=args.sep):
+def getColnames(file, sep='\t'):
     '''Returns a list of header items in a file.'''
 
     with open(file, 'r') as f:
@@ -289,7 +289,13 @@ def normalizeTree(tree:str):
 #
 
 
-def createPhyloXML(fam,newick):
+def createPhyloXML(fam,newick, resultsFile):
+    print ("Loading results... ")
+    # resultsText =  loadResultsSites(args.resultsFile, args.statcol, args.nostat, sep=args.sep)
+    dict_results = loadResultsSiteBranch(resultsFile, sep=args.sep)
+    # print(dict_results)
+    print ("OK")
+
     # Parse and return exactly one tree from the given file or handle
     # if not ':' in newick:
     #     nv_arbre = ""
@@ -344,6 +350,9 @@ def createPhyloXML(fam,newick):
     nbfeuille = 0
     famspecies = {}
 
+    res_colnames = getColnames(args.resultsFile)[1:]
+    print('res_colnames:', res_colnames)
+    colname_index = 0
     for element in clade[0].iter('clade'):
         # print(element.tag)
         # look for a <name> element in the current <clade> element
@@ -394,17 +403,24 @@ def createPhyloXML(fam,newick):
                 leaf.append(crossref)
             evrec.append(leaf)
             element.append(evrec)
-    
-    res_colnames = getColnames(args.resultsFile)[1:]
-    print(res_colnames)
-    colname_index = 0
-    for element in clade[0].iter('clade'):
+        
         if element.find('branch_length') is not None:
             branch_info = etree.Element('branch_info')
             branch_info.set('branch_id', str(res_colnames[colname_index]))
-            branch_info.set('branch_results', str('coucou'))
+            branch_info.set('branch_results', str(dict_results[res_colnames[colname_index]]))
             element.append(branch_info)
             colname_index += 1
+    
+    # res_colnames = getColnames(args.resultsFile)[1:]
+    # print(res_colnames)
+    # colname_index = 0
+    # for element in clade[0].iter('clade'):
+    #     if element.find('branch_length') is not None:
+    #         branch_info = etree.Element('branch_info')
+    #         branch_info.set('branch_id', str(res_colnames[colname_index]))
+    #         branch_info.set('branch_results', str('coucou'))
+    #         element.append(branch_info)
+    #         colname_index += 1
     
     print ("Number of leaves : ")
     print (nbfeuille)
@@ -413,8 +429,8 @@ def createPhyloXML(fam,newick):
     print (nbspecies)
 
     ## Ajout des résultats
-    resultsElement = etree.Element('statistics')
-    resultsElement.set('results', resultsText)
+    # resultsElement = etree.Element('statistics')
+    # resultsElement.set('results', resultsText)
 
     LengthMaxSeqID = etree.Element('maxSeqIdLength')
     LengthMaxSeqID.text = str(maxSeqIdLength)
@@ -425,7 +441,7 @@ def createPhyloXML(fam,newick):
     e=subtree[0].find('phylogeny')
     e.append(treesize)
     e.append(LengthMaxSeqID)
-    e.append(resultsElement) # ajout de la balise contenant les résultats
+    # e.append(resultsElement) # ajout de la balise contenant les résultats
     text =  minidom.parseString(ElementTree.tostring(subtree[0])).toprettyxml()
     # remove blank lines
     cleantext = "\n".join([ll.rstrip() for ll in text.splitlines() if ll.strip()])
@@ -441,19 +457,14 @@ alignmentDict, maxSeqIdLength = loadedAlignment[0], loadedAlignment[1]
 # print('maxSeqIdLength:', maxSeqIdLength)
 print ("OK")
 
-print ("Loading results... ")
-resultsText =  loadResultsSites(args.resultsFile, args.statcol, args.nostat, sep=args.sep)
-# resultsText = loadResultsSiteBranch(args.resultsFile, sep=args.sep)
-print ("OK")
-
 #Creates empty phyloxml document
-project = Phyloxml()   # a decommenter si on veut un fichier xml unique
+# project = Phyloxml()   # a decommenter si on veut un fichier xml unique
 
 # Loads Species name dico
 dico = loadDico(args.alignmentFile)
 
 # Loads newick tree
-treefile = open(args.treeFile,"r")
+treefile = open(args.treeFile, "r")
 # print(args.output)
 if args.output:
     output_name = args.output
@@ -473,7 +484,7 @@ for line in treefile:
     else:
         newick = tline[0]
         fam = ''
-    phyloxmltree = createPhyloXML(fam,newick)
+    phyloxmltree = createPhyloXML(fam,newick, args.resultsFile)
     xmloutputfile.write(phyloxmltree)
     print("Famille "+fam+" OK")
 
