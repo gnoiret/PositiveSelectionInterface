@@ -70,38 +70,27 @@ parser.add_argument('-o', '--output', dest='output', action='store',\
     the same name as the tree file)')
 args = parser.parse_args()
 
-# #
-# tree = "((((((((papAnuXM_017956960:0.00809496,(((macFasXM_005550221:0.00289701,(macMulXM_015134241:0.0022655,macNemXM_011730830:0.000864565)4:0.00124679)5:0.0077718,manLeuXM_011998270:0.00501842)7:0.00250405,cerAtyXM_012032058:0.00439159)9:0.00131476)10:0.00588244,chlSabXM_007982155:0.013576)12:0.0102079,(colAngXM_011955057:0.0417556,(rhiRoxXM_010370424:0.00239969,rhiBieXM_017870301:0.0138669)16:0.044625)17:0.00385901)18:0.0333012,((((panTroXM_009453613:0.00851837,homSapCCDS34680:0.00463484)21:0.00545281,gorGorXM_004045741:0.00956036)23:0.0130972,ponAbeXM_002818211:0.0293612)25:0.00339537,nomLeuXM_012510254:0.0334299)27:0.0149917)28:0.124488,carSyrXM_008064267:0.286938)30:0.0253192,(otoGarXM_003782669:0.195123,(proCoqXM_012647381:0.044556,micMurXM_012779641:0.0980136)34:0.0569938)35:0.0394367)36:1.08999,panPanXM_008961997:0.0577899)38:0.0642909,aotNanXM_012450812:0.0367385,cebCapXM_017525097:0.0433883);"
-# tree = '(((A,(B,C)),(D,E));'
-def normalize_tree(tree:str):
-    '''Adds branch numbers following a <name>:<number>:<length> syntax.'''
-    # print(tree)
-    tree = re.sub(r'([\),])([0-9]+):', r'\1:', tree)
-    tree = re.sub(r'([\),])(:[0-9]+):', r'\1:', tree)
-    # print(tree)
-    new_tree = ''
-    branch_id = 0
-    if ':' in tree:
-        for char in tree:
-            if char in ':':
-                new_tree += ':' + str(branch_id) + char
-                branch_id += 1
-            else:
-                new_tree += char
-    else:
-        for char in tree:
-            if char in ',)':
-                new_tree += ':' + str(branch_id) + ':' + str(1) + char
-                branch_id += 1
-            else:
-                new_tree += char
-    return new_tree
-# tree = normalize_tree(tree)
-# print(tree)
-#
 
-# def dna_to_prot(dna_seq:str):
-def nuc_acid_to_prot(nuc_seq:str):
+def loadDico(fileDico):
+    """
+    Fonction qui prend un fichier d'alignement en entree et retourne un dictionnaire des noms d'espece des sequences
+    """
+
+    file = open(fileDico,"r")
+    speciesDico = {}
+    for line in file:
+        if line[0]==">":
+            speciesDico[line.split('>')[1].split('\n')[0]] = line.split('>')[1].split('\n')[0]
+            # tline = re.split('_',line)
+            # #key = f"{tline[0]} {tline[1]}"
+            # key = line.split('\n')[0]
+            # fin = tline[4].split("\n")[0]
+            # speciesDico[key.split(">")[1]] = f"{tline[2]} {tline[3]} {fin}"
+    file.close()
+    return speciesDico
+
+
+def nucToAmino(nuc_seq:str):
     '''Converts a DNA/RNA sequence into a proteic sequence.'''
 
     matches = {
@@ -173,7 +162,7 @@ def loadAlignment(alignmentFile):
     return alignmentDict, maxSeqIdLength
 
 
-def loadResultsSites(resultsFile, statcol=1, nostat_value=-1.0, sep='\t'):
+def loadResultsSites(resultsFile, statcol=1, nostat_value=-1.0, sep=args.sep):
     """Loads site results from column with index <statcol>."""
 
     resultsDict = {}
@@ -209,7 +198,7 @@ def loadResultsSites(resultsFile, statcol=1, nostat_value=-1.0, sep='\t'):
     return resultsText
 
 
-def loadResultsSiteBranch(resultsFile, nostat_value=-1.0, sep='\t'):
+def loadResultsSiteBranch(resultsFile, sep=args.sep):
     """Loads site-branch results."""
 
     d_cols = {}
@@ -223,47 +212,81 @@ def loadResultsSiteBranch(resultsFile, nostat_value=-1.0, sep='\t'):
             line = line.strip().split(sep)
             for i in range(len(line)):
                 column_lists[i].append(line[i])
+        
+        # column_lists: [[sites, 1, 2, ...], [0, 0.1248, 0.12381, ...], [1, 0.131, 0.835, ...], ...]
 
         for column in column_lists:
             d_cols[column[0]] = column[1:]
+        
+        # d: {sites: [1, 2, ...], 0: [0.1248, 0.12381, ...], 1: [0.131, 0.835, ...], ...}
 
         position_header = 'sites'
         d_cols_2 = dict(d_cols)
 
         for col_key in d_cols:
             if col_key != position_header:
-                col_text = f'{col_key}('
+                col_text = ''
                 for i in range(len(d_cols[position_header])):
                     col_text += f'{d_cols[position_header][i]}:{d_cols[col_key][i]} '
-                col_text += '\b)'
+                    # '1:0.1248 2:0.12381 ...'
+                col_text += '\b' # remove last space
                 d_cols_2[col_key] = col_text
+                # d_cols_2: {1: '1:0.1248 2:0.12381 ...', ...}
 
-    results_text = ''
-    for col in d_cols_2:
-        if col != position_header:
-            results_text += d_cols_2[col]+'\n'
-    results_text = results_text[:-1]
+    # results_text = ''
+    # for col in d_cols_2:
+    #     if col != position_header:
+    #         results_text += d_cols_2[col]+'\n'
+    # results_text = results_text[:-1]
     # print(results_text)
-    return results_text
+    # return results_text
+    return d_cols_2
 
 
-def loadDico(fileDico):
-    """
-    Fonction qui prend un fichier d'alignement en entree et retourne un dictionnaire des noms d'espece des sequences
-    """
+def getColnames(file, sep=args.sep):
+    '''Returns a list of header items in a file.'''
 
-    file = open(fileDico,"r")
-    speciesDico = {}
-    for line in file:
-        if line[0]==">":
-            speciesDico[line.split('>')[1].split('\n')[0]] = line.split('>')[1].split('\n')[0]
-            # tline = re.split('_',line)
-            # #key = f"{tline[0]} {tline[1]}"
-            # key = line.split('\n')[0]
-            # fin = tline[4].split("\n")[0]
-            # speciesDico[key.split(">")[1]] = f"{tline[2]} {tline[3]} {fin}"
-    file.close()
-    return speciesDico
+    with open(file, 'r') as f:
+        header_items =  f.readline().rstrip().split(sep)
+    return header_items
+
+
+# #
+# tree = "((((((((papAnuXM_017956960:0.00809496,(((macFasXM_005550221:0.00289701,(macMulXM_015134241:0.0022655,macNemXM_011730830:0.000864565)4:0.00124679)5:0.0077718,manLeuXM_011998270:0.00501842)7:0.00250405,cerAtyXM_012032058:0.00439159)9:0.00131476)10:0.00588244,chlSabXM_007982155:0.013576)12:0.0102079,(colAngXM_011955057:0.0417556,(rhiRoxXM_010370424:0.00239969,rhiBieXM_017870301:0.0138669)16:0.044625)17:0.00385901)18:0.0333012,((((panTroXM_009453613:0.00851837,homSapCCDS34680:0.00463484)21:0.00545281,gorGorXM_004045741:0.00956036)23:0.0130972,ponAbeXM_002818211:0.0293612)25:0.00339537,nomLeuXM_012510254:0.0334299)27:0.0149917)28:0.124488,carSyrXM_008064267:0.286938)30:0.0253192,(otoGarXM_003782669:0.195123,(proCoqXM_012647381:0.044556,micMurXM_012779641:0.0980136)34:0.0569938)35:0.0394367)36:1.08999,panPanXM_008961997:0.0577899)38:0.0642909,aotNanXM_012450812:0.0367385,cebCapXM_017525097:0.0433883);"
+# tree = '(((A,(B,C)),(D,E));'
+def normalizeTree(tree:str):
+    '''Adds branch numbers following a <name>:<number>:<length> syntax.'''
+
+    # print(tree)
+    tree = re.sub(r'([\),])([0-9]+):', r'\1:', tree)
+    tree = re.sub(r'([\),])(:[0-9]+):', r'\1:', tree)
+    # print(tree)
+    # Tree without additional information other than branch lengths
+    
+    new_tree = ''
+    branch_id = 0
+    if ':' in tree:
+        for i in range(len(tree)):
+            if tree[i] in ':':
+                new_tree += ':' + str(branch_id) + tree[i]
+                # while re.match(r'[0-9\.:]', tree[i]):
+                #     new_tree += tree[i]
+                #     i += 1
+                #  + str(branch_id) + tree[i]
+                branch_id += 1
+            else:
+                new_tree += tree[i]
+    else:
+        for i in range(len(tree)):
+            if tree[i] in ',)':
+                new_tree += ':' + str(branch_id) + ':' + str(1) + tree[i]
+                branch_id += 1
+            else:
+                new_tree += tree[i]
+    return new_tree
+# tree = normalizeTree(tree)
+# print(tree)
+#
 
 
 def createPhyloXML(fam,newick):
@@ -281,11 +304,17 @@ def createPhyloXML(fam,newick):
     #             nv_arbre+=newick[i]
     #     newick = nv_arbre
     
-    newick = normalize_tree(newick)
+    newick = normalizeTree(newick)
     print(f'newick:\n{newick}')
+    # Tree now has a <branch_name>:<number>:<length> syntax
 
     handle = StringIO(newick)
+    # print('handle:', handle)
+
     trees = Phylo.read(handle, 'newick')
+    # print('trees:', trees)
+    # Clade(branch_length=0.0642909)
+
     # Write a sequence of Tree objects to the given file or handle
     rd = str(random.randint(0,1000))
     Phylo.write([trees], 'tmpfile-'+rd+'.xml', 'phyloxml')
@@ -304,7 +333,7 @@ def createPhyloXML(fam,newick):
 
     text = re.sub('<phyloxml[^>]+>', header, text)
     text = text.replace('Phyloxml', 'phyloxml')
-    tree = etree.fromstring(text,parser=p)
+    tree = etree.fromstring(text, parser=p)
     treename = etree.Element("name")
     treename.text = fam
     ins = tree.find('phylogeny')
@@ -359,20 +388,23 @@ def createPhyloXML(fam,newick):
             leaf.set('dnaAlign', seq_alg) # ajout de la séquence en nucléotides
             # leaf.set('aaAlign', translate.dna_to_prot(seq_alg)) # ajout de la séquence en acides aminés
             # leaf.set('aaAlign', dna_to_prot(seq_alg)) # ajout de la séquence en acides aminés
-            leaf.set('aaAlign', nuc_acid_to_prot(seq_alg)) # ajout de la séquence en acides aminés
+            leaf.set('aaAlign', nucToAmino(seq_alg)) # ajout de la séquence en acides aminés
 
             if 'crossdico' in globals():
                 leaf.append(crossref)
             evrec.append(leaf)
             element.append(evrec)
-        
-        branch_info = element.find('branch_info')
     
-    # bn = 0
-    # for branch in clade[0].iter('branch_length'):
-    #     branch.set('num', str(bn))
-    #     branch.set('res', str(111))
-    #     bn += 1
+    res_colnames = getColnames(args.resultsFile)[1:]
+    print(res_colnames)
+    colname_index = 0
+    for element in clade[0].iter('clade'):
+        if element.find('branch_length') is not None:
+            branch_info = etree.Element('branch_info')
+            branch_info.set('branch_id', str(res_colnames[colname_index]))
+            branch_info.set('branch_results', str('coucou'))
+            element.append(branch_info)
+            colname_index += 1
     
     print ("Number of leaves : ")
     print (nbfeuille)
