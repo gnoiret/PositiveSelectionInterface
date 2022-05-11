@@ -75,7 +75,7 @@ router.post("/upload_files", upload.fields([
   console.log('Tree: ' + fname_tree + '\n' +
   'Alignment: ' + fname_alignment + '\n' +
   'Results: ' + fname_results + '\n' +
-  'Future XML file: ' + fname_xml);
+  'XML: ' + fname_xml);
 
   // console.log(req.files);
   // console.log('req.files.length: '+req.files.length);
@@ -144,19 +144,20 @@ router.post("/upload_files", upload.fields([
         // res.json({ message: "Successfully uploaded files", tree: fname_tree, alignment: fname_alignment, results: fname_results });
         console.log('Rendering view');
         res.render('displaytree.ejs', {arbre:JSONtree,pattern:JSONpattern});
-        console.log('Deleting XML tree');
-        exec('rm'
-          +' '+xml_dir+fname_xml,
-          (error, stdout, stderr) => {
-            if (error) {
-              console.log(`error: ${error.message}`);
-            }
-            if (stderr) {
-              console.log(`error: ${stderr}`);
-            }
-            console.log(`${stdout}`);
-          }
-        )
+
+        // console.log('Deleting XML tree');
+        // exec('rm'
+        //   +' '+xml_dir+fname_xml,
+        //   (error, stdout, stderr) => {
+        //     if (error) {
+        //       console.log(`error: ${error.message}`);
+        //     }
+        //     if (stderr) {
+        //       console.log(`error: ${stderr}`);
+        //     }
+        //     console.log(`${stdout}`);
+        //   }
+        // )
       });
     });
   });
