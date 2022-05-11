@@ -73,8 +73,8 @@ args = parser.parse_args()
 # #
 # tree = "((((((((papAnuXM_017956960:0.00809496,(((macFasXM_005550221:0.00289701,(macMulXM_015134241:0.0022655,macNemXM_011730830:0.000864565)4:0.00124679)5:0.0077718,manLeuXM_011998270:0.00501842)7:0.00250405,cerAtyXM_012032058:0.00439159)9:0.00131476)10:0.00588244,chlSabXM_007982155:0.013576)12:0.0102079,(colAngXM_011955057:0.0417556,(rhiRoxXM_010370424:0.00239969,rhiBieXM_017870301:0.0138669)16:0.044625)17:0.00385901)18:0.0333012,((((panTroXM_009453613:0.00851837,homSapCCDS34680:0.00463484)21:0.00545281,gorGorXM_004045741:0.00956036)23:0.0130972,ponAbeXM_002818211:0.0293612)25:0.00339537,nomLeuXM_012510254:0.0334299)27:0.0149917)28:0.124488,carSyrXM_008064267:0.286938)30:0.0253192,(otoGarXM_003782669:0.195123,(proCoqXM_012647381:0.044556,micMurXM_012779641:0.0980136)34:0.0569938)35:0.0394367)36:1.08999,panPanXM_008961997:0.0577899)38:0.0642909,aotNanXM_012450812:0.0367385,cebCapXM_017525097:0.0433883);"
 # tree = '(((A,(B,C)),(D,E));'
-def add_branch_numbers(tree:str):
-    '''Adds branch numbers following a <name>:<number>[:<length>] syntax.'''
+def normalize_tree(tree:str):
+    '''Adds branch numbers following a <name>:<number>:<length> syntax.'''
     # print(tree)
     tree = re.sub(r'([\),])([0-9]+):', r'\1:', tree)
     tree = re.sub(r'([\),])(:[0-9]+):', r'\1:', tree)
@@ -91,12 +91,12 @@ def add_branch_numbers(tree:str):
     else:
         for char in tree:
             if char in ',)':
-                new_tree += ':' + str(branch_id) + char
+                new_tree += ':' + str(branch_id) + ':' + str(1) + char
                 branch_id += 1
             else:
                 new_tree += char
     return new_tree
-# tree = add_branch_numbers(tree)
+# tree = normalize_tree(tree)
 # print(tree)
 #
 
@@ -268,21 +268,22 @@ def loadDico(fileDico):
 
 def createPhyloXML(fam,newick):
     # Parse and return exactly one tree from the given file or handle
-    if not ':' in newick:
-        nv_arbre = ""
-        for i in range(len(newick)):
-            if (newick[i]==',' and newick[i-1]!=')') or (newick[i]==')' and newick[i-1]!=')'):
-                nv_arbre+=":0.7"
-                nv_arbre+=newick[i]
-            elif (newick[i]==',' and newick[i-1]==')') or (newick[i]==')' and newick[i-1]==')'):
-                nv_arbre+=":0.4"
-                nv_arbre+=newick[i]
-            else:
-                nv_arbre+=newick[i]
-        newick = nv_arbre
+    # if not ':' in newick:
+    #     nv_arbre = ""
+    #     for i in range(len(newick)):
+    #         if (newick[i]==',' and newick[i-1]!=')') or (newick[i]==')' and newick[i-1]!=')'):
+    #             nv_arbre+=":0.7"
+    #             nv_arbre+=newick[i]
+    #         elif (newick[i]==',' and newick[i-1]==')') or (newick[i]==')' and newick[i-1]==')'):
+    #             nv_arbre+=":0.4"
+    #             nv_arbre+=newick[i]
+    #         else:
+    #             nv_arbre+=newick[i]
+    #     newick = nv_arbre
     
-    newick = add_branch_numbers(newick)
-    print('newick:\n', newick)
+    newick = normalize_tree(newick)
+    print(f'newick:\n{newick}')
+
     handle = StringIO(newick)
     trees = Phylo.read(handle, 'newick')
     # Write a sequence of Tree objects to the given file or handle
@@ -295,10 +296,10 @@ def createPhyloXML(fam,newick):
     os.remove('tmpfile-'+rd+'.xml')
     #
     p = XMLParser(huge_tree=True)
-    text = text.replace("phy:", "")
+    # text = text.replace("phy:", "")
 
-    text = re.sub("b'([^']*)'", "\\1", text)
-    text = re.sub('branch_length_attr="[^"]+"', "", text)
+    # text = re.sub("b'([^']*)'", "\\1", text)
+    # text = re.sub('branch_length_attr="[^"]+"', "", text)
     header = "<phyloxml>"
 
     text = re.sub('<phyloxml[^>]+>', header, text)
@@ -354,8 +355,6 @@ def createPhyloXML(fam,newick):
                 if cds in seqdefdico:
                     leaf.set('defintiion', seqdefdico[cds])
 
-
-
             ## Ajout des séquences aux feuilles
             leaf.set('dnaAlign', seq_alg) # ajout de la séquence en nucléotides
             # leaf.set('aaAlign', translate.dna_to_prot(seq_alg)) # ajout de la séquence en acides aminés
@@ -366,6 +365,14 @@ def createPhyloXML(fam,newick):
                 leaf.append(crossref)
             evrec.append(leaf)
             element.append(evrec)
+        
+        branch_info = element.find('branch_info')
+    
+    # bn = 0
+    # for branch in clade[0].iter('branch_length'):
+    #     branch.set('num', str(bn))
+    #     branch.set('res', str(111))
+    #     bn += 1
     
     print ("Number of leaves : ")
     print (nbfeuille)
@@ -399,7 +406,7 @@ sys.setrecursionlimit(15000)
 print ("Loading alignment... ")
 loadedAlignment = loadAlignment(args.alignmentFile)
 alignmentDict, maxSeqIdLength = loadedAlignment[0], loadedAlignment[1]
-print('maxSeqIdLength:', maxSeqIdLength)
+# print('maxSeqIdLength:', maxSeqIdLength)
 print ("OK")
 
 print ("Loading results... ")
