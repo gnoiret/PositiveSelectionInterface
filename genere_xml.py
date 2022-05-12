@@ -291,7 +291,7 @@ def normalizeTree(tree:str):
 
 def createPhyloXML(fam,newick, resultsFile):
     print ("Loading results... ")
-    # resultsText =  loadResultsSites(args.resultsFile, args.statcol, args.nostat, sep=args.sep)
+    resultsText =  loadResultsSites(args.resultsFile, 0, args.nostat, sep=args.sep)
     dict_results = loadResultsSiteBranch(resultsFile, sep=args.sep)
     # print(dict_results)
     print ("OK")
@@ -313,10 +313,8 @@ def createPhyloXML(fam,newick, resultsFile):
     newick = normalizeTree(newick)
     print(f'newick:\n{newick}')
     # Tree now has a <branch_name>:<number>:<length> syntax
-
     handle = StringIO(newick)
     # print('handle:', handle)
-
     trees = Phylo.read(handle, 'newick')
     # print('trees:', trees)
     # Clade(branch_length=0.0642909)
@@ -429,8 +427,8 @@ def createPhyloXML(fam,newick, resultsFile):
     print (nbspecies)
 
     ## Ajout des résultats
-    # resultsElement = etree.Element('statistics')
-    # resultsElement.set('results', resultsText)
+    resultsElement = etree.Element('global_results')
+    resultsElement.set('results', resultsText)
 
     LengthMaxSeqID = etree.Element('maxSeqIdLength')
     LengthMaxSeqID.text = str(maxSeqIdLength)
@@ -441,7 +439,7 @@ def createPhyloXML(fam,newick, resultsFile):
     e=subtree[0].find('phylogeny')
     e.append(treesize)
     e.append(LengthMaxSeqID)
-    # e.append(resultsElement) # ajout de la balise contenant les résultats
+    e.append(resultsElement) # ajout de la balise contenant les résultats
     text =  minidom.parseString(ElementTree.tostring(subtree[0])).toprettyxml()
     # remove blank lines
     cleantext = "\n".join([ll.rstrip() for ll in text.splitlines() if ll.strip()])
