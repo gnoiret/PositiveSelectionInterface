@@ -36,9 +36,11 @@
         <span class="caret"></span>
       </button>
       <ul class="dropdown-menu">
+        <li><a href="#" id="do-nothing">Do Nothing</a></li>
         <li><a href="#" id="switch">Switch children</a></li>
         <li><a href="#" id="collapse">Collapse/Expand</a></li>
         <li><a href="#" id="subtree">Sub Tree/Upper Tree</a></li>
+        
       </ul>
     </div>
     <!-- Bouton Collapse -->
@@ -237,13 +239,17 @@ function  main_display() {
   options = stringOptions.split(",");
 
   // Action associee au click
-  action = svgEvents.switchChildren;
+  // action = svgEvents.switchChildren;
+  action = svgEvents.doNothing;
   var stringAction = myStorage.getItem("action");
   if ((stringAction === null )||(stringAction === undefined)||(stringAction === "undefined")){
-    stringAction = "Collapse/Expand";
+    stringAction = 'Do Nothing';
     myStorage.setItem("action",stringAction);
   }
   switch (myStorage.getItem("action")) {
+    case 'Do Nothing':
+      action = svgEvents.doNothing;
+      break;
     case "Switch children":
       action = svgEvents.switchChildren;
       break;
@@ -254,6 +260,8 @@ function  main_display() {
       action = svgEvents.focus;
       break;
     default:
+      console.log(action);
+      break;
   }
 
   // Largeur de l'arbre
@@ -561,6 +569,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .append("path")
     .attr("class", "symbol")
     .on("click", function(d) {
+      console.log('symbol clicked');
       // if (d.data.lastEvent.crossref) {
       //   // Si la balise crossref est presente on fait un lien vers l'url
       //   // qui requete l'identifiant dans la base de donnees selectionnee
@@ -1558,6 +1567,9 @@ $('#selectCrossref').ready(function() {
   });
 $('#action').ready(function() {
   switch (myStorage.getItem("action")) {
+    case 'Do Nothing':
+      $('#do-nothing').css('color','#FF0000');
+      break;
     case "Switch children":
       $('#switch').css('color','#FF0000');
       break;
@@ -1574,8 +1586,17 @@ $('#action').on('click', function(event, dropdownData) {
   var target = event.toElement || event.relatedTarget || event.target || function () { throw "Failed to attach an event target!"; }
   myStorage.setItem("action",target.text);
   switch (target.text) {
+    case 'Do Nothing':
+      action = svgEvents.doNothing;
+      $('#do-nothing').css('color','#FF0000');
+      $('#switch').css('color','#000000');
+      $('#collapse').css('color','#000000');
+      $('#subtree').css('color','#000000');
+      updateLayout(cladeRoot);
+      break;
     case "Switch children":
       action = svgEvents.switchChildren;
+      $('#do-nothing').css('color','#000000');
       $('#switch').css('color','#FF0000');
       $('#collapse').css('color','#000000');
       $('#subtree').css('color','#000000');
@@ -1583,6 +1604,7 @@ $('#action').on('click', function(event, dropdownData) {
       break;
     case "Collapse/Expand":
       action = svgEvents.collapse;
+      $('#do-nothing').css('color','#000000');
       $('#switch').css('color','#000000');
       $('#collapse').css('color','#FF0000');
       $('#subtree').css('color','#000000');
@@ -1590,6 +1612,7 @@ $('#action').on('click', function(event, dropdownData) {
       break;
     case "Sub Tree/Upper Tree":
       action = svgEvents.focus;
+      $('#do-nothing').css('color','#000000');
       $('#switch').css('color','#000000');
       $('#collapse').css('color','#000000');
       $('#subtree').css('color','#FF0000');
@@ -1663,6 +1686,7 @@ $('#export').on('click', function(event, dropdownData) {
 // Actions à la fin du chargement de la page
 $(document).ready(function() {
   $('#collapse-mode span').text(function() {
+    console.log('collapseMode:', collapseMode);
     switch (collapseMode) {
       case 'collapseOn':
         return 'Collapse On';
@@ -1690,6 +1714,7 @@ $(document).ready(function() {
         $('#collapse-mode span').text('Collapse Off');
         break;
     }
+    console.log('collapseMode:', collapseMode);
   });
   switch (displaySeqType) {
     case 'AA':
