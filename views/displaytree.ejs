@@ -36,7 +36,7 @@
         <span class="caret"></span>
       </button>
       <ul class="dropdown-menu">
-        <li><a href="#" id="do-nothing">Do Nothing</a></li>
+        <li><a href="#" id="do-nothing">View Branch Results</a></li>
         <li><a href="#" id="switch">Switch children</a></li>
         <li><a href="#" id="collapse">Collapse/Expand</a></li>
         <li><a href="#" id="subtree">Sub Tree/Upper Tree</a></li>
@@ -44,9 +44,9 @@
       </ul>
     </div>
     <!-- Bouton Collapse -->
-    <button type="button" class="btn btn-default btn-sm" aria-label="Collapse" data-toggle="tooltip" data-placement="top" title="Collapse the tree" id="globalcollapse">
+    <!-- <button type="button" class="btn btn-default btn-sm" aria-label="Collapse" data-toggle="tooltip" data-placement="top" title="Collapse the tree" id="globalcollapse">
       <span>Compact tree</span>
-    </button>
+    </button> -->
     <!-- Bouton Exapand all -->
     <button type="button" class="btn btn-default btn-sm" aria-label="Expand"  data-toggle="tooltip" data-placement="top" title="Expand the tree (takes time on big trees!)" id="globalexpand">
       <span>Expand tree</span>
@@ -84,9 +84,9 @@
       </ul>
     </div>
     <!-- Bouton Action -->
-    <button type="button" class="btn btn-default btn-sm" aria-label="Action" data-toggle="tooltip" data-placement="top" title="Switch between collapse and results modes" id="collapse-mode">
+    <!-- <button type="button" class="btn btn-default btn-sm" aria-label="Action" data-toggle="tooltip" data-placement="top" title="Switch between collapse and results modes" id="collapse-mode">
       <span>Collapse Mode</span>
-    </button>
+    </button> -->
     <!-- Bouton  Export -->
     <div class="btn-group" role="group" id="export">
       <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="export figure">
@@ -243,11 +243,11 @@ function  main_display() {
   action = svgEvents.doNothing;
   var stringAction = myStorage.getItem("action");
   if ((stringAction === null )||(stringAction === undefined)||(stringAction === "undefined")){
-    stringAction = 'Do Nothing';
+    stringAction = 'View Branch Results';
     myStorage.setItem("action",stringAction);
   }
   switch (myStorage.getItem("action")) {
-    case 'Do Nothing':
+    case 'View Branch Results':
       action = svgEvents.doNothing;
       break;
     case "Switch children":
@@ -361,7 +361,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   } else if (!firstLoad && resultsText) {
     var results = resultsText;
   } else {
-    var results = '1:0 2:1 3:0 4:1 5:0';
+    var results = resultsText;
   }
   // var results = xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results);
   results = results.split(' ');
@@ -495,7 +495,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
           }
           return (false)
         });
-        sel1.style("stroke-width", "10")
+        // sel1.style("stroke-width", "10")
       }
     })
     .on('mouseout',function (d){
@@ -512,37 +512,6 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         });
         sel1.style("stroke-width",configLayout.linkStrokeSize)
       }
-    })
-    .on('mouseover', function (d) {
-      // console.log(this);
-      $(this).css('stroke-width', 10);
-      // var sel = g.select(this);
-      // this.style('stroke-width', 10);
-      // var selLinks = g.selectAll('.link');
-      // selLinks.style('stroke-width', '10');
-      // console.log('d');
-      // console.log(d);
-      // console.log('selLinks');
-      // console.log(selLinks);
-
-      // var pattIndex =  d.target.data.lastEvent.pattern;
-      // if (pattIndex !== undefined) {
-      //   var sel1 = g.selectAll(".link").filter(function(e) {
-      //     var pa = e.target.data.lastEvent.pattern;
-      //     if (pa !== undefined) {
-      //       // pa est le tableau des index des pattern  associee au noeud
-      //       // pattIndex[0] est l'index de la pattern  associee au noeud survole
-      //       return (pa.indexOf(pattIndex[0]) > -1)
-      //     }
-      //     return (false)
-      //   });
-      //   sel1.style("stroke-width",configLayout.linkStrokeSize)
-      // }
-    })
-    .on('mouseout', function (d) {
-      // console.log(d.target);
-      var selLinks = g.selectAll('.link');
-      selLinks.style('stroke-width', '2');
     })
     .attr("d", diagonal)
     .attr('stroke-dasharray',function(d){
@@ -568,6 +537,12 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .attr("class", "gsymbol")
     .append("path")
     .attr("class", "symbol")
+    .on('mouseover', function() {
+      //
+    })
+    .on('mouseout', function() {
+      //
+    })
     .on("click", function(d) {
       console.log('symbol clicked');
       // if (d.data.lastEvent.crossref) {
@@ -580,7 +555,13 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       //   }
       //   window.open(url);
       // }
-      resultsText = d.data.branch_info.branch_results;
+      d3.select(this).attr('fill', function(elt) {
+        console.log(elt);
+        return '#FFFFFF';
+      });
+      if (action == svgEvents.doNothing) {
+        resultsText = d.data.branch_info.branch_results;
+      }
       // console.log(d.data.branch_info.branch_id, resultsText);
       // updateSvg(treeRoot, firstLoad, d.data.branch_info.branch_results);
       updateLayout(treeRoot, firstLoad, resultsText);
@@ -1567,7 +1548,7 @@ $('#selectCrossref').ready(function() {
   });
 $('#action').ready(function() {
   switch (myStorage.getItem("action")) {
-    case 'Do Nothing':
+    case 'View Branch Results':
       $('#do-nothing').css('color','#FF0000');
       break;
     case "Switch children":
@@ -1586,7 +1567,7 @@ $('#action').on('click', function(event, dropdownData) {
   var target = event.toElement || event.relatedTarget || event.target || function () { throw "Failed to attach an event target!"; }
   myStorage.setItem("action",target.text);
   switch (target.text) {
-    case 'Do Nothing':
+    case 'View Branch Results':
       action = svgEvents.doNothing;
       $('#do-nothing').css('color','#FF0000');
       $('#switch').css('color','#000000');
