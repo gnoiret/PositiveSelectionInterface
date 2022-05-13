@@ -904,10 +904,10 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .data(psResultsDataset);
   // Affichage des rectangles
   globalRects.enter()
-    .append('a')
-    .attr('xlink:href', function(d) {
-      return '#ps-rect-'+d.site;
-    })
+    // .append('a')
+    // .attr('xlink:href', function(d) {
+    //   return '#ps-rect-'+d.site;
+    // })
     .append('rect')
     .attr('class', 'ps-rects-global')
     .attr('title', function(d) {
@@ -1184,6 +1184,16 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // ==============================================================
   // Fin modif : blocs de séquences
   // ==============================================================
+  $('.ps-rects-global').on('click', function(event) {
+    console.log('coucou', $(this).attr('title').split('-')[0]);
+    var siteNumber = $(this).attr('title').split('-')[0];
+    var target = document.getElementById('alignment-container');
+    // console.log(target);
+    // largeur svg2 : 50 + seq_lg + 10 + psResultsDataset.length*12 + 50
+    // 0 : 50 | seq_lg | 10
+    // max : 50 | seq_lg | 10 psResultsDataset.length*hStep
+    target.scrollTo(siteNumber*12 + seq_lg + 50 - target.clientWidth/2, 0); // use offsetWidth for paddings, borders and margins
+  });
 }
 // Fin de la fonction updateSvg
 // ----------------------------
@@ -1803,17 +1813,19 @@ $('#export').on('click', function(event, dropdownData) {
     default:
   }
 });
-$('#scroll-right').on('click', function() {
-  var target = document.getElementById('alignment-container');
-  // console.log(target);
-  // largeur svg2 : 50 + seq_lg + 10 + psResultsDataset.length*12 + 50
-  // 0 : 50 | seq_lg | 10
-  // max : 50 | seq_lg | 10 psResultsDataset.length*hStep
-  target.scrollTo(800 - target.clientWidth/2, 0); // use offsetWidth for paddings, borders and margins
-})
 
 // Actions à la fin du chargement de la page
 $(document).ready(function() {
+  $('.ps-rects-global').on('click', function(event) {
+    console.log('coucou', $(this).attr('title').split('-')[0]);
+    var siteNumber = $(this).attr('title').split('-')[0];
+    var target = document.getElementById('alignment-container');
+    // console.log(target);
+    // largeur svg2 : 50 + seq_lg + 10 + psResultsDataset.length*12 + 50
+    // 0 : 50 | seq_lg | 10
+    // max : 50 | seq_lg | 10 psResultsDataset.length*hStep
+    target.scrollTo(siteNumber*12 + seq_lg + 50 - target.clientWidth/2, 0); // use offsetWidth for paddings, borders and margins
+  });
   $('#collapse-mode span').text(function() {
     console.log('collapseMode:', collapseMode);
     switch (collapseMode) {
