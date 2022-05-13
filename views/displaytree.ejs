@@ -237,7 +237,8 @@ function  main_display() {
   // Definit  la div tooltip
   div = d3.select("body").append("div")
     .attr("class", "tooltip")
-    .style("opacity", 0);
+    // .style("opacity", 0)
+    .style('positon', 'absolute');
   svg1 = d3.select("#svg1");   // selectionne la div svg1
   g = svg1.append("g")      // ajoute element au svg1
     .attr("id", "treeAlign");
@@ -355,6 +356,20 @@ function updateLayout(cRoot,firstLoad=0) {
   } else {
     updateSvg(treeRoot,firstLoad, '1:0 2:1 3:1 4:0 5:1');
   }
+}
+
+function hideTooltip() {
+  $('.tooltip').hide();
+}
+function showTooltip() {
+  $('.tooltip').show();
+}
+function moveTooltip(coords, text) {
+  $('.tooltip').css({
+    'top':coords.x,
+    'left':coords.y
+  })
+  .html(text);
 }
 
 // Fonction principale : mise a jour du svg
@@ -557,6 +572,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .append("path")
     .attr("class", "symbol")
     .on('mouseover', function(d) {
+      $('.tooltip').html(getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length);
       // console.log('mouseover node');
       // mouseover on a node
       // goal: display the number of positive sites
@@ -1192,7 +1208,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     // largeur svg2 : 50 + seq_lg + 10 + psResultsDataset.length*12 + 50
     // 0 : 50 | seq_lg | 10
     // max : 50 | seq_lg | 10 psResultsDataset.length*hStep
-    target.scrollTo(siteNumber*12 + seq_lg + 50 - target.clientWidth/2, 0); // use offsetWidth for paddings, borders and margins
+    target.scrollTo(siteNumber*hStep + seq_lg + 50 - target.clientWidth/2, 0); // use offsetWidth for paddings, borders and margins
   });
 }
 // Fin de la fonction updateSvg
