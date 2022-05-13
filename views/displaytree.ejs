@@ -27,8 +27,8 @@
   <nav id="main-nav" class="navbar navbar-default navbar-fixed-top">
     <% include ../partials/header %>
     <!-- Division pour eventuel bouton crossref -->
-    <div class="btn-group" id="crossref">
-    </div>
+    <!-- <div class="btn-group" id="crossref">
+    </div> -->
     <!-- Bouton Action -->
     <div class="btn-group" role="group" id="action">
       <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="Choose action on node"  >
@@ -40,7 +40,6 @@
         <li><a href="#" id="switch">Switch children</a></li>
         <li><a href="#" id="collapse">Collapse/Expand</a></li>
         <li><a href="#" id="subtree">Sub Tree/Upper Tree</a></li>
-        
       </ul>
     </div>
     <!-- Bouton Collapse -->
@@ -101,7 +100,22 @@
     <!-- Champs Seuils sup. et inf. -->
     <label for="ps-threshold-low"  style="font-size: 12px;">Lower threshold:</label><input type="number" id="ps-threshold-low" min="0.0" step="0.05" placeholder="PS Threshold" value="0.9" style="width: 5em; font-size: 12px;"/>
     <label for="ps-threshold-high" style="font-size: 12px;">Upper threshold:</label><input type="number" id="ps-threshold-high" min="0.0" step="0.05" placeholder="PS Threshold" value="1.0" style="width: 5em; font-size: 12px;"/>
+    <!-- Bouton de déplacement gauche -->
+    <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="navigate-left"  data-toggle="tooltip" data-placement="top" title="Navigate left">
+      <span>Navigate left</span>
+      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+    </button>
+    <!-- Bouton de déplacement droit -->
+    <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="navigate-right"  data-toggle="tooltip" data-placement="top" title="Navigate right">
+      <span>Navigate right</span>
+      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+    </button>
   </nav>
+  <div id="svg-container-upper">
+    <div  style="border:2px solid lightgrey; float: left; overflow-y: auto; width: 100%; height: 50px;" id="navigator-container">
+      <svg id="svg0"></svg>
+    </div>
+  </div>
   <div id="demo">
     <div id="svg-container">
       <div  style="border:2px solid lightgrey; float: left; overflow-y: auto; width: 40%;" id="tree-container">
@@ -154,14 +168,16 @@
   var div;
   var myStorage = window.localStorage;    // utilisation de localStorage pour consrever les preferences
   var displaySeqType = 'AA';
-  var hStepBase = 12;
+  var hStepBase = 1;
   var alignmentLetterSpacing = hStepBase - 10;
   var psThresholdHigh = $('#ps-threshold-high').val() || 1.0;
   var psThresholdLow = $('#ps-threshold-low').val() || 0.3;
-  var psThresholdHighBgColor = "#FC6565";
-  var psThresholdLowBgColor = "#F7F7F7";
-  var psBelowThresholdBgColor = "#6FDCF7";
-  var psMissingBgColor = "#aaaaaa";
+  // var psThresholdHighBgColor = "#FC6565";
+  var psThresholdHighBgColor = "#ff0000";
+  var psThresholdLowBgColor = "#ffcccc";
+  // var psBelowThresholdBgColor = "#6FDCF7";
+  var psBelowThresholdBgColor = "#cccccc";
+  var psMissingBgColor = "#ffffff";
   var psThresholdsChanged = false;
   var seq_lg = xmlparser.flatTree(recTree.phyloxml.phylogeny.maxSeqIdLength)*10;
   var resultsText = '';
@@ -448,7 +464,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   var decalageY = -90;
 
   svg1.attr("width", widthSVG + margin.right + margin.left);
-  svg1.attr("height", heightSVG + margin.top + margin.down+400      + ajustementY);
+  svg1.attr("height", heightSVG + margin.top + margin.down+300      + ajustementY);
   g.attr("transform", "translate(" + (margin.right - minX - 250) + "," + (margin.top - minY + 200     + decalageY) + ")");
 
   // console.log(links);
@@ -821,14 +837,102 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // Selection des feuilles
   // =======================
   var leaves = nodes.filter(function (e) {
-      return !e.children;
-    });
-  // ======================================================
+    return !e.children;
+  });
+  
+  var widthSVG0 = psResultsDataset.length;
+  var heightSVG0 = 50;
+  var psGraphGlobalWidth = psResultsDataset.length;
+  var psGraphGlobalHeight = 50;
+  var psGraphGlobalMargins = {top:0, right:0, bottom:0, left:0}
+  var svg0 = d3.select('#svg0');
+  svg0.attr('width', widthSVG0)
+    .attr('height',  heightSVG0);
+  // // Définition de l'échelle pour l'axe x
+  // var xPsGraphGlobal = d3.scaleLinear()
+  //   .domain([1, psResultsDataset.length+1])
+  //   .range([0, psGraphGlobalWidth]);
+  // // Définition de l'échelle pour l'axe y
+  // var yPsGraphGlobal = d3.scaleLinear()
+  //   .domain([0, maxStat(psResultsDataset)])
+  //   .range([psGraphGlobalHeight, 0]);
+  // Ajout du graphe des résultats au SVG
+  var psGraphGlobal = svg0.append('g')
+    .attr('id', 'ps-graph-global')
+    .attr('transform', 'translate('+psGraphGlobalMargins.left+', '+psGraphGlobalMargins.top+')');
+  // // Ajout de l'axe x au graphe
+  // psGraph.append('g')
+  //   .attr('transform', 'translate(0,' + psGraphHeight + ')')
+  //   .call(d3.axisBottom(x).ticks(psResultsDataset.length/5)); // graduations tous les 5 codons / AA
+  // // Ajout de l'axe y au graphe
+  // psGraph.append('g')
+  //   .call(d3.axisLeft(y));
+  // // Ajout du seuil inférieur au graphe
+  // psGraph.append('line')
+  //   .attr('x1', x(1))
+  //   .attr('y1', y(psThresholdLow))
+  //   .attr('x2', x(psResultsDataset.length+1.5))
+  //   .attr('y2', y(psThresholdLow))
+  //   .style('stroke', '#000000')
+  //   // .style('stroke', psThresholdLowBgColor)
+  //   .style('stroke-width', 2+'px')
+  //   .style('stroke-dasharray', ('4, 4'));
+  // // Ajout du seuil supérieur au graphe
+  // psGraph.append('line')
+  //   .attr('x1', x(1))
+  //   .attr('y1', y(psThresholdHigh))
+  //   .attr('x2', x(psResultsDataset.length+1.5))
+  //   .attr('y2', y(psThresholdHigh))
+  //   .style('stroke', '#000000')
+  //   // .style('stroke', psThresholdHighBgColor)
+  //   .style('stroke-width', 2+'px')
+  //   .style('stroke-dasharray', ('4, 4'));
+  
+  // // // Suppression du graphe
+  // // psGraph.exit().remove();
+
+  // Calcul du décalage des sites pour le positionnement des rectangles du graphe
+  var siteOffset = 1 - psResultsDataset[0].site;
+  // Association des données aux futurs rectangles
+  var globalRects = psGraphGlobal.selectAll('.ps-rects-global')
+    .data(psResultsDataset);
+  // Affichage des rectangles
+  globalRects.enter().append('rect')
+    .attr('class', 'ps-rects-global')
+    // .attr('title', function(d) {
+    //   return d.site;
+    // })
+    .attr('width', function(d) { return 1; })
+    .attr('height', function(d) { return psGraphGlobalHeight; })
+    // .attr('x', function(d) { return xPsGraphGlobal(d.site + siteOffset); })
+    .attr('x', function(d) { return d.site + siteOffset; })
+    // .attr('y', function(d) { return yPsGraphGlobal(d.stat); })
+    .attr('y', function(d) { return 0; })
+    .style('fill', function(d) {
+      if (d.stat >= psThresholdHigh) {
+        return psThresholdHighBgColor;
+      } else if (d.stat >= psThresholdLow) {
+        return psThresholdLowBgColor;
+      } else if (d.stat >= 0) {
+        return psBelowThresholdBgColor;
+      } else {
+        return psMissingBgColor;
+      }
+    })
+    .style('stroke', '#000000')
+    .style('stroke-width', 0+'px');
+  
+  // psGraph.on('click', function(event) {
+  //   // var coords = d3.mouse(this);
+  //   console.log(event.target.title);
+  // });
+  
+  // =====================================================
   // | Début : graphe des résultats de sélection positive |
   // ======================================================
   var svg2 = d3.select("#svg2");
   svg2.attr("width", widthSVG + margin.right + ajustementX + 400)
-    .attr("height",  heightSVG + margin.top + margin.down + 200);
+    .attr("height",  heightSVG + margin.top + margin.down + 100);
   // Fonction de calcul de la statistique maximale dans les résultats
   function maxStat(results_list) {
     var currentmax = results_list[0].stat;
@@ -927,7 +1031,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       }
     })
     .style('stroke', '#000000')
-    .style('stroke-width', 1+'px');
+    .style('stroke-width', 0+'px');
   
   psGraph.on('click', function(event) {
     // var coords = d3.mouse(this);
