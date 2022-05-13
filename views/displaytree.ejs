@@ -112,7 +112,7 @@
     </button>
   </nav>
   <div id="svg-container-upper">
-    <div  style="border:2px solid lightgrey; float: left; overflow-y: auto; width: 100%; height: 50px;" id="navigator-container">
+    <div  style="border:2px solid lightgrey; float: left; overflow-y: hidden; width: 100%; height: 50px;" id="navigator-container">
       <svg id="svg0"></svg>
     </div>
   </div>
@@ -903,7 +903,12 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   var globalRects = psGraphGlobal.selectAll('.ps-rects-global')
     .data(psResultsDataset);
   // Affichage des rectangles
-  globalRects.enter().append('rect')
+  globalRects.enter()
+    .append('a')
+    .attr('xlink:href', function(d) {
+      return '#ps-rect-'+d.site;
+    })
+    .append('rect')
     .attr('class', 'ps-rects-global')
     .attr('title', function(d) {
       return d.site+'-global';
@@ -926,11 +931,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       }
     })
     .style('stroke', '#000000')
-    .style('stroke-width', 0+'px')
-    .append('a')
-    .attr('xlink:href', function(d) {
-      return '#'+d.site;
-    });
+    .style('stroke-width', 0+'px');
   
   psGraphGlobal.on('click', function() {
     var coords = d3.mouse(this);
@@ -1020,11 +1021,14 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // Calcul du décalage des sites pour le positionnement des rectangles du graphe
   var siteOffset = 1 - psResultsDataset[0].site;
   // Association des données aux futurs rectangles
-  var rects = psGraph.selectAll('.psrects')
+  var rects = psGraph.selectAll('.ps-rects')
     .data(psResultsDataset);
   // Affichage des rectangles
   rects.enter().append('rect')
-    .attr('class', 'psrects')
+    .attr('id', function(d) {
+      return 'ps-rect-'+d.site;
+    })
+    .attr('class', 'ps-rects')
     .attr('title', function(d) {
       return d.site;  
     })
