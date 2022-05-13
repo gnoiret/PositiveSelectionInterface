@@ -364,6 +364,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     var results = resultsText;
   }
   // var results = xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results);
+  
   results = results.split(' ');
   var psResultsDataset = [];
   // var site = 0;
@@ -537,8 +538,8 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .attr("class", "gsymbol")
     .append("path")
     .attr("class", "symbol")
-    .on('mouseover', function() {
-      //
+    .on('mouseover', function(d) {
+      console.log(d.data.branch_info.branch_results)
     })
     .on('mouseout', function() {
       //
