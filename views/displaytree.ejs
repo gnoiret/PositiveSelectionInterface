@@ -237,8 +237,8 @@ function  main_display() {
   // Definit  la div tooltip
   div = d3.select("body").append("div")
     .attr("class", "tooltip")
-    // .style("opacity", 0)
-    .style('positon', 'absolute');
+    .style("opacity", 1)
+    .style('position', 'absolute');
   svg1 = d3.select("#svg1");   // selectionne la div svg1
   g = svg1.append("g")      // ajoute element au svg1
     .attr("id", "treeAlign");
@@ -364,12 +364,11 @@ function hideTooltip() {
 function showTooltip() {
   $('.tooltip').show();
 }
-function moveTooltip(coords, text) {
+function moveTooltip(x, y) {
   $('.tooltip').css({
-    'top':coords.x,
-    'left':coords.y
-  })
-  .html(text);
+    'top':x,
+    'left':y
+  });
 }
 
 // Fonction principale : mise a jour du svg
@@ -572,15 +571,25 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .append("path")
     .attr("class", "symbol")
     .on('mouseover', function(d) {
-      $('.tooltip').html(getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length);
+      showTooltip();
+      var myText = getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length;
+      d3.select('.tooltip')
+      .text(myText);
+      // var mouseX = event.clientX;
+      // var mouseY = event.clientY;
+      // moveTooltip(mouseX, mouseY);
+      // $('.tooltip').html(getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length).show();
+      
+      // console.log('d', d);
+      // console.log(coords);
+      // console.log('mouseover d:', d);
       // console.log('mouseover node');
       // mouseover on a node
       // goal: display the number of positive sites
-
-      console.log(getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length, 'positive sites');
+      // console.log(getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length, 'positive sites');
     })
     .on('mouseout', function() {
-      //
+      hideTooltip();
     })
     .on("click", function(d) {
       // console.log('click node');
@@ -1204,11 +1213,31 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     console.log('coucou', $(this).attr('title').split('-')[0]);
     var siteNumber = $(this).attr('title').split('-')[0];
     var target = document.getElementById('alignment-container');
-    // console.log(target);
+    // console.log(target);œ
     // largeur svg2 : 50 + seq_lg + 10 + psResultsDataset.length*12 + 50
     // 0 : 50 | seq_lg | 10
     // max : 50 | seq_lg | 10 psResultsDataset.length*hStep
     target.scrollTo(siteNumber*hStep + seq_lg + 50 - target.clientWidth/2, 0); // use offsetWidth for paddings, borders and margins
+  });
+  $('.symbol').on('mouseover', function(event) {
+    console.log('mouseover event', event);
+    var mouseY = event.clientX;
+    var mouseX = event.clientY;
+    // console.log(mouseX, mouseY);
+    moveTooltip(mouseX, mouseY);
+    // console.log(document.getElementsByClassName('tooltip')[0]);
+    var tooltipElement = document.getElementsByClassName('tooltip')[0];
+    tooltipElement.innerHTML = getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length;
+    // $('.tooltip').html(getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length)
+    // .css({
+    //   'z-index': '1',
+    //   'background':'#FFFFFF',
+    //   'width':'100px',
+    //   'height':'100px',
+    //   'top':'500px',
+    //   'left':'500px'
+    // })
+    // .show();
   });
 }
 // Fin de la fonction updateSvg
