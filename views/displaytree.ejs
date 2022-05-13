@@ -101,13 +101,13 @@
     <label for="ps-threshold-low"  style="font-size: 12px;">Lower threshold:</label><input type="number" id="ps-threshold-low" min="0.0" step="0.05" placeholder="PS Threshold" value="0.9" style="width: 5em; font-size: 12px;"/>
     <label for="ps-threshold-high" style="font-size: 12px;">Upper threshold:</label><input type="number" id="ps-threshold-high" min="0.0" step="0.05" placeholder="PS Threshold" value="1.0" style="width: 5em; font-size: 12px;"/>
     <!-- Bouton de déplacement gauche -->
-    <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="navigate-left"  data-toggle="tooltip" data-placement="top" title="Navigate left">
-      <span>Navigate left</span>
+    <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="scroll-left"  data-toggle="tooltip" data-placement="top" title="Scroll left">
+      <span>Scroll left</span>
       <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
     </button>
     <!-- Bouton de déplacement droit -->
-    <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="navigate-right"  data-toggle="tooltip" data-placement="top" title="Navigate right">
-      <span>Navigate right</span>
+    <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="scroll-right"  data-toggle="tooltip" data-placement="top" title="Scroll right">
+      <span>Scroll right</span>
       <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
     </button>
   </nav>
@@ -168,16 +168,18 @@
   var div;
   var myStorage = window.localStorage;    // utilisation de localStorage pour consrever les preferences
   var displaySeqType = 'AA';
-  var hStepBase = 1;
+  var hStepBase = 12;
   var alignmentLetterSpacing = hStepBase - 10;
   var psThresholdHigh = $('#ps-threshold-high').val() || 1.0;
   var psThresholdLow = $('#ps-threshold-low').val() || 0.3;
   // var psThresholdHighBgColor = "#FC6565";
-  var psThresholdHighBgColor = "#ff0000";
-  var psThresholdLowBgColor = "#ffcccc";
+  var psThresholdHighBgColor = "#FF0000";
+  var psThresholdLowBgColor = "#FFFF00";
   // var psBelowThresholdBgColor = "#6FDCF7";
-  var psBelowThresholdBgColor = "#cccccc";
-  var psMissingBgColor = "#ffffff";
+  // var psBelowThresholdBgColor = "#000000";
+  var psBelowThresholdBgColor = "#AAAAAA";
+  // var psBelowThresholdBgColor = "#FFFFFF";
+  var psMissingBgColor = "#FFFFFF";
   var psThresholdsChanged = false;
   var seq_lg = xmlparser.flatTree(recTree.phyloxml.phylogeny.maxSeqIdLength)*10;
   var resultsText = '';
@@ -459,7 +461,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   });
   var widthSVG = maxX - minX;
   var heightSVG = maxY - minY;
-  var ajustementX = psResultsDataset.length*hStep - 520;
+  var ajustementX = psResultsDataset.length*hStep - 120;
   var ajustementY = -200;
   var decalageY = -90;
 
@@ -555,13 +557,17 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .append("path")
     .attr("class", "symbol")
     .on('mouseover', function(d) {
-      console.log(d.data.branch_info.branch_results)
+      // console.log('mouseover node');
+      // mouseover on a node
+      // goal: display the number of positive sites
+
+      console.log(getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length, 'positive sites');
     })
     .on('mouseout', function() {
       //
     })
     .on("click", function(d) {
-      console.log('symbol clicked');
+      // console.log('click node');
       // if (d.data.lastEvent.crossref) {
       //   // Si la balise crossref est presente on fait un lien vers l'url
       //   // qui requete l'identifiant dans la base de donnees selectionnee
@@ -572,10 +578,10 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       //   }
       //   window.open(url);
       // }
-      d3.select(this).attr('fill', function(elt) {
-        console.log(elt);
-        return '#FFFFFF';
-      });
+      // d3.select(this).attr('fill', function(elt) {
+      //   console.log(elt);
+      //   return '#FFFFFF';
+      // });
       if (action == svgEvents.doNothing) {
         resultsText = d.data.branch_info.branch_results;
       }
@@ -899,9 +905,9 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // Affichage des rectangles
   globalRects.enter().append('rect')
     .attr('class', 'ps-rects-global')
-    // .attr('title', function(d) {
-    //   return d.site;
-    // })
+    .attr('title', function(d) {
+      return d.site+'-global';
+    })
     .attr('width', function(d) { return 1; })
     .attr('height', function(d) { return psGraphGlobalHeight; })
     // .attr('x', function(d) { return xPsGraphGlobal(d.site + siteOffset); })
@@ -920,18 +926,25 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       }
     })
     .style('stroke', '#000000')
-    .style('stroke-width', 0+'px');
+    .style('stroke-width', 0+'px')
+    .append('a')
+    .attr('xlink:href', function(d) {
+      return '#'+d.site;
+    });
   
-  // psGraph.on('click', function(event) {
-  //   // var coords = d3.mouse(this);
-  //   console.log(event.target.title);
-  // });
+  psGraphGlobal.on('click', function() {
+    var coords = d3.mouse(this);
+    console.log(coords);
+  });
   
-  // =====================================================
+  // ======================================================
   // | Début : graphe des résultats de sélection positive |
   // ======================================================
   var svg2 = d3.select("#svg2");
-  svg2.attr("width", widthSVG + margin.right + ajustementX + 400)
+  // svg2.attr("width", widthSVG + margin.right + ajustementX)
+  //   .attr("height",  heightSVG + margin.top + margin.down + 100);
+  console.log('seq_lg:', seq_lg);
+  svg2.attr("width",  50 + seq_lg + 10 + psResultsDataset.length*hStep + 50)
     .attr("height",  heightSVG + margin.top + margin.down + 100);
   // Fonction de calcul de la statistique maximale dans les résultats
   function maxStat(results_list) {
@@ -1033,9 +1046,9 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .style('stroke', '#000000')
     .style('stroke-width', 0+'px');
   
-  psGraph.on('click', function(event) {
-    // var coords = d3.mouse(this);
-    console.log(event.target.title);
+  psGraph.on('click', function() {
+    var coords = d3.mouse(this);
+    // console.log(event.target.title);
   });
   // ====================================================
   // | Fin : graphe des résultats de sélection positive |
@@ -1173,6 +1186,24 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
 
 // Autres fonctions utilitaires
 // ----------------------------
+
+// Fonction qui renvoie la liste des positions des sites positifs
+function getPositiveSites(resultsText, upperThreshold) {
+  var resultsList = resultsText.split(' ');
+  var positiveSites = [];
+  // console.log(resultsList);
+  resultsList.forEach((r) => {
+    var site = r.split(':')[0];
+    var value = r.split(':')[1];
+    // console.log('site:', r.split(':')[0], 'value:', r.split(':')[1]);
+    if (value >= psThresholdHigh) {
+      positiveSites.push(site);
+    }
+  })
+  // console.log('positive sites:', positiveSites);
+  // console.log(positiveSites.length, 'positive sites');
+  return positiveSites;
+}
 
 // Fonction de test du support local.storage
 // ------------------------------------------
@@ -1768,6 +1799,14 @@ $('#export').on('click', function(event, dropdownData) {
     default:
   }
 });
+$('#scroll-right').on('click', function() {
+  var target = document.getElementById('alignment-container');
+  // console.log(target);
+  // largeur svg2 : 50 + seq_lg + 10 + psResultsDataset.length*12 + 50
+  // 0 : 50 | seq_lg | 10
+  // max : 50 | seq_lg | 10 psResultsDataset.length*hStep
+  target.scrollTo(800 - target.clientWidth/2, 0); // use offsetWidth for paddings, borders and margins
+})
 
 // Actions à la fin du chargement de la page
 $(document).ready(function() {
