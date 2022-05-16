@@ -177,7 +177,7 @@
   var psThresholdLowBgColor = "#FFFF00";
   // var psBelowThresholdBgColor = "#6FDCF7";
   // var psBelowThresholdBgColor = "#000000";
-  var psBelowThresholdBgColor = "#AAAAAA";
+  var psBelowThresholdBgColor = "#DDDDDD";
   // var psBelowThresholdBgColor = "#FFFFFF";
   var psMissingBgColor = "#FFFFFF";
   var psThresholdsChanged = false;
@@ -366,8 +366,8 @@ function showTooltip() {
 }
 function moveTooltip(x, y) {
   $('.tooltip').css({
-    'top':x,
-    'left':y
+    'top':x-42,
+    'left':y-42
   });
 }
 
@@ -662,44 +662,44 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     });
   allNodes
     .select(".symbol")
-    .attr("fill", function(d) {//Couleur de remplissage  du symbol
-      // switch (d.data.lastEvent.eventType) {
-      //   case "monophyletic":
-      //     // return setLeafColour(d.data.lastEvent.speciesLocation);
-      //     break;
-      //   case "speciation":
-          return configLayout.color.speciation;
-        //   break;
-        // case "speciationOutLoss":
-        //   return configLayout.color.speciationOutLoss
-        //   break;
-        // case "branchingOut":
-        //   return configLayout.color.branchingOut
-        //   break;
-        // case "speciationOut":
-        //   return configLayout.color.speciationOut
-        //   break;
-        // case "bifurcationOut":
-        //   return configLayout.color.bifurcationOut
-        //   break;
-        // case "transferBack":
-        //   return configLayout.color.transferBack
-        //   break;
-        // case "duplication":
-        //   return configLayout.color.duplication
-        //   break;
-        // case "speciationLoss":
-        //   return configLayout.color.speciationLoss
-        //   break;
-        // case "leaf":
-        //   // return setLeafColour(d.data.lastEvent.speciesLocation);
-        //   break;
-        // case "loss":
-        //   return configLayout.color.loss
-        //   break;
-        // default:
-        // }
-      })
+    // .attr("fill", function(d) {//Couleur de remplissage du symbole des noeuds
+    //   switch (d.data.lastEvent.eventType) {
+    //     case "monophyletic":
+    //       // return setLeafColour(d.data.lastEvent.speciesLocation);
+    //       break;
+    //     case "speciation":
+    //       return configLayout.color.speciation;
+    //       break;
+    //     case "speciationOutLoss":
+    //       return configLayout.color.speciationOutLoss
+    //       break;
+    //     case "branchingOut":
+    //       return configLayout.color.branchingOut
+    //       break;
+    //     case "speciationOut":
+    //       return configLayout.color.speciationOut
+    //       break;
+    //     case "bifurcationOut":
+    //       return configLayout.color.bifurcationOut
+    //       break;
+    //     case "transferBack":
+    //       return configLayout.color.transferBack
+    //       break;
+    //     case "duplication":
+    //       return configLayout.color.duplication
+    //       break;
+    //     case "speciationLoss":
+    //       return configLayout.color.speciationLoss
+    //       break;
+    //     case "leaf":
+    //       // return setLeafColour(d.data.lastEvent.speciesLocation);
+    //       break;
+    //     case "loss":
+    //       return configLayout.color.loss
+    //       break;
+    //     default:
+    //     }
+    //   })
     .attr("d", function(d) { //Type de symbol
        // Verification si le noeud est collapse
       if (d.data.nodeinfo) {
@@ -743,48 +743,49 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         default:
       }
     })
-    .attr("stroke-width", "0px")
-    .filter(function (d) {
-       return d.data._clade? true : false;
-    })
-    .attr("fill", "white")
-    .attr("stroke-width", "2px")
-    .attr("stroke", function(d) {   //Couleur de trait du symbol
-      switch (d.data.lastEvent.eventType) {
-        case "speciation":
-          return configLayout.color.speciation
-          break;
-        case "speciationOutLoss":
-          return configLayout.color.speciationOutLoss
-          break;
-        case "speciationOut":
-          return configLayout.color.speciationOut
-          break;
-        case "bifurcationOut":
-          return configLayout.color.bifurcationOut
-          break;
-        case "transferBack":
-          return configLayout.color.transferBack
-          break;
-        case "duplication":
-          return configLayout.color.duplication
-          break;
-        case "speciationLoss":
-          return configLayout.color.speciationLoss
-          break;
-        case "leaf":
-          return configLayout.color.leaf
-          break;
-        case "monophyletic":
-          // return configLayout.color.leaf
-          // return setLeafColour(d.data.lastEvent.speciesLocation)
-          break;
-        case "loss":
-          return configLayout.color.loss
-          break;
-        default:
-      }
-    });
+    // .attr("stroke-width", "0px")
+    // .filter(function (d) {
+    //    return d.data._clade? true : false;
+    // })
+    // .attr("fill", "white")
+    // .attr("stroke-width", "2px")
+    // .attr("stroke", function(d) {   //Couleur de trait du symbol
+    //   switch (d.data.lastEvent.eventType) {
+    //     case "speciation":
+    //       return configLayout.color.speciation
+    //       break;
+    //     case "speciationOutLoss":
+    //       return configLayout.color.speciationOutLoss
+    //       break;
+    //     case "speciationOut":
+    //       return configLayout.color.speciationOut
+    //       break;
+    //     case "bifurcationOut":
+    //       return configLayout.color.bifurcationOut
+    //       break;
+    //     case "transferBack":
+    //       return configLayout.color.transferBack
+    //       break;
+    //     case "duplication":
+    //       return configLayout.color.duplication
+    //       break;
+    //     case "speciationLoss":
+    //       return configLayout.color.speciationLoss
+    //       break;
+    //     case "leaf":
+    //       return configLayout.color.leaf
+    //       break;
+    //     case "monophyletic":
+    //       // return configLayout.color.leaf
+    //       // return setLeafColour(d.data.lastEvent.speciesLocation)
+    //       break;
+    //     case "loss":
+    //       return configLayout.color.loss
+    //       break;
+    //     default:
+    //   }
+    // })
+    ;
   allNodes
     .select(".label")
     .transition()
@@ -849,21 +850,87 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       }
       else return "none";
     });
-  allNodes
-    .select(".internal")
-    .transition()
-    .attr("y", 11)
-    .attr("x", -10)
-    .style("text-anchor","end")
-    .text(function(d) {
-      var name = "";
-      if (options.includes("intname")) {
-        if (d.data.confidence) {
-          var name = d.data.confidence._text;
-        }
+  // allNodes
+  //   .select(".internal")
+  //   .transition()
+  //   .attr("y", 11)
+  //   .attr("x", -10)
+  //   .style("text-anchor","end")
+  //   .text(function(d) {
+  //     var name = "";
+  //     if (options.includes("intname")) {
+  //       if (d.data.confidence) {
+  //         var name = d.data.confidence._text;
+  //       }
+  //     }
+  //     return name
+  //   });
+  
+  
+  
+  // console.log(d3.selectAll('path.symbol'));
+  // var nodeSymbols = d3.selectAll('path.symbol');
+  // nodeSymbols.attr('fill', function(d) {
+  //   console.log('coucou', d.data); // d: branch data
+  //   // var nbPositive = getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length;
+  //   var nbPositive = 0;
+  //   if (nbPositive == 0) {
+  //     return 'hsl(0, 100%, 100%)';
+  //     // return '#0000FF';
+  //   }
+  //   else if (nbPositive < 10) {
+  //     return 'hsl(0, 100%, 80%)';
+  //     // return '#0000FF';
+  //   }
+  //   else if (nbPositive < 100) {
+  //     return 'hsl(0, 100%, 60%)';
+  //     // return '#0000FF';
+  //   }
+  //   else {
+  //     return 'hsl(0, 100%, 40%)';
+  //     // return '#FF0000';
+  //   }
+  // })
+  // .attr('stroke', '#000000')
+  // .attr('stroke-width', '2px');
+
+  allNodes.attr('fill', function(d) {
+    var nbPositive = undefined;
+    console.log('allNodes', d.data.branch_info);
+    if (d.data.branch_info) {
+      console.log('branch_info is defined');
+      nbPositive = getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length;
+      if (nbPositive == 0) {
+        return 'hsl(0, 100%, 100%)';
+        // return '#0000FF';
       }
-      return name
-    });
+      else if (nbPositive < 5) {
+        return 'hsl(0, 100%, 80%)';
+        // return '#0000FF';
+      }
+      else if (nbPositive < 10) {
+        return 'hsl(0, 100%, 80%)';
+        // return '#0000FF';
+      }
+      else if (nbPositive < 25) {
+        return 'hsl(0, 100%, 80%)';
+        // return '#0000FF';
+      }
+      else if (nbPositive < 100) {
+        return 'hsl(0, 100%, 40%)';
+        // return '#0000FF';
+      }
+      else {
+        return 'hsl(0, 100%, 0%)';
+        // return '#FF0000';
+      }
+    } else {
+      console.log('branch_info is undefined');
+    }
+  })
+
+
+
   // =======================
   // Selection des feuilles
   // =======================
@@ -969,7 +1036,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   var svg2 = d3.select("#svg2");
   // svg2.attr("width", widthSVG + margin.right + ajustementX)
   //   .attr("height",  heightSVG + margin.top + margin.down + 100);
-  console.log('seq_lg:', seq_lg);
+  // console.log('seq_lg:', seq_lg);
   svg2.attr("width",  50 + seq_lg + 10 + psResultsDataset.length*hStep + 50)
     .attr("height",  heightSVG + margin.top + margin.down + 100);
   // Fonction de calcul de la statistique maximale dans les résultats
@@ -1220,7 +1287,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     target.scrollTo(siteNumber*hStep + seq_lg + 50 - target.clientWidth/2, 0); // use offsetWidth for paddings, borders and margins
   });
   $('.symbol').on('mouseover', function(event) {
-    console.log('mouseover event', event);
+    // console.log('mouseover event', event);
     var mouseY = event.clientX;
     var mouseX = event.clientY;
     // console.log(mouseX, mouseY);
