@@ -902,22 +902,22 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       nbPositive = getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length;
       if (nbPositive == 0) {
         // return 'hsl(0, 100%, 100%)';
-        return '#0000FF';
+        return '#0000FF'; // blue
       }
       else if (nbPositive < 5) {
-        return 'hsl(0, 100%, 80%)';
+        return 'hsl(0, 100%, 80%)'; // light red
         // return '#0000FF';
       }
       else if (nbPositive < 10) {
-        return 'hsl(0, 100%, 65%)';
+        return 'hsl(0, 100%, 65%)'; // light red
         // return '#0000FF';
       }
       else if (nbPositive < 25) {
-        return 'hsl(0, 100%, 50%)';
+        return 'hsl(0, 100%, 50%)'; // red
         // return '#0000FF';
       }
       else if (nbPositive < 100) {
-        return 'hsl(0, 100%, 35%)';
+        return 'hsl(0, 100%, 35%)'; // dark red
         // return '#0000FF';
       }
       else {
