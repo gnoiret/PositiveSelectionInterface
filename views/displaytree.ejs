@@ -901,23 +901,23 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       console.log('branch_info is defined');
       nbPositive = getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length;
       if (nbPositive == 0) {
-        return 'hsl(0, 100%, 100%)';
-        // return '#0000FF';
+        // return 'hsl(0, 100%, 100%)';
+        return '#0000FF';
       }
       else if (nbPositive < 5) {
         return 'hsl(0, 100%, 80%)';
         // return '#0000FF';
       }
       else if (nbPositive < 10) {
-        return 'hsl(0, 100%, 60%)';
+        return 'hsl(0, 100%, 65%)';
         // return '#0000FF';
       }
       else if (nbPositive < 25) {
-        return 'hsl(0, 100%, 40%)';
+        return 'hsl(0, 100%, 50%)';
         // return '#0000FF';
       }
       else if (nbPositive < 100) {
-        return 'hsl(0, 100%, 20%)';
+        return 'hsl(0, 100%, 35%)';
         // return '#0000FF';
       }
       else {
