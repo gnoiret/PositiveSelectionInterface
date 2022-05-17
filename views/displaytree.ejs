@@ -993,6 +993,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // Association des données aux futurs rectangles
   var globalRects = psGraphGlobal.selectAll('.ps-rects-global')
     .data(psResultsDataset);
+  globalRects.exit().remove();
   // Affichage des rectangles
   globalRects.enter()
     // .append('a')
@@ -1000,35 +1001,46 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     //   return '#ps-rect-'+d.site;
     // })
     .append('rect')
-    .attr('class', 'ps-rects-global')
-    .attr('title', function(d) {
-      return d.site+'-global';
-    })
-    .attr('width', function(d) { return 1; })
-    .attr('height', function(d) { return psGraphGlobalHeight; })
-    // .attr('x', function(d) { return xPsGraphGlobal(d.site + siteOffset); })
-    .attr('x', function(d) { return d.site + siteOffset; })
-    // .attr('y', function(d) { return yPsGraphGlobal(d.stat); })
-    .attr('y', function(d) { return 0; })
-    .style('fill', function(d) {
-      if (d.stat >= psThresholdHigh) {
-        return psThresholdHighBgColor;
-      } else if (d.stat >= psThresholdLow) {
-        return psThresholdLowBgColor;
-      } else if (d.stat >= 0) {
-        return psBelowThresholdBgColor;
-      } else {
-        return psMissingBgColor;
-      }
-    })
-    .style('stroke', '#000000')
-    .style('stroke-width', 0+'px');
+      .attr('class', 'ps-rects-global')
+      // .attr('title', function(d) {
+      //   return d.site+'-global';
+      // })
+      .attr('width', function(d) { return 1; })
+      .attr('height', function(d) { return psGraphGlobalHeight; })
+      // .attr('x', function(d) { return xPsGraphGlobal(d.site + siteOffset); })
+      .attr('x', function(d) { return d.site + siteOffset; })
+      // .attr('y', function(d) { return yPsGraphGlobal(d.stat); })
+      .attr('y', function(d) { return 0; })
+      .style('fill', function(d) {
+        // if (d.stat >= psThresholdHigh) {
+        //   return psThresholdHighBgColor;
+        // } else if (d.stat >= psThresholdLow) {
+        //   return psThresholdLowBgColor;
+        // } else if (d.stat >= 0) {
+        //   return psBelowThresholdBgColor;
+        // } else {
+        //   return psMissingBgColor;
+        // }
+        return 'transparent';
+      })
+      .style('stroke', '#000000')
+      .style('stroke-width', 0+'px');
   
   psGraphGlobal.on('click', function() {
     var siteNumber = d3.mouse(this)[0];
-      console.log('Navigating to site', siteNumber);
-      var target = document.getElementById('alignment-container');
-      target.scrollTo(50 + seq_lg + 10 + siteNumber*hStep - target.clientWidth/2, 0);
+    console.log('Navigating to site', siteNumber);
+    var target = document.getElementById('alignment-container');
+    target.scrollTo(50 + seq_lg + 10 + siteNumber*hStep - target.clientWidth/2, 0);
+    var navWindowRect = psGraphGlobal
+      .append('rect')
+        .class('navigation-window')
+        .attr('x', siteNumber)
+        .attr('y', 25)
+        .attr('width', 20)
+        .attr('height', 20)
+        .attr('transform', 'translate('+siteNumber+','+25+')')
+        .style('stroke', '#00FFFF')
+        .style('stroke-width', 10+'px');
   });
   
   // ======================================================
@@ -1118,13 +1130,13 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .data(psResultsDataset);
   // Affichage des rectangles
   rects.enter().append('rect')
-    .attr('id', function(d) {
-      return 'ps-rect-'+d.site;
-    })
+    // .attr('id', function(d) {
+    //   return 'ps-rect-'+d.site;
+    // })
     .attr('class', 'ps-rects')
-    .attr('title', function(d) {
-      return d.site;  
-    })
+    // .attr('title', function(d) {
+    //   return d.site;  
+    // })
     .attr('width', function(d) { return hStep; })
     .attr('height', function(d) { return y(0) - y(d.stat); })
     .attr('x', function(d) { return x(d.site + siteOffset); })
