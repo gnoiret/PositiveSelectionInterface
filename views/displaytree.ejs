@@ -366,8 +366,8 @@ function showTooltip() {
 }
 function moveTooltip(x, y) {
   $('.tooltip').css({
-    'top':x-42,
-    'left':y-42
+    'left':x-42,
+    'top':y-45
   });
 }
 
@@ -896,10 +896,11 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
 
   allNodes.attr('fill', function(d) {
     var nbPositive = undefined;
-    console.log('allNodes', d.data.branch_info);
+    // console.log('allNodes', d.data.branch_info);
     if (d.data.branch_info) {
-      console.log('branch_info is defined');
+      // console.log('branch_info is defined');
       nbPositive = getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length;
+      // console.log(d.data.branch_info.branch_id, d.data.name, nbPositive);
       if (nbPositive == 0) {
         // return 'hsl(0, 100%, 100%)';
         return '#0000FF'; // blue
@@ -924,8 +925,6 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         return 'hsl(0, 100%, 0%)';
         // return '#FF0000';
       }
-    } else {
-      console.log('branch_info is undefined');
     }
   })
 
@@ -1026,8 +1025,10 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .style('stroke-width', 0+'px');
   
   psGraphGlobal.on('click', function() {
-    var coords = d3.mouse(this);
-    console.log(coords);
+    var siteNumber = d3.mouse(this)[0];
+      console.log('Navigating to site', siteNumber);
+      var target = document.getElementById('alignment-container');
+      target.scrollTo(50 + seq_lg + 10 + siteNumber*hStep - target.clientWidth/2, 0);
   });
   
   // ======================================================
@@ -1276,36 +1277,39 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // ==============================================================
   // Fin modif : blocs de séquences
   // ==============================================================
-  $('.ps-rects-global').on('click', function(event) {
-    console.log('coucou', $(this).attr('title').split('-')[0]);
-    var siteNumber = $(this).attr('title').split('-')[0];
-    var target = document.getElementById('alignment-container');
-    // console.log(target);œ
-    // largeur svg2 : 50 + seq_lg + 10 + psResultsDataset.length*12 + 50
-    // 0 : 50 | seq_lg | 10
-    // max : 50 | seq_lg | 10 psResultsDataset.length*hStep
-    target.scrollTo(siteNumber*hStep + seq_lg + 50 - target.clientWidth/2, 0); // use offsetWidth for paddings, borders and margins
-  });
-  $('.symbol').on('mouseover', function(event) {
-    // console.log('mouseover event', event);
-    var mouseY = event.clientX;
-    var mouseX = event.clientY;
-    // console.log(mouseX, mouseY);
-    moveTooltip(mouseX, mouseY);
-    // console.log(document.getElementsByClassName('tooltip')[0]);
-    var tooltipElement = document.getElementsByClassName('tooltip')[0];
-    tooltipElement.innerHTML = getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length;
-    // $('.tooltip').html(getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length)
-    // .css({
-    //   'z-index': '1',
-    //   'background':'#FFFFFF',
-    //   'width':'100px',
-    //   'height':'100px',
-    //   'top':'500px',
-    //   'left':'500px'
-    // })
-    // .show();
-  });
+  // $('.ps-rects-global').on('click', function(event) {
+  //   console.log('coucou', $(this).attr('title').split('-')[0]);
+  //   var siteNumber = $(this).attr('title').split('-')[0];
+  //   var target = document.getElementById('alignment-container');
+  //   // console.log(target);œ
+  //   // largeur svg2 : 50 + seq_lg + 10 + psResultsDataset.length*12 + 50
+  //   // 0 : 50 | seq_lg | 10
+  //   // max : 50 | seq_lg | 10 psResultsDataset.length*hStep
+  //   target.scrollTo(siteNumber*hStep + seq_lg + 50 - target.clientWidth/2, 0); // use offsetWidth for paddings, borders and margins
+  // });
+  // $('.symbol').on('mouseover', function(event) {
+  //   // console.log('mouseover event', event);
+  //   var mouseY = event.clientX;
+  //   var mouseX = event.clientY;
+  //   // console.log(mouseX, mouseY);
+  //   moveTooltip(mouseX, mouseY);
+  //   // console.log(document.getElementsByClassName('tooltip')[0]);
+  //   var tooltipElement = document.getElementsByClassName('tooltip')[0];
+  //   tooltipElement.innerHTML = getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length;
+  //   // $('.tooltip').html(getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length)
+  //   // .css({
+  //   //   'z-index': '1',
+  //   //   'background':'#FFFFFF',
+  //   //   'width':'100px',
+  //   //   'height':'100px',
+  //   //   'top':'500px',
+  //   //   'left':'500px'
+  //   // })
+  //   // .show();
+  // });
+  // $('#alugnment-container').on('scroll', function (event) {
+  //   console.log('scrolling alignment container', event)
+  // });
 }
 // Fin de la fonction updateSvg
 // ----------------------------
@@ -1928,15 +1932,30 @@ $('#export').on('click', function(event, dropdownData) {
 
 // Actions à la fin du chargement de la page
 $(document).ready(function() {
-  $('.ps-rects-global').on('click', function(event) {
-    console.log('coucou', $(this).attr('title').split('-')[0]);
-    var siteNumber = $(this).attr('title').split('-')[0];
-    var target = document.getElementById('alignment-container');
-    // console.log(target);
-    // largeur svg2 : 50 + seq_lg + 10 + psResultsDataset.length*12 + 50
-    // 0 : 50 | seq_lg | 10
-    // max : 50 | seq_lg | 10 psResultsDataset.length*hStep
-    target.scrollTo(siteNumber*12 + seq_lg + 50 - target.clientWidth/2, 0); // use offsetWidth for paddings, borders and margins
+  $('.symbol').on('mouseover', function(event) {
+    // console.log('mouseover event', event);
+    var scrollTop = $(window).scrollTop();
+    console.log('scrollTop', scrollTop);
+    var mouseY = event.clientY + scrollTop;
+    var mouseX = event.clientX;
+    console.log('mouseX, mouseY', mouseX, mouseY);
+    moveTooltip(mouseX, mouseY);
+    // console.log(document.getElementsByClassName('tooltip')[0]);
+    var tooltipElement = document.getElementsByClassName('tooltip')[0];
+    tooltipElement.innerHTML = getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length;
+    // $('.tooltip').html(getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length)
+    // .css({
+    //   'z-index': '1',
+    //   'background':'#FFFFFF',
+    //   'width':'100px',
+    //   'height':'100px',
+    //   'top':'500px',
+    //   'left':'500px'
+    // })
+    // .show();
+  });
+  $('#alugnment-container').on('scroll', function (event) {
+    console.log('scrolling alignment container', event)
   });
   $('#collapse-mode span').text(function() {
     console.log('collapseMode:', collapseMode);
