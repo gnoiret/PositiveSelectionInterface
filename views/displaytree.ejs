@@ -184,6 +184,7 @@
   var seq_lg = xmlparser.flatTree(recTree.phyloxml.phylogeny.maxSeqIdLength)*10;
   var resultsText = '';
   var collapseMode = 'collapseOff';
+  var navWindowColor = '#000000';
 
   if (!isStorageSupported(myStorage)) {
     console.log("window.localStorage problem");
@@ -1028,30 +1029,37 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       // .style('stroke-width', 0+'px')
       ;
   
-  psGraphGlobal.on('click', function() {
+  d3.select('#svg0').on('click', function () {
     // Get the site's number (mouse position in pixels) and navigate to this site in the large window
     var siteNumber = d3.mouse(this)[0];
     console.log('Navigating to site', siteNumber);
     var target = document.getElementById('alignment-container');
-    target.scrollTo(50 + seq_lg + 10 + siteNumber*hStep - target.clientWidth/2, 0); // offsetWidth for margins, paddings and borders
-    
-    // // Draw a rectangle surrounding the site that was clicked
-    // $('.navigation-window').remove();
-    // var largeWindow = document.getElementById('alignment-container');
-    // var navWindowWidth = largeWindow.clientWidth/hStep + 2;
-    // var navWindowRect = psGraphGlobal
-    //   .append('rect')
-    //     .attr('class', 'navigation-window')
-    //     .attr('x', siteNumber - navWindowWidth/2 + 2)
-    //     .attr('y', 1)
-    //     .attr('width', navWindowWidth)
-    //     .attr('height', psGraphGlobalHeight-6)
-    //     // .attr('transform', 'translate('+siteNumber+','+25+')')
-    //     .style('fill', 'transparent')
-    //     .style('stroke', '#00FFFF')
-    //     // .style('stroke', '#0000FF')
-    //     .style('stroke-width', 2+'px');
+    target.scrollTo(50 + seq_lg + 10 + siteNumber*hStep - target.clientWidth/2, 0);
   });
+  // psGraphGlobal.on('click', function() {
+  //   // Get the site's number (mouse position in pixels) and navigate to this site in the large window
+  //   var siteNumber = d3.mouse(this)[0];
+  //   console.log('Navigating to site', siteNumber);
+  //   var target = document.getElementById('alignment-container');
+  //   target.scrollTo(50 + seq_lg + 10 + siteNumber*hStep - target.clientWidth/2, 0);
+    
+  //   // // Draw a rectangle surrounding the site that was clicked
+  //   // $('.navigation-window').remove();
+  //   // var largeWindow = document.getElementById('alignment-container');
+  //   // var navWindowWidth = largeWindow.clientWidth/hStep + 2;
+  //   // var navWindowRect = psGraphGlobal
+  //   //   .append('rect')
+  //   //     .attr('class', 'navigation-window')
+  //   //     .attr('x', siteNumber - navWindowWidth/2 + 2)
+  //   //     .attr('y', 1)
+  //   //     .attr('width', navWindowWidth)
+  //   //     .attr('height', psGraphGlobalHeight-6)
+  //   //     // .attr('transform', 'translate('+siteNumber+','+25+')')
+  //   //     .style('fill', 'transparent')
+  //   //     .style('stroke', '#00FFFF')
+  //   //     // .style('stroke', '#0000FF')
+  //   //     .style('stroke-width', 2+'px');
+  // });
 
   $('#alignment-container').on('scroll', function() {
     // Draw a rectangle surrounding the site that was clicked
@@ -1064,15 +1072,18 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       .append('rect')
         .attr('class', 'navigation-window')
         .attr('x', siteNumber - navWindowWidth/2 + 2)
-        .attr('y', 1)
+        .attr('y', 2)
         .attr('width', navWindowWidth)
-        .attr('height', psGraphGlobalHeight-6)
+        .attr('height', psGraphGlobalHeight-8)
         // .attr('transform', 'translate('+siteNumber+','+25+')')
         .style('fill', 'transparent')
-        .style('stroke', '#00FFFF')
-        // .style('stroke', '#0000FF')
+        // .style('stroke', '#00FFFF')
+        .style('stroke', navWindowColor)
         .style('stroke-width', 2+'px');
   });
+
+  $('#alignment-container').scrollLeft($('#alignment-container').scrollLeft()+1);
+  $('#alignment-container').scrollLeft($('#alignment-container').scrollLeft()-1);
   
   // ======================================================
   // | Début : graphe des résultats de sélection positive |
