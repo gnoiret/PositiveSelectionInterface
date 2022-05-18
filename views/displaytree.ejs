@@ -1033,22 +1033,44 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     var siteNumber = d3.mouse(this)[0];
     console.log('Navigating to site', siteNumber);
     var target = document.getElementById('alignment-container');
-    target.scrollTo(50 + seq_lg + 10 + siteNumber*hStep - target.clientWidth/2, 0);
+    target.scrollTo(50 + seq_lg + 10 + siteNumber*hStep - target.clientWidth/2, 0); // offsetWidth for margins, paddings and borders
     
+    // // Draw a rectangle surrounding the site that was clicked
+    // $('.navigation-window').remove();
+    // var largeWindow = document.getElementById('alignment-container');
+    // var navWindowWidth = largeWindow.clientWidth/hStep + 2;
+    // var navWindowRect = psGraphGlobal
+    //   .append('rect')
+    //     .attr('class', 'navigation-window')
+    //     .attr('x', siteNumber - navWindowWidth/2 + 2)
+    //     .attr('y', 1)
+    //     .attr('width', navWindowWidth)
+    //     .attr('height', psGraphGlobalHeight-6)
+    //     // .attr('transform', 'translate('+siteNumber+','+25+')')
+    //     .style('fill', 'transparent')
+    //     .style('stroke', '#00FFFF')
+    //     // .style('stroke', '#0000FF')
+    //     .style('stroke-width', 2+'px');
+  });
+
+  $('#alignment-container').on('scroll', function() {
     // Draw a rectangle surrounding the site that was clicked
+    console.log('scrolling alignment');
     $('.navigation-window').remove();
-    var navWindowWidth = 100;
+    var largeWindow = $('#alignment-container');
+    var siteNumber = - (50 + seq_lg + 10 - largeWindow.scrollLeft() - largeWindow.innerWidth()/2)/hStep;
+    var navWindowWidth = largeWindow.innerWidth()/hStep + 2;
     var navWindowRect = psGraphGlobal
       .append('rect')
         .attr('class', 'navigation-window')
-        .attr('x', siteNumber - navWindowWidth/2)
+        .attr('x', siteNumber - navWindowWidth/2 + 2)
         .attr('y', 1)
         .attr('width', navWindowWidth)
         .attr('height', psGraphGlobalHeight-6)
         // .attr('transform', 'translate('+siteNumber+','+25+')')
         .style('fill', 'transparent')
         .style('stroke', '#00FFFF')
-        // .style('stroke', '#000000')
+        // .style('stroke', '#0000FF')
         .style('stroke-width', 2+'px');
   });
   
