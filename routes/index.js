@@ -145,19 +145,19 @@ router.post("/upload_files", upload.fields([
         console.log('Rendering view');
         res.render('displaytree.ejs', {arbre:JSONtree,pattern:JSONpattern});
 
-        // console.log('Deleting XML tree');
-        // exec('rm'
-        //   +' '+xml_dir+fname_xml,
-        //   (error, stdout, stderr) => {
-        //     if (error) {
-        //       console.log(`error: ${error.message}`);
-        //     }
-        //     if (stderr) {
-        //       console.log(`error: ${stderr}`);
-        //     }
-        //     console.log(`${stdout}`);
-        //   }
-        // )
+        console.log('Deleting XML tree');
+        exec('rm'
+          +' '+xml_dir+fname_xml,
+          (error, stdout, stderr) => {
+            if (error) {
+              console.log(`error: ${error.message}`);
+            }
+            if (stderr) {
+              console.log(`error: ${stderr}`);
+            }
+            console.log(`${stdout}`);
+          }
+        )
       });
     });
   });
