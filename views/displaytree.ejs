@@ -112,13 +112,13 @@
     </button>
   </nav>
   <div id="svg-container-upper">
-    <div  style="border:2px solid lightgrey; float: left; overflow-y: hidden; width: 100%; height: 50px;" id="navigator-container">
+    <div style="border:2px solid lightgrey; float: left; overflow-y: hidden; width: 100%; height: 80px;" id="navigator-container">
       <svg id="svg0"></svg>
     </div>
   </div>
   <div id="demo">
     <div id="svg-container">
-      <div  style="border:2px solid lightgrey; float: left; overflow-y: auto; width: 40%;" id="tree-container">
+      <div style="border:2px solid lightgrey; float: left; overflow-y: auto; width: 40%;" id="tree-container">
         <svg id="svg1"></svg>
       </div>
       <div style="border:2px solid lightgrey; overflow-x: auto; overflow-y: auto;" id="alignment-container" >
@@ -126,6 +126,7 @@
       </div>
     </div>
   </div>
+  <div id="none"></div>
 </body>
 
 <script src="xmltree.js" charset="utf-8"></script>
@@ -939,55 +940,26 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   });
   
   var widthSVG0 = psResultsDataset.length;
-  var heightSVG0 = 50;
+  var heightSVG0 = 80;
   var psGraphGlobalWidth = psResultsDataset.length;
   var psGraphGlobalHeight = 50;
-  var psGraphGlobalMargins = {top:0, right:0, bottom:0, left:0}
+  var psGraphGlobalMargins = {top:15, right:0, bottom:15, left:0};
   var svg0 = d3.select('#svg0');
-  svg0.attr('width', widthSVG0)
+  svg0
+    .attr('width', widthSVG0)
     .attr('height',  heightSVG0);
-  // // Définition de l'échelle pour l'axe x
-  // var xPsGraphGlobal = d3.scaleLinear()
-  //   .domain([1, psResultsDataset.length+1])
-  //   .range([0, psGraphGlobalWidth]);
-  // // Définition de l'échelle pour l'axe y
-  // var yPsGraphGlobal = d3.scaleLinear()
-  //   .domain([0, maxStat(psResultsDataset)])
-  //   .range([psGraphGlobalHeight, 0]);
-  // Ajout du graphe des résultats au SVG
-  var psGraphGlobal = svg0.append('g')
-    .attr('id', 'ps-graph-global')
-    .attr('transform', 'translate('+psGraphGlobalMargins.left+', '+psGraphGlobalMargins.top+')');
-  // // Ajout de l'axe x au graphe
-  // psGraph.append('g')
-  //   .attr('transform', 'translate(0,' + psGraphHeight + ')')
-  //   .call(d3.axisBottom(x).ticks(psResultsDataset.length/5)); // graduations tous les 5 codons / AA
-  // // Ajout de l'axe y au graphe
-  // psGraph.append('g')
-  //   .call(d3.axisLeft(y));
-  // // Ajout du seuil inférieur au graphe
-  // psGraph.append('line')
-  //   .attr('x1', x(1))
-  //   .attr('y1', y(psThresholdLow))
-  //   .attr('x2', x(psResultsDataset.length+1.5))
-  //   .attr('y2', y(psThresholdLow))
-  //   .style('stroke', '#000000')
-  //   // .style('stroke', psThresholdLowBgColor)
-  //   .style('stroke-width', 2+'px')
-  //   .style('stroke-dasharray', ('4, 4'));
-  // // Ajout du seuil supérieur au graphe
-  // psGraph.append('line')
-  //   .attr('x1', x(1))
-  //   .attr('y1', y(psThresholdHigh))
-  //   .attr('x2', x(psResultsDataset.length+1.5))
-  //   .attr('y2', y(psThresholdHigh))
-  //   .style('stroke', '#000000')
-  //   // .style('stroke', psThresholdHighBgColor)
-  //   .style('stroke-width', 2+'px')
-  //   .style('stroke-dasharray', ('4, 4'));
+
+  d3.select('#ps-graph-global').remove();
   
-  // // // Suppression du graphe
-  // // psGraph.exit().remove();
+  if (!document.getElementById('ps-graph-global')) {
+    // Ajout du graphe des résultats au SVG
+    svg0.append('g')
+      .attr('id', 'ps-graph-global')
+      .attr('transform', 'translate('+psGraphGlobalMargins.left+', '+psGraphGlobalMargins.top+')');
+    
+  }
+
+  var psGraphGlobal = d3.select('#ps-graph-global');
 
   // Calcul du décalage des sites pour le positionnement des rectangles du graphe
   var siteOffset = 1 - psResultsDataset[0].site;
@@ -1029,37 +1001,35 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       // .style('stroke-width', 0+'px')
       ;
   
-  d3.select('#svg0').on('click', function () {
+  $('#svg0').on('mousedown', function (e) {
+    console.log('mousedown');
     // Get the site's number (mouse position in pixels) and navigate to this site in the large window
-    var siteNumber = d3.mouse(this)[0];
+    var siteNumber = event.pageX;
+    console.log('Navigating to site', siteNumber);
+    var target = document.getElementById('alignment-container');
+    target.scrollTo(50 + seq_lg + 10 + siteNumber*hStep - target.clientWidth/2, 0);
+
+    $('#svg0').on('mousemove', function (e) {
+      console.log('mousemove');
+      console.log('mousemove event', e);
+      // Get the site's number (mouse position in pixels) and navigate to this site in the large window
+      var siteNumber = event.pageX;
+      console.log('Navigating to site', siteNumber);
+      var target = document.getElementById('alignment-container');
+      target.scrollTo(50 + seq_lg + 10 + siteNumber*hStep - target.clientWidth/2, 0);
+    });
+    
+  });
+
+  $('#svg0').on('mouseup', function (e) {
+    console.log('mouseup');
+    $('#svg0').off('mousemove');
+    // Get the site's number (mouse position in pixels) and navigate to this site in the large window
+    var siteNumber = event.pageX;
     console.log('Navigating to site', siteNumber);
     var target = document.getElementById('alignment-container');
     target.scrollTo(50 + seq_lg + 10 + siteNumber*hStep - target.clientWidth/2, 0);
   });
-  // psGraphGlobal.on('click', function() {
-  //   // Get the site's number (mouse position in pixels) and navigate to this site in the large window
-  //   var siteNumber = d3.mouse(this)[0];
-  //   console.log('Navigating to site', siteNumber);
-  //   var target = document.getElementById('alignment-container');
-  //   target.scrollTo(50 + seq_lg + 10 + siteNumber*hStep - target.clientWidth/2, 0);
-    
-  //   // // Draw a rectangle surrounding the site that was clicked
-  //   // $('.navigation-window').remove();
-  //   // var largeWindow = document.getElementById('alignment-container');
-  //   // var navWindowWidth = largeWindow.clientWidth/hStep + 2;
-  //   // var navWindowRect = psGraphGlobal
-  //   //   .append('rect')
-  //   //     .attr('class', 'navigation-window')
-  //   //     .attr('x', siteNumber - navWindowWidth/2 + 2)
-  //   //     .attr('y', 1)
-  //   //     .attr('width', navWindowWidth)
-  //   //     .attr('height', psGraphGlobalHeight-6)
-  //   //     // .attr('transform', 'translate('+siteNumber+','+25+')')
-  //   //     .style('fill', 'transparent')
-  //   //     .style('stroke', '#00FFFF')
-  //   //     // .style('stroke', '#0000FF')
-  //   //     .style('stroke-width', 2+'px');
-  // });
 
   $('#alignment-container').on('scroll', function() {
     // Draw a rectangle surrounding the site that was clicked
@@ -1072,18 +1042,19 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       .append('rect')
         .attr('class', 'navigation-window')
         .attr('x', siteNumber - navWindowWidth/2 + 2)
-        .attr('y', 2)
+        .attr('y', 1)
         .attr('width', navWindowWidth)
-        .attr('height', psGraphGlobalHeight-8)
+        .attr('height', psGraphGlobalHeight-2)
         // .attr('transform', 'translate('+siteNumber+','+25+')')
-        .style('fill', 'transparent')
+        // .style('fill', 'transparent')
+        .style('fill', 'rgba(0,64,0,0.1)')
         // .style('stroke', '#00FFFF')
         .style('stroke', navWindowColor)
         .style('stroke-width', 2+'px');
   });
 
-  $('#alignment-container').scrollLeft($('#alignment-container').scrollLeft()+1);
-  $('#alignment-container').scrollLeft($('#alignment-container').scrollLeft()-1);
+  $('#alignment-container').scrollLeft($('#alignment-container').scrollLeft()+1).scrollLeft($('#alignment-container').scrollLeft()-1);
+  // $('#alignment-container');
   
   // ======================================================
   // | Début : graphe des résultats de sélection positive |
@@ -1092,7 +1063,8 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // svg2.attr("width", widthSVG + margin.right + ajustementX)
   //   .attr("height",  heightSVG + margin.top + margin.down + 100);
   // console.log('seq_lg:', seq_lg);
-  svg2.attr("width",  50 + seq_lg + 10 + psResultsDataset.length*hStep + 50)
+  svg2
+    .attr("width",  50 + seq_lg + 10 + psResultsDataset.length*hStep + 10 + seq_lg + 50)
     .attr("height",  heightSVG + margin.top + margin.down + 100);
   // Fonction de calcul de la statistique maximale dans les résultats
   function maxStat(results_list) {
@@ -1141,26 +1113,6 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // Ajout de l'axe y au graphe
   psGraph.append('g')
     .call(d3.axisLeft(y));
-  // Ajout du seuil inférieur au graphe
-  psGraph.append('line')
-    .attr('x1', x(1))
-    .attr('y1', y(psThresholdLow))
-    .attr('x2', x(psResultsDataset.length+1.5))
-    .attr('y2', y(psThresholdLow))
-    .style('stroke', '#000000')
-    // .style('stroke', psThresholdLowBgColor)
-    .style('stroke-width', 2+'px')
-    .style('stroke-dasharray', ('4, 4'));
-  // Ajout du seuil supérieur au graphe
-  psGraph.append('line')
-    .attr('x1', x(1))
-    .attr('y1', y(psThresholdHigh))
-    .attr('x2', x(psResultsDataset.length+1.5))
-    .attr('y2', y(psThresholdHigh))
-    .style('stroke', '#000000')
-    // .style('stroke', psThresholdHighBgColor)
-    .style('stroke-width', 2+'px')
-    .style('stroke-dasharray', ('4, 4'));
   
   // // Suppression du graphe
   // psGraph.exit().remove();
@@ -1196,6 +1148,27 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     })
     .style('stroke', '#000000')
     .style('stroke-width', 0+'px');
+  
+  // Ajout du seuil supérieur au graphe
+  psGraph.append('line')
+    .attr('x1', x(1))
+    .attr('y1', y(psThresholdHigh))
+    .attr('x2', x(psResultsDataset.length+1))
+    .attr('y2', y(psThresholdHigh))
+    .style('stroke', '#000000')
+    // .style('stroke', psThresholdHighBgColor)
+    .style('stroke-width', 2+'px')
+    .style('stroke-dasharray', ('4, 4'));
+  // Ajout du seuil inférieur au graphe
+  psGraph.append('line')
+    .attr('x1', x(1))
+    .attr('y1', y(psThresholdLow))
+    .attr('x2', x(psResultsDataset.length+1))
+    .attr('y2', y(psThresholdLow))
+    .style('stroke', '#000000')
+    // .style('stroke', psThresholdLowBgColor)
+    .style('stroke-width', 1+'px')
+    .style('stroke-dasharray', ('4, 4'));
   
   psGraph.on('click', function() {
     var coords = d3.mouse(this);
