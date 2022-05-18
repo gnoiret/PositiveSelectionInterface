@@ -991,7 +991,8 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // Calcul du décalage des sites pour le positionnement des rectangles du graphe
   var siteOffset = 1 - psResultsDataset[0].site;
   // Association des données aux futurs rectangles
-  var globalRects = psGraphGlobal.selectAll('.ps-rects-global')
+  var globalRects = psGraphGlobal
+    .selectAll('.ps-rects-global')
     .data(psResultsDataset);
   globalRects.exit().remove();
   // Affichage des rectangles
@@ -1012,35 +1013,43 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       // .attr('y', function(d) { return yPsGraphGlobal(d.stat); })
       .attr('y', function(d) { return 0; })
       .style('fill', function(d) {
-        // if (d.stat >= psThresholdHigh) {
-        //   return psThresholdHighBgColor;
-        // } else if (d.stat >= psThresholdLow) {
-        //   return psThresholdLowBgColor;
-        // } else if (d.stat >= 0) {
-        //   return psBelowThresholdBgColor;
-        // } else {
-        //   return psMissingBgColor;
-        // }
-        return 'transparent';
+        if (d.stat >= psThresholdHigh) {
+          return psThresholdHighBgColor;
+        } else if (d.stat >= psThresholdLow) {
+          return psThresholdLowBgColor;
+        } else if (d.stat >= 0) {
+          return psBelowThresholdBgColor;
+        } else {
+          return psMissingBgColor;
+        }
+        // return 'transparent';
       })
-      .style('stroke', '#000000')
-      .style('stroke-width', 0+'px');
+      // .style('stroke', '#000000')
+      // .style('stroke-width', 0+'px')
+      ;
   
   psGraphGlobal.on('click', function() {
+    // Get the site's number (mouse position in pixels) and navigate to this site in the large window
     var siteNumber = d3.mouse(this)[0];
     console.log('Navigating to site', siteNumber);
     var target = document.getElementById('alignment-container');
     target.scrollTo(50 + seq_lg + 10 + siteNumber*hStep - target.clientWidth/2, 0);
+    
+    // Draw a rectangle surrounding the site that was clicked
+    $('.navigation-window').remove();
+    var navWindowWidth = 100;
     var navWindowRect = psGraphGlobal
       .append('rect')
-        .class('navigation-window')
-        .attr('x', siteNumber)
-        .attr('y', 25)
-        .attr('width', 20)
-        .attr('height', 20)
-        .attr('transform', 'translate('+siteNumber+','+25+')')
+        .attr('class', 'navigation-window')
+        .attr('x', siteNumber - navWindowWidth/2)
+        .attr('y', 1)
+        .attr('width', navWindowWidth)
+        .attr('height', psGraphGlobalHeight-6)
+        // .attr('transform', 'translate('+siteNumber+','+25+')')
+        .style('fill', 'transparent')
         .style('stroke', '#00FFFF')
-        .style('stroke-width', 10+'px');
+        // .style('stroke', '#000000')
+        .style('stroke-width', 2+'px');
   });
   
   // ======================================================
