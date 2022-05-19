@@ -1,16 +1,18 @@
 const upload_dir = 'uploads/';
 const xml_dir = 'uploads/';
 
+const bodyParser = require('body-parser');
+// const browser = require('browser-detect');
 const express = require('express');
 const router = express.Router();
-const formidable = require('formidable');
+// const formidable = require('formidable');
+const fs = require('fs');
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
-const util = require('util');
+// const path = require('path');
 const url = require('url');
-const path = require('path');
-const browser = require('browser-detect');
-const bodyParser = require('body-parser');
+// const util = require('util');
+
 const {exec} = require('child_process');
 router.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 router.use(bodyParser.json()); // support json encoded bodies
@@ -36,7 +38,7 @@ if (typeof localStorage === "undefined" || localStorage === null) {
 
 // Home
 // ----
-router.get('/', function(req, res, next) {
+router.get('/', function(req, res) {
   res.render('index.ejs', {title: 'M1 Internship : Positive Selection Interface'});
 });
 
@@ -48,19 +50,48 @@ router.post("/upload_files", upload.fields([
   {name: 'file_r', maxCount: 1}
 ]), 
 (req, res) => {
-  console.log('Uploading files...');
+  console.log('Successfully uploaded files');
   console.log(req.body);
   console.log(req.files);
-  console.log('Successfully uploaded files');
   
-  const fname_tree = req.files.file_t[0].filename;
-  const fname_alignment = req.files.file_a[0].filename;
-  const fname_results = req.files.file_r[0].filename;
+  var currentTimestampMs = Date.now();
+  // var fname_t = req.files.file_t[0].filename;
+  // var fname_a = req.files.file_a[0].filename;
+  // var fname_r = req.files.file_r[0].filename;
+  var fname_t = currentTimestampMs+'-t'+req.files.file_t[0].filename.substring(0, 3);
+  var fname_a = currentTimestampMs+'-a'+req.files.file_a[0].filename.substring(0, 3);
+  var fname_r = currentTimestampMs+'-r'+req.files.file_r[0].filename.substring(0, 3);
+  fs.rename(req.files.file_t[0].path, upload_dir+fname_t, function(err) {
+    if (err) {
+      console.log('ERROR:', err);
+    }
+  });
+  fs.rename(req.files.file_a[0].path, upload_dir+fname_a, function(err) {
+    if (err) {
+      console.log('ERROR:', err);
+    }
+  });
+  fs.rename(req.files.file_r[0].path, upload_dir+fname_r, function(err) {
+    if (err) {
+      console.log('ERROR:', err);
+    }
+  });
+  // req.files.forEach(file => fs.rename(file[0].path, file[0].destination+Date.now()+'-'+file[0].filename.substring(0, 3), function(err) {
+  //   if (err) {
+  //     console.log('ERROR:', err);
+  //   }
+  // }));
   // Date.now() is the current timestamp in milliseconds
-  const fname_xml = Date.now() + '-'
-                  + fname_tree.substring(0, 3)
-                  + fname_alignment.substring(0, 3)
-                  + fname_results.substring(0, 3)+'.xml';
+  var fname_xml = currentTimestampMs
+    +'-xml-'
+    + fname_t.split('-')[1]
+    + fname_a.split('-')[1]
+    + fname_r.split('-')[1]
+    // +'.xml'
+    ;
+    // + fname_t.substring(0, 3)
+    // + fname_a.substring(0, 3)
+    // + fname_r.substring(0, 3)+'.xml';
   const full_path_xml = xml_dir + fname_xml;
   const statcol = req.body.statcol;
   const nostat = req.body.nostat;
@@ -75,9 +106,9 @@ router.post("/upload_files", upload.fields([
     sitebranch = false;
   }
 
-  console.log('Tree: ' + fname_tree + '\n' +
-  'Alignment: ' + fname_alignment + '\n' +
-  'Results: ' + fname_results + '\n' +
+  console.log('Tree: ' + fname_t + '\n' +
+  'Alignment: ' + fname_a + '\n' +
+  'Results: ' + fname_r + '\n' +
   'XML: ' + fname_xml);
 
   // console.log(req.files);
@@ -86,9 +117,9 @@ router.post("/upload_files", upload.fields([
   // Faire tourner genere_xml.py avec exec()
   console.log('Generating XML tree');
   exec('python3 genere_xml.py'
-      +' -t '+upload_dir+fname_tree
-      +' -a '+upload_dir+fname_alignment
-      +' -r '+upload_dir+fname_results
+      +' -t '+upload_dir+fname_t
+      +' -a '+upload_dir+fname_a
+      +' -r '+upload_dir+fname_r
       +' -o '+xml_dir+fname_xml
       +' -c '+statcol
       +' -n '+nostat
@@ -99,9 +130,9 @@ router.post("/upload_files", upload.fields([
     } else {
       console.log('Deleting data files');
       exec('rm'
-        +' '+upload_dir+fname_tree
-        +' '+upload_dir+fname_alignment
-        +' '+upload_dir+fname_results,
+        +' '+upload_dir+fname_t
+        +' '+upload_dir+fname_a
+        +' '+upload_dir+fname_r,
         (error, stdout, stderr) => {
           if (error) {
             console.log(`error: ${error.message}`);
@@ -119,8 +150,6 @@ router.post("/upload_files", upload.fields([
     console.log(`${stdout}`);
     
     // Lire l'arbre XML en JSON et afficher les données
-    const fs = require('fs');
-    // const fname =  + req.file.filename
     const fname = full_path_xml;
     fs.readFile(fname, 'utf8' , (err, data) => {
       if (err) {
@@ -141,10 +170,7 @@ router.post("/upload_files", upload.fields([
           return;
         }
         var JSONtree = JSON.stringify(results);
-        // console.log(JSONtree);
-        // Séquence à mettre en valeur :
-        var JSONpattern = JSON.stringify("0:homSapCCDS34680");
-        // res.json({ message: "Successfully uploaded files", tree: fname_tree, alignment: fname_alignment, results: fname_results });
+        var JSONpattern = JSON.stringify("0:homSapCCDS34680"); // Séquence à mettre en valeur
         console.log('Rendering view');
         res.render('displaytree.ejs', {arbre:JSONtree,pattern:JSONpattern});
 
