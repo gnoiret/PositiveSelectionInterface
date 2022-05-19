@@ -100,15 +100,9 @@
     <!-- Champs Seuils sup. et inf. -->
     <label for="ps-threshold-low"  style="font-size: 12px;">Lower threshold:</label><input type="number" id="ps-threshold-low" min="0.0" step="0.05" placeholder="PS Threshold" value="0.9" style="width: 5em; font-size: 12px;"/>
     <label for="ps-threshold-high" style="font-size: 12px;">Upper threshold:</label><input type="number" id="ps-threshold-high" min="0.0" step="0.05" placeholder="PS Threshold" value="1.0" style="width: 5em; font-size: 12px;"/>
-    <!-- Bouton de déplacement gauche -->
-    <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="scroll-left"  data-toggle="tooltip" data-placement="top" title="Scroll left">
-      <span>Scroll left</span>
-      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-    </button>
-    <!-- Bouton de déplacement droit -->
-    <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="scroll-right"  data-toggle="tooltip" data-placement="top" title="Scroll right">
-      <span>Scroll right</span>
-      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+    <!-- Bouton de chargement des résultats globaux -->
+    <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="reload-global-results"  data-toggle="tooltip" data-placement="top" title="Scroll left">
+      <span>Reload global results</span>
     </button>
   </nav>
   <div id="svg-container-upper">
@@ -616,7 +610,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       }
       // console.log(d.data.branch_info.branch_id, resultsText);
       // updateSvg(treeRoot, firstLoad, d.data.branch_info.branch_results);
-      updateLayout(treeRoot, firstLoad, resultsText);
+      updateLayout(treeRoot, firstLoad);
     });
   nodeEnter
     .append("text")
@@ -1353,6 +1347,11 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
 // Autres fonctions utilitaires
 // ----------------------------
 
+function reloadGlobalResults() {
+  resultsText = xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results);
+  updateLayout(cladeRoot);
+}
+
 // Fonction qui renvoie la liste des positions des sites positifs
 function getPositiveSites(resultsText, upperThreshold) {
   var resultsList = resultsText.split(' ');
@@ -1968,6 +1967,7 @@ $('#export').on('click', function(event, dropdownData) {
 
 // Actions à la fin du chargement de la page
 $(document).ready(function() {
+  $('button#reload-global-results').click(reloadGlobalResults);
   $('.symbol').on('mouseover', function(event) {
     // console.log('mouseover event', event);
     var scrollTop = $(window).scrollTop();
