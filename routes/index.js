@@ -51,6 +51,7 @@ router.post("/upload_files", upload.fields([
   console.log('Uploading files...');
   console.log(req.body);
   console.log(req.files);
+  console.log('Successfully uploaded files');
   
   const fname_tree = req.files.file_t[0].filename;
   const fname_alignment = req.files.file_a[0].filename;
@@ -63,13 +64,15 @@ router.post("/upload_files", upload.fields([
   const full_path_xml = xml_dir + fname_xml;
   const statcol = req.body.statcol;
   const nostat = req.body.nostat;
-  const sitebranch = req.body.sitebranch;
+  var sitebranch = req.body.sitebranch;
 
   console.log('sitebranch:', sitebranch);
   if (sitebranch != undefined) {
     console.log('sitebranch');
+    sitebranch = true;
   } else {
     console.log('not sitebranch');
+    sitebranch = false;
   }
 
   console.log('Tree: ' + fname_tree + '\n' +
@@ -88,7 +91,8 @@ router.post("/upload_files", upload.fields([
       +' -r '+upload_dir+fname_results
       +' -o '+xml_dir+fname_xml
       +' -c '+statcol
-      +' -n '+nostat,
+      +' -n '+nostat
+      +(sitebranch?' -b ':''),
   (error, stdout, stderr) => {
     if (error) {
       console.log(`error: ${error.message}`);
@@ -139,8 +143,7 @@ router.post("/upload_files", upload.fields([
         var JSONtree = JSON.stringify(results);
         // console.log(JSONtree);
         // Séquence à mettre en valeur :
-        var JSONpattern = JSON.stringify("0:NM_001193307dot1_hom_Sap_SAMD9");
-        // res.json({ message: "Successfully uploaded files" });
+        var JSONpattern = JSON.stringify("0:homSapCCDS34680");
         // res.json({ message: "Successfully uploaded files", tree: fname_tree, alignment: fname_alignment, results: fname_results });
         console.log('Rendering view');
         res.render('displaytree.ejs', {arbre:JSONtree,pattern:JSONpattern});
