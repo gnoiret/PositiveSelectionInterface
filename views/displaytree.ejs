@@ -186,6 +186,8 @@
   var resultsText = '';
   var collapseMode = 'collapseOff';
   var navWindowColor = '#000000';
+  var alignmentWindow = $('#alignment-container');
+  var compactWindow = $('#navigator-container');
 
   if (!isStorageSupported(myStorage)) {
     console.log("window.localStorage problem");
@@ -1001,34 +1003,39 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       // .style('stroke-width', 0+'px')
       ;
   
-  $('#svg0').on('mousedown', function (e) {
-    console.log('mousedown');
-    // Get the site's number (mouse position in pixels) and navigate to this site in the large window
-    var siteNumber = event.pageX;
-    console.log('Navigating to site', siteNumber);
-    var target = document.getElementById('alignment-container');
-    target.scrollTo(50 + seq_lg + 10 + siteNumber*hStep - target.clientWidth/2, 0);
+  
+  function scrollAlignment(event) {
+    // var alignmentWindow = $('#alignment-container');
+    // var compactWindow = $('#navigator-container');
 
-    $('#svg0').on('mousemove', function (e) {
-      console.log('mousemove');
-      console.log('mousemove event', e);
-      // Get the site's number (mouse position in pixels) and navigate to this site in the large window
-      var siteNumber = event.pageX;
-      console.log('Navigating to site', siteNumber);
-      var target = document.getElementById('alignment-container');
-      target.scrollTo(50 + seq_lg + 10 + siteNumber*hStep - target.clientWidth/2, 0);
+    // console.log('scrollAlignment:', event.type, 'on', event.currentTarget);
+
+    // Get the site's number (mouse position in pixels) and navigate to this site in the large window
+    console.log('compactWindow.scrollLeft()', compactWindow.scrollLeft());
+    var siteNumber = event.pageX + compactWindow.scrollLeft();
+    console.log('Navigating to site', siteNumber);
+    alignmentWindow.scrollLeft(50 + seq_lg + 10 + siteNumber*hStep - alignmentWindow.innerWidth()/2, 0);
+
+    if (event.type === 'mouseup') {
+      console.log('mouse released', event.currentTarget.id);
+      compactWindow.off('mousemove');
+    }
+  }
+  
+  compactWindow.on('mousedown', function(e) {
+    console.log(e.type);
+    scrollAlignment(e);
+
+    compactWindow.on('mousemove', function (e) {
+      console.log(e.type);
+      scrollAlignment(e);
     });
-    
-  });
 
-  $('#svg0').on('mouseup', function (e) {
-    console.log('mouseup');
-    $('#svg0').off('mousemove');
-    // Get the site's number (mouse position in pixels) and navigate to this site in the large window
-    var siteNumber = event.pageX;
-    console.log('Navigating to site', siteNumber);
-    var target = document.getElementById('alignment-container');
-    target.scrollTo(50 + seq_lg + 10 + siteNumber*hStep - target.clientWidth/2, 0);
+    compactWindow.on('mouseup', function (e) {
+      console.log(e.type);
+      scrollAlignment(e);
+      compactWindow.off('mousemove');
+    });
   });
 
   $('#alignment-container').on('scroll', function() {
@@ -1047,14 +1054,16 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         .attr('height', psGraphGlobalHeight-2)
         // .attr('transform', 'translate('+siteNumber+','+25+')')
         // .style('fill', 'transparent')
-        .style('fill', 'rgba(0,64,0,0.1)')
+        .style('fill', 'rgba(0,0,0,0.1)')
         // .style('stroke', '#00FFFF')
         .style('stroke', navWindowColor)
         .style('stroke-width', 2+'px');
   });
 
-  $('#alignment-container').scrollLeft($('#alignment-container').scrollLeft()+1).scrollLeft($('#alignment-container').scrollLeft()-1);
-  // $('#alignment-container');
+  // Hack to keep the navigation window visible after a branch change
+  $('#alignment-container')
+    .scrollLeft($('#alignment-container').scrollLeft()+1)
+    .scrollLeft($('#alignment-container').scrollLeft()-1);
   
   // ======================================================
   // | Début : graphe des résultats de sélection positive |
