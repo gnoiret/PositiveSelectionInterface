@@ -55,7 +55,7 @@ parser.add_argument('-s', '--sep', dest='sep', action='store',\
     required=False,\
     default='\t',\
     help='column separator')
-parser.add_argument('-x', '--sitebranch', dest='isSitebranch', action='store_true',\
+parser.add_argument('-b', '--sitebranch', dest='isSitebranch', action='store_true',\
     required=False,\
     help='view site-branch data')
 parser.add_argument('-c', '--col', dest='statcol', action='store', type=int,\
@@ -290,11 +290,11 @@ def normalizeTree(tree:str):
 
 
 def createPhyloXML(fam,newick, resultsFile):
-    print ("Loading results... ")
-    resultsText =  loadResultsSites(args.resultsFile, 0, args.nostat, sep=args.sep)
-    dict_results = loadResultsSiteBranch(resultsFile, sep=args.sep)
-    # print(dict_results)
-    print ("OK")
+    # print ("Loading results... ")
+    # resultsText =  loadResultsSites(args.resultsFile, 0, args.nostat, sep=args.sep)
+    # dict_results = loadResultsSiteBranch(resultsFile, sep=args.sep)
+    # # print(dict_results)
+    # print ("OK")
 
     # Parse and return exactly one tree from the given file or handle
     # if not ':' in newick:
@@ -402,12 +402,13 @@ def createPhyloXML(fam,newick, resultsFile):
             evrec.append(leaf)
             element.append(evrec)
         
-        if element.find('branch_length') is not None:
-            branch_info = etree.Element('branch_info')
-            branch_info.set('branch_id', str(res_colnames[colname_index]))
-            branch_info.set('branch_results', str(dict_results[res_colnames[colname_index]]))
-            element.append(branch_info)
-            colname_index += 1
+        if args.isSitebranch:
+            if element.find('branch_length') is not None:
+                branch_info = etree.Element('branch_info')
+                branch_info.set('branch_id', str(res_colnames[colname_index]))
+                branch_info.set('branch_results', str(dict_results[res_colnames[colname_index]]))
+                element.append(branch_info)
+                colname_index += 1
     
     # res_colnames = getColnames(args.resultsFile)[1:]
     # print(res_colnames)
@@ -453,6 +454,12 @@ print ("Loading alignment... ")
 loadedAlignment = loadAlignment(args.alignmentFile)
 alignmentDict, maxSeqIdLength = loadedAlignment[0], loadedAlignment[1]
 # print('maxSeqIdLength:', maxSeqIdLength)
+print ("OK")
+
+print ("Loading results... ")
+resultsText =  loadResultsSites(args.resultsFile, 0, args.nostat, sep=args.sep)
+dict_results = loadResultsSiteBranch(args.resultsFile, sep=args.sep)
+# print(dict_results)
 print ("OK")
 
 #Creates empty phyloxml document
