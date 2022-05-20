@@ -177,11 +177,13 @@
   var psMissingBgColor = "#FFFFFF";
   var psThresholdsChanged = false;
   var seq_lg = xmlparser.flatTree(recTree.phyloxml.phylogeny.maxSeqIdLength)*10;
+  // var resultsText = xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results);
   var resultsText = '';
   var collapseMode = 'collapseOff';
   var navWindowColor = '#000000';
   var alignmentWindow = $('#alignment-container');
   var compactWindow = $('#navigator-container');
+  var resultsJSON = null;
 
   if (!isStorageSupported(myStorage)) {
     console.log("window.localStorage problem");
@@ -349,11 +351,7 @@ function updateLayout(cRoot,firstLoad=0) {
     phylogeny_setloss(treeRoot,nodeWidth);
   }
 
-  if (resultsText != '') {
-    updateSvg(treeRoot,firstLoad, resultsText);
-  } else {
-    updateSvg(treeRoot,firstLoad, '1:0 2:1 3:1 4:0 5:1');
-  }
+  updateSvg(treeRoot,firstLoad);
 }
 
 function hideTooltip() {
@@ -376,34 +374,44 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   d3.selectAll('#ps-graph, #sequences-container').remove();
 
   // ==============================================================
-  // Début modif : variables pour graphe et séquences
+  // | Début modif : variables pour graphe et séquences           |
   // ==============================================================
   // Ajustement du pas selon le type de séquences affichées
   var hStep = displaySeqType == 'AA' ? hStepBase : hStepBase*3;
   var seqblocks = d3.selectAll('.seqblock');
-  var results = resultsText;
+  // var results = JSON.parse(resultsText);
+  // console.log(results);
+  // var results = resultsText;
   // console.log('firstLoad:', firstLoad);
   // console.log('results:', results);
-  if (firstLoad && !resultsText) {
-    var results = xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results);
-  } else if (firstLoad && resultsText) {
-    var results = resultsText;
-  } else if (!firstLoad && resultsText) {
-    var results = resultsText;
+  if (!resultsJSON) {
+    console.log('!resultsJSON', resultsJSON);
+    // console.log('global results:', xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results));
+    resultsJSON = JSON.parse(xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results));
+    console.log('global results JSON:', resultsJSON);
+  // } else if (firstLoad && resultsText) {
+  //   var results = resultsText;
+  // } else if (!firstLoad && resultsText) {
+  //   var results = resultsText;
   } else {
-    var results = resultsText;
+    console.log('resultsJSON:', resultsJSON);
+    // resultsJSON = JSON.parse(resultsText);
+    resultsJSON = resultsJSON;
   }
   // var results = xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results);
+
+  console.log('resultsJSON', resultsJSON);
   
-  results = results.split(' ');
-  var psResultsDataset = [];
-  // var site = 0;
-  // var stat = 0.0;
-  results.forEach(function (d,i) {
-    d = d.split(':');
-    result = {site:parseInt(d[0]), stat:parseFloat(d[1])};
-    psResultsDataset.push(result);
-  });
+  // results = results.split(' ');
+  // var psResultsDataset = [];
+  // // var site = 0;
+  // // var stat = 0.0;
+  // results.forEach(function (d,i) {
+  //   d = d.split(':');
+  //   result = {site:parseInt(d[0]), stat:parseFloat(d[1])};
+  //   psResultsDataset.push(result);
+  // });
+  psResultsDataset = resultsJSON;
   // console.log(psResultsDataset);
   var psGraphMargins = {top: 20, right: 50, bottom: 50, left: 50+seq_lg};
   var psGraphWidth = psResultsDataset.length*hStep;
@@ -570,13 +578,13 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .attr("class", "symbol")
     .on('mouseover', function(d) {
       showTooltip();
-      var myText = getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length;
+      var myText = getPositiveSitesJSON(d.data.branch_info.results, psThresholdHigh).length;
       d3.select('.tooltip')
       .text(myText);
       // var mouseX = event.clientX;
       // var mouseY = event.clientY;
       // moveTooltip(mouseX, mouseY);
-      // $('.tooltip').html(getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length).show();
+      // $('.tooltip').html(getPositiveSites(d.data.branch_info.results, psThresholdHigh).length).show();
       
       // console.log('d', d);
       // console.log(coords);
@@ -584,7 +592,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       // console.log('mouseover node');
       // mouseover on a node
       // goal: display the number of positive sites
-      // console.log(getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length, 'positive sites');
+      // console.log(getPositiveSites(d.data.branch_info.results, psThresholdHigh).length, 'positive sites');
     })
     .on('mouseout', function() {
       hideTooltip();
@@ -606,10 +614,10 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       //   return '#FFFFFF';
       // });
       if (action == svgEvents.doNothing) {
-        resultsText = d.data.branch_info.branch_results;
+        resultsJSON = JSON.parse(d.data.branch_info.results);
       }
-      // console.log(d.data.branch_info.branch_id, resultsText);
-      // updateSvg(treeRoot, firstLoad, d.data.branch_info.branch_results);
+      // console.log(d.data.branch_info.id, resultsText);
+      // updateSvg(treeRoot, firstLoad, d.data.branch_info.results);
       updateLayout(treeRoot, firstLoad);
     });
   nodeEnter
@@ -626,7 +634,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       //   }
       //   window.open(url);
       // }
-      // console.log(d.data.branch_info.branch_id, d.data.branch_info.branch_results);
+      // console.log(d.data.branch_info.id, d.data.branch_info.results);
     });
   nodeEnter
     .append("text")
@@ -738,7 +746,10 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
           break;
         case "loss":
           return symbol.type(d3.symbolCross)()
+          break;
         default:
+          return symbol.type(d3.symbolCross)()
+          break;
       }
     })
     // .attr("stroke-width", "0px")
@@ -870,7 +881,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // var nodeSymbols = d3.selectAll('path.symbol');
   // nodeSymbols.attr('fill', function(d) {
   //   console.log('coucou', d.data); // d: branch data
-  //   // var nbPositive = getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length;
+  //   // var nbPositive = getPositiveSites(d.data.branch_info.results, psThresholdHigh).length;
   //   var nbPositive = 0;
   //   if (nbPositive == 0) {
   //     return 'hsl(0, 100%, 100%)';
@@ -897,8 +908,8 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     // console.log('allNodes', d.data.branch_info);
     if (d.data.branch_info) {
       // console.log('branch_info is defined');
-      nbPositive = getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length;
-      // console.log(d.data.branch_info.branch_id, d.data.name, nbPositive);
+      nbPositive = getPositiveSitesJSON(d.data.branch_info.results, psThresholdHigh).length;
+      // console.log(d.data.branch_info.id, d.data.name, nbPositive);
       if (nbPositive == 0) {
         // return 'hsl(0, 100%, 100%)';
         return '#0000FF'; // blue
@@ -958,13 +969,18 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   var psGraphGlobal = d3.select('#ps-graph-global');
 
   // Calcul du décalage des sites pour le positionnement des rectangles du graphe
-  var siteOffset = 1 - psResultsDataset[0].site;
+  // var siteOffset = 1 - psResultsDataset[0].site;
+  var siteOffset = 0;
   // Association des données aux futurs rectangles
   var globalRects = psGraphGlobal
     .selectAll('.ps-rects-global')
-    .data(psResultsDataset);
+    .data(function() {
+      console.log('compact graph: attaching psResultsDataset', psResultsDataset);
+      return psResultsDataset;
+    });
   globalRects.exit().remove();
   // Affichage des rectangles
+  var i = 0;
   globalRects.enter()
     // .append('a')
     // .attr('xlink:href', function(d) {
@@ -978,15 +994,16 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       .attr('width', function(d) { return 1; })
       .attr('height', function(d) { return psGraphGlobalHeight; })
       // .attr('x', function(d) { return xPsGraphGlobal(d.site + siteOffset); })
-      .attr('x', function(d) { return d.site + siteOffset; })
+      // .attr('x', function(d) { return d.site + siteOffset; })
+      .attr('x', function(d) { i ++; return i + siteOffset; })
       // .attr('y', function(d) { return yPsGraphGlobal(d.stat); })
       .attr('y', function(d) { return 0; })
       .style('fill', function(d) {
-        if (d.stat >= psThresholdHigh) {
+        if (d >= psThresholdHigh) {
           return psThresholdHighBgColor;
-        } else if (d.stat >= psThresholdLow) {
+        } else if (d >= psThresholdLow) {
           return psThresholdLowBgColor;
-        } else if (d.stat >= 0) {
+        } else if (d >= 0) {
           return psBelowThresholdBgColor;
         } else {
           return psMissingBgColor;
@@ -1005,28 +1022,28 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     // console.log('scrollAlignment:', event.type, 'on', event.currentTarget);
 
     // Get the site's number (mouse position in pixels) and navigate to this site in the large window
-    console.log('compactWindow.scrollLeft()', compactWindow.scrollLeft());
+    // console.log('compactWindow.scrollLeft()', compactWindow.scrollLeft());
     var siteNumber = event.pageX + compactWindow.scrollLeft();
-    console.log('Navigating to site', siteNumber);
+    // console.log('Navigating to site', siteNumber);
     alignmentWindow.scrollLeft(50 + seq_lg + 10 + siteNumber*hStep - alignmentWindow.innerWidth()/2, 0);
 
     if (event.type === 'mouseup') {
-      console.log('mouse released', event.currentTarget.id);
+      // console.log('mouse released', event.currentTarget.id);
       compactWindow.off('mousemove');
     }
   }
   
   compactWindow.on('mousedown', function(e) {
-    console.log(e.type);
+    // console.log(e.type);
     scrollAlignment(e);
 
     compactWindow.on('mousemove', function (e) {
-      console.log(e.type);
+      // console.log(e.type);
       scrollAlignment(e);
     });
 
     compactWindow.on('mouseup', function (e) {
-      console.log(e.type);
+      // console.log(e.type);
       scrollAlignment(e);
       compactWindow.off('mousemove');
     });
@@ -1116,41 +1133,46 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // Ajout de l'axe y au graphe
   psGraph.append('g')
     .call(d3.axisLeft(y));
-  
-  // // Suppression du graphe
-  // psGraph.exit().remove();
 
   // Calcul du décalage des sites pour le positionnement des rectangles du graphe
-  var siteOffset = 1 - psResultsDataset[0].site;
+  // var siteOffset = 1 - psResultsDataset[0].site;
+  // var siteOffset = 0;
   // Association des données aux futurs rectangles
-  var rects = psGraph.selectAll('.ps-rects')
-    .data(psResultsDataset);
+  var rects = psGraph
+    .selectAll('.ps-rects')
+    .data(function() {
+      console.log('big graph: attaching psResultsDataset', psResultsDataset);
+      return psResultsDataset;
+    });
   // Affichage des rectangles
-  rects.enter().append('rect')
-    // .attr('id', function(d) {
-    //   return 'ps-rect-'+d.site;
-    // })
-    .attr('class', 'ps-rects')
-    // .attr('title', function(d) {
-    //   return d.site;  
-    // })
-    .attr('width', function(d) { return hStep; })
-    .attr('height', function(d) { return y(0) - y(d.stat); })
-    .attr('x', function(d) { return x(d.site + siteOffset); })
-    .attr('y', function(d) { return y(d.stat); })
-    .style('fill', function(d) {
-      if (d.stat >= psThresholdHigh) {
-        return psThresholdHighBgColor;
-      } else if (d.stat >= psThresholdLow) {
-        return psThresholdLowBgColor;
-      } else if (d.stat >= 0) {
-        return psBelowThresholdBgColor;
-      } else {
-        return psMissingBgColor;
-      }
-    })
-    .style('stroke', '#000000')
-    .style('stroke-width', 0+'px');
+  var i = 0;
+  rects.enter()
+    .append('rect')
+      // .attr('id', function(d) {
+      //   return 'ps-rect-'+d.site;
+      // })
+      .attr('class', 'ps-rects')
+      // .attr('title', function(d) {
+      //   return d.site;  
+      // })
+      .attr('width', function(d) { return hStep; })
+      .attr('height', function(d) { return y(0) - y(d); })
+      // .attr('x', function(d) { return x(d.site + siteOffset); })
+      .attr('x', function(d) { i ++; return x(i); })
+      .attr('y', function(d) { return y(d); })
+      .style('fill', function(d) {
+        if (d >= psThresholdHigh) {
+          return psThresholdHighBgColor;
+        } else if (d >= psThresholdLow) {
+          return psThresholdLowBgColor;
+        } else if (d >= 0) {
+          return psBelowThresholdBgColor;
+        } else {
+          return psMissingBgColor;
+        }
+      })
+      .style('stroke', '#000000')
+      .style('stroke-width', 0+'px');
   
   // Ajout du seuil supérieur au graphe
   psGraph.append('line')
@@ -1204,7 +1226,8 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .attr('id', 'sequences-container')
     .attr("transform", "translate(" + (margin.right - minX - 300) + "," + (margin.top - minY + 200  + decalageY) + ")")
   // Association des données aux futurs blocs de séquences
-  var seqblocks = seqDiv.selectAll('.seqblock')
+  var seqblocks = seqDiv
+    .selectAll('.seqblock')
     .data(seq_dataset);
   // Création et positionnement des blocs de séquences
   var seqblocksEnter = seqblocks.enter().append('g')
@@ -1252,7 +1275,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   var aaSequence = d3.select('.aa-sequence');
   var nucSequence = d3.select('.dna-sequence');
   // console.log('First site ID', psResultsDataset[0].site);
-  for (i = psResultsDataset[0].site; i < psResultsDataset.length; i ++) {
+  for (i = 0; i < psResultsDataset.length; i ++) {
     if (displaySeqType == 'AA') {
       // Ajout d'un rectangle coloré par AA
       aaSequence.append('rect')
@@ -1261,11 +1284,11 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
         .attr('height', maxYSeq - minYSeq + hStepBase*2)
         .style('fill', () => {
-          if (psResultsDataset[i].stat >= psThresholdHigh) {
+          if (psResultsDataset[i] >= psThresholdHigh) {
             return psThresholdHighBgColor;
-          } else if (psResultsDataset[i].stat >= psThresholdLow) {
+          } else if (psResultsDataset[i] >= psThresholdLow) {
             return psThresholdLowBgColor;
-          } else if (psResultsDataset[i].stat >= 0) {
+          } else if (psResultsDataset[i] >= 0) {
             return psBelowThresholdBgColor;
           } else {
             return psMissingBgColor;
@@ -1279,11 +1302,11 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
         .attr('height', maxYSeq - minYSeq + hStepBase*2)
         .style('fill', () => {
-          if (psResultsDataset[i].stat >= psThresholdHigh) {
+          if (psResultsDataset[i] >= psThresholdHigh) {
             return psThresholdHighBgColor;
-          } else if (psResultsDataset[i].stat >= psThresholdLow) {
+          } else if (psResultsDataset[i] >= psThresholdLow) {
             return psThresholdLowBgColor;
-          } else if (psResultsDataset[i].stat >= 0) {
+          } else if (psResultsDataset[i] >= 0) {
             return psBelowThresholdBgColor;
           } else {
             return psMissingBgColor;
@@ -1291,6 +1314,45 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         });
     }
   }
+  // for (i = psResultsDataset[0].site; i < psResultsDataset.length; i ++) {
+  //   if (displaySeqType == 'AA') {
+  //     // Ajout d'un rectangle coloré par AA
+  //     aaSequence.append('rect')
+  //       .attr('x', function(d) {return i*hStep;})
+  //       .attr('width', hStep)
+  //       .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
+  //       .attr('height', maxYSeq - minYSeq + hStepBase*2)
+  //       .style('fill', () => {
+  //         if (psResultsDataset[i].stat >= psThresholdHigh) {
+  //           return psThresholdHighBgColor;
+  //         } else if (psResultsDataset[i].stat >= psThresholdLow) {
+  //           return psThresholdLowBgColor;
+  //         } else if (psResultsDataset[i].stat >= 0) {
+  //           return psBelowThresholdBgColor;
+  //         } else {
+  //           return psMissingBgColor;
+  //         }
+  //       });
+  //   } else {
+  //     // Ajout d'un rectangle coloré par codon
+  //     nucSequence.append('rect')
+  //       .attr('x', function(d) {return i*hStep;})
+  //       .attr('width', hStep)
+  //       .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
+  //       .attr('height', maxYSeq - minYSeq + hStepBase*2)
+  //       .style('fill', () => {
+  //         if (psResultsDataset[i].stat >= psThresholdHigh) {
+  //           return psThresholdHighBgColor;
+  //         } else if (psResultsDataset[i].stat >= psThresholdLow) {
+  //           return psThresholdLowBgColor;
+  //         } else if (psResultsDataset[i].stat >= 0) {
+  //           return psBelowThresholdBgColor;
+  //         } else {
+  //           return psMissingBgColor;
+  //         }
+  //       });
+  //   }
+  // }
   
   // Alignement : ajout des AA / codons (version séquence entière)
   seqTextAA.append('text')
@@ -1325,8 +1387,8 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   //   moveTooltip(mouseX, mouseY);
   //   // console.log(document.getElementsByClassName('tooltip')[0]);
   //   var tooltipElement = document.getElementsByClassName('tooltip')[0];
-  //   tooltipElement.innerHTML = getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length;
-  //   // $('.tooltip').html(getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length)
+  //   tooltipElement.innerHTML = getPositiveSites(d.data.branch_info.results, psThresholdHigh).length;
+  //   // $('.tooltip').html(getPositiveSites(d.data.branch_info.results, psThresholdHigh).length)
   //   // .css({
   //   //   'z-index': '1',
   //   //   'background':'#FFFFFF',
@@ -1348,19 +1410,24 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
 // ----------------------------
 
 function reloadGlobalResults() {
-  resultsText = xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results);
+  resultsJSON = JSON.parse(xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results));
   updateLayout(cladeRoot);
 }
 
 // Fonction qui renvoie la liste des positions des sites positifs
-function getPositiveSites(resultsText, upperThreshold) {
-  var resultsList = resultsText.split(' ');
+function getPositiveSitesJSON(textResultsList, upperThreshold) {
+  var jsonResultsList = JSON.parse(textResultsList);
+  // console.log('jsonResultsList', jsonResultsList);
+  // console.log('jsonResultsList[0]', jsonResultsList[0]);
+  // console.log('jsonResultsList[jsonResultsList.length - 1]', jsonResultsList[jsonResultsList.length - 1]);
+  
   var positiveSites = [];
   // console.log(resultsList);
-  resultsList.forEach((r) => {
-    var site = r.split(':')[0];
-    var value = r.split(':')[1];
-    // console.log('site:', r.split(':')[0], 'value:', r.split(':')[1]);
+  jsonResultsList.forEach((r, i) => {
+    // console.log('site', i);
+    var site = i;
+    var value = r;
+    // console.log('site:', i, 'value:', r);
     if (value >= psThresholdHigh) {
       positiveSites.push(site);
     }
@@ -1369,6 +1436,24 @@ function getPositiveSites(resultsText, upperThreshold) {
   // console.log(positiveSites.length, 'positive sites');
   return positiveSites;
 }
+
+// // Fonction qui renvoie la liste des positions des sites positifs
+// function getPositiveSites(resultsText, upperThreshold) {
+//   var resultsList = resultsText.split(' ');
+//   var positiveSites = [];
+//   // console.log(resultsList);
+//   resultsList.forEach((r) => {
+//     var site = r.split(':')[0];
+//     var value = r.split(':')[1];
+//     // console.log('site:', r.split(':')[0], 'value:', r.split(':')[1]);
+//     if (value >= psThresholdHigh) {
+//       positiveSites.push(site);
+//     }
+//   })
+//   // console.log('positive sites:', positiveSites);
+//   // console.log(positiveSites.length, 'positive sites');
+//   return positiveSites;
+// }
 
 // Fonction de test du support local.storage
 // ------------------------------------------
@@ -1978,8 +2063,8 @@ $(document).ready(function() {
     moveTooltip(mouseX, mouseY);
     // console.log(document.getElementsByClassName('tooltip')[0]);
     var tooltipElement = document.getElementsByClassName('tooltip')[0];
-    tooltipElement.innerHTML = getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length;
-    // $('.tooltip').html(getPositiveSites(d.data.branch_info.branch_results, psThresholdHigh).length)
+    tooltipElement.innerHTML = getPositiveSitesJSON(JSON.parse(d.data.branch_info.results), psThresholdHigh).length;
+    // $('.tooltip').html(getPositiveSites(d.data.branch_info.results, psThresholdHigh).length)
     // .css({
     //   'z-index': '1',
     //   'background':'#FFFFFF',
@@ -1991,39 +2076,39 @@ $(document).ready(function() {
     // .show();
   });
   $('#alugnment-container').on('scroll', function (event) {
-    console.log('scrolling alignment container', event)
+    // console.log('scrolling alignment container', event)
   });
-  $('#collapse-mode span').text(function() {
-    console.log('collapseMode:', collapseMode);
-    switch (collapseMode) {
-      case 'collapseOn':
-        return 'Collapse On';
-        break;
-      case 'collapseOff':
-      return 'Collapse Off';
-        break;
-      default:
-        return collapseMode;
-        break;
-    }
-  });
-  $('#collapse-mode').on('click', function(event, dropdownData) {
-    switch (collapseMode) {
-      case 'collapseOff':
-        collapseMode = 'collapseOn';
-        $('#collapse-mode span').text('Collapse On');
-        break;
-      case 'collapseOn':
-        collapseMode = 'collapseOff';
-        $('#collapse-mode span').text('Collapse Off');
-        break;
-      default:
-        collapseMode = 'collapseOff';
-        $('#collapse-mode span').text('Collapse Off');
-        break;
-    }
-    console.log('collapseMode:', collapseMode);
-  });
+  // $('#collapse-mode span').text(function() {
+  //   console.log('collapseMode:', collapseMode);
+  //   switch (collapseMode) {
+  //     case 'collapseOn':
+  //       return 'Collapse On';
+  //       break;
+  //     case 'collapseOff':
+  //     return 'Collapse Off';
+  //       break;
+  //     default:
+  //       return collapseMode;
+  //       break;
+  //   }
+  // });
+  // $('#collapse-mode').on('click', function(event, dropdownData) {
+  //   switch (collapseMode) {
+  //     case 'collapseOff':
+  //       collapseMode = 'collapseOn';
+  //       $('#collapse-mode span').text('Collapse On');
+  //       break;
+  //     case 'collapseOn':
+  //       collapseMode = 'collapseOff';
+  //       $('#collapse-mode span').text('Collapse Off');
+  //       break;
+  //     default:
+  //       collapseMode = 'collapseOff';
+  //       $('#collapse-mode span').text('Collapse Off');
+  //       break;
+  //   }
+  //   console.log('collapseMode:', collapseMode);
+  // });
   switch (displaySeqType) {
     case 'AA':
       $('a#aminoacid').css('color', '#FF0000');
