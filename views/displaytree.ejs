@@ -385,22 +385,22 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // console.log('firstLoad:', firstLoad);
   // console.log('results:', results);
   if (!resultsJSON) {
-    console.log('!resultsJSON', resultsJSON);
+    // console.log('!resultsJSON', resultsJSON);
     // console.log('global results:', xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results));
     resultsJSON = JSON.parse(xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results));
-    console.log('global results JSON:', resultsJSON);
+    // console.log('global results JSON:', resultsJSON);
   // } else if (firstLoad && resultsText) {
   //   var results = resultsText;
   // } else if (!firstLoad && resultsText) {
   //   var results = resultsText;
   } else {
-    console.log('resultsJSON:', resultsJSON);
+    // console.log('resultsJSON:', resultsJSON);
     // resultsJSON = JSON.parse(resultsText);
     resultsJSON = resultsJSON;
   }
   // var results = xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results);
 
-  console.log('resultsJSON', resultsJSON);
+  // console.log('resultsJSON', resultsJSON);
   
   // results = results.split(' ');
   // var psResultsDataset = [];
@@ -975,7 +975,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   var globalRects = psGraphGlobal
     .selectAll('.ps-rects-global')
     .data(function() {
-      console.log('compact graph: attaching psResultsDataset', psResultsDataset);
+      // console.log('compact graph: attaching psResultsDataset', psResultsDataset);
       return psResultsDataset;
     });
   globalRects.exit().remove();
@@ -1087,6 +1087,33 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .attr("width",  50 + seq_lg + 10 + psResultsDataset.length*hStep + 10 + seq_lg + 50)
     .attr("height",  heightSVG + margin.top + margin.down + 100);
   // Fonction de calcul de la statistique maximale dans les résultats
+  function maxStatJSON(jsonResultsList) {
+    var currentmax = jsonResultsList[0];
+    jsonResultsList.forEach(function(res) {
+      if (res > currentmax) {
+        currentmax = res;
+      }
+    });
+    if (currentmax >= 2) {
+      return 2;
+    } else {
+      return currentmax;
+    }
+    return currentmax;
+  }
+  function minStatJSON(jsonResultsList) {
+    var currentmin = jsonResultsList[0];
+    jsonResultsList.forEach(function(res) {
+      if (res < currentmin) {
+        currentmin = res;
+      }
+    });
+    if (currentmin <= 0) {
+      return currentmin;
+    } else {
+      return 0;
+    }
+  }
   function maxStat(results_list) {
     var currentmax = results_list[0].stat;
     results_list.forEach(function(res) {
@@ -1120,7 +1147,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .range([0, psGraphWidth]);
   // Définition de l'échelle pour l'axe y
   var y = d3.scaleLinear()
-    .domain([0, maxStat(psResultsDataset)])
+    .domain([0, maxStatJSON(psResultsDataset)])
     .range([psGraphHeight, 0]);
   // Ajout du graphe des résultats au SVG
   var psGraph = svg2.append('g')
@@ -1141,7 +1168,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   var rects = psGraph
     .selectAll('.ps-rects')
     .data(function() {
-      console.log('big graph: attaching psResultsDataset', psResultsDataset);
+      // console.log('big graph: attaching psResultsDataset', psResultsDataset);
       return psResultsDataset;
     });
   // Affichage des rectangles
