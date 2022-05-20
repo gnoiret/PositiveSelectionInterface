@@ -14,6 +14,7 @@ Positional arguments:
 """
 
 import argparse
+import json
 import sys
 import re
 import random
@@ -192,9 +193,11 @@ def loadResultsSites(resultsFile, statcol=1, nostat_value=-1.0, sep='\t'):
 
     resultsText = ''
     for key, item in resultsDict.items():
-        resultsText += f'{key}:{item}'
-        if key != max(resultsDict.keys()):
-            resultsText += ' '
+        # resultsText += f'{key}:{item}'
+        resultsText += f'{item}, '
+        # if key != max(resultsDict.keys()):
+        #     resultsText += ', '
+    resultsText = '['+resultsText[:-2]+']' # remove last space and comma
     return resultsText
 
 
@@ -227,11 +230,16 @@ def loadResultsSiteBranch(resultsFile, sep='\t'):
             if col_key != position_header:
                 col_text = ''
                 for i in range(len(d_cols[position_header])):
-                    col_text += f'{d_cols[position_header][i]}:{d_cols[col_key][i]} '
+                    # col_text += f'{d_cols[position_header][i]}:{d_cols[col_key][i]}, '
                     # col_text: '1:0.1248 2:0.12381 ...'
-                col_text = col_text[:-1] # remove last space
+                    
+                    col_text += f'{d_cols[col_key][i]}, '
+                    # col_text: '0.1248, 0.12381, ...'
+                    
+                col_text = '['+col_text[:-2]+']' # remove last space and comma
                 d_cols_2[col_key] = col_text
                 # d_cols_2: {1: '1:0.1248 2:0.12381 ...', ...}
+                # d_cols_2: {1: '[0.1248, 0.12381, ...]', ...}
 
     # results_text = ''
     # for col in d_cols_2:
@@ -311,7 +319,7 @@ def createPhyloXML(fam,newick, resultsFile):
     #     newick = nv_arbre
     
     newick = normalizeTree(newick)
-    print(f'newick:\n{newick}')
+    # print(f'newick:\n{newick}')
     # Tree now has a <branch_name>:<number>:<length> syntax
     handle = StringIO(newick)
     # print('handle:', handle)
@@ -405,8 +413,8 @@ def createPhyloXML(fam,newick, resultsFile):
         if args.isSitebranch:
             if element.find('branch_length') is not None:
                 branch_info = etree.Element('branch_info')
-                branch_info.set('branch_id', str(res_colnames[colname_index]))
-                branch_info.set('branch_results', str(dict_results[res_colnames[colname_index]]))
+                branch_info.set('id', str(res_colnames[colname_index]))
+                branch_info.set('results', str(dict_results[res_colnames[colname_index]]))
                 element.append(branch_info)
                 colname_index += 1
     
@@ -428,8 +436,9 @@ def createPhyloXML(fam,newick, resultsFile):
     print (nbspecies)
 
     ## Ajout des résultats
-    resultsElement = etree.Element('global_results')
-    resultsElement.set('results', resultsText)
+    globalResultsElement = etree.Element('global_results')
+    globalResultsElement.set('results', resultsText)
+    # globalResultsElement.text = resultsText
 
     LengthMaxSeqID = etree.Element('maxSeqIdLength')
     LengthMaxSeqID.text = str(maxSeqIdLength)
@@ -440,7 +449,7 @@ def createPhyloXML(fam,newick, resultsFile):
     e=subtree[0].find('phylogeny')
     e.append(treesize)
     e.append(LengthMaxSeqID)
-    e.append(resultsElement) # ajout de la balise contenant les résultats
+    e.append(globalResultsElement) # ajout de la balise contenant les résultats
     text =  minidom.parseString(ElementTree.tostring(subtree[0])).toprettyxml()
     # remove blank lines
     cleantext = "\n".join([ll.rstrip() for ll in text.splitlines() if ll.strip()])
@@ -453,13 +462,11 @@ sys.setrecursionlimit(15000)
 print ("Loading alignment... ")
 loadedAlignment = loadAlignment(args.alignmentFile)
 alignmentDict, maxSeqIdLength = loadedAlignment[0], loadedAlignment[1]
-# print('maxSeqIdLength:', maxSeqIdLength)
 print ("OK")
 
 print ("Loading results... ")
-resultsText =  loadResultsSites(args.resultsFile, 0, args.nostat, sep=args.sep)
+resultsText =  loadResultsSites(args.resultsFile, args.statcol, args.nostat, sep=args.sep)
 dict_results = loadResultsSiteBranch(args.resultsFile, sep=args.sep)
-# print(dict_results)
 print ("OK")
 
 #Creates empty phyloxml document
@@ -470,7 +477,6 @@ dico = loadDico(args.alignmentFile)
 
 # Loads newick tree
 treefile = open(args.treeFile, "r")
-# print(args.output)
 if args.output:
     output_name = args.output
 else:
@@ -478,7 +484,6 @@ else:
         output_name = args.treeFile[::-1].split('.', 1)[1][::-1]
     else:
         output_name = args.treeFile
-# xmloutputfile = open(output_name+".xml","w")
 xmloutputfile = open(output_name,"w")
 
 for line in treefile:
