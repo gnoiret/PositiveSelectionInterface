@@ -72,7 +72,7 @@
     </button>
     <!-- Début modif -->
     <!-- Bouton  Alignement -->
-    <div class="btn-group" role="group" id="alignement">
+    <div class="btn-group" role="group" id="alignment-type">
       <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="Choose type of alignment"  >
         AlignmentNature
         <span class="caret"></span>
@@ -1049,13 +1049,13 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     });
   });
 
-  $('#alignment-container').on('scroll', function() {
+  alignmentWindow.on('scroll', function() {
     // Draw a rectangle surrounding the site that was clicked
     console.log('scrolling alignment');
     $('.navigation-window').remove();
-    var largeWindow = $('#alignment-container');
-    var siteNumber = - (50 + seq_lg + 10 - largeWindow.scrollLeft() - largeWindow.innerWidth()/2)/hStep;
-    var navWindowWidth = largeWindow.innerWidth()/hStep + 2;
+    // var largeWindow = $('#alignment-container');
+    var siteNumber = - (50 + seq_lg + 10 - alignmentWindow.scrollLeft() - alignmentWindow.innerWidth()/2)/hStep;
+    var navWindowWidth = alignmentWindow.innerWidth()/hStep + 2;
     var navWindowRect = psGraphGlobal
       .append('rect')
         .attr('class', 'navigation-window')
@@ -1072,9 +1072,9 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   });
 
   // Hack to keep the navigation window visible after a branch change
-  $('#alignment-container')
-    .scrollLeft($('#alignment-container').scrollLeft()+1)
-    .scrollLeft($('#alignment-container').scrollLeft()-1);
+  alignmentWindow
+    .scrollLeft(alignmentWindow.scrollLeft()+1)
+    .scrollLeft(alignmentWindow.scrollLeft()-1);
   
   // ======================================================
   // | Début : graphe des résultats de sélection positive |
@@ -2174,11 +2174,11 @@ $(document).ready(function() {
     });
   });
   // Gestion du bouton pour le type d'alignement
-  $('#alignement').on('click', function(event, dropdownData) {
+  $('#alignment-type').on('click', function(event, dropdownData) {
     var target = event.toElement || event.relatedTarget || event.target || function () { throw "Failed to attach an event target!"; }
-    myStorage.setItem("alignement",target.text);
+    myStorage.setItem("alignment-type",target.text);
     switch (target.text) {
-      case "Codons":
+      case "Codons": // Codons to Amino Acids
         if (displaySeqType != 'Nuc') {
           displaySeqType = "Nuc";
           console.log("Displaying codons");
@@ -2188,9 +2188,12 @@ $(document).ready(function() {
           $("#nucleotid").css('color', '#FF0000');
           $("#aminoacid").css('color', '#000000');
           updateLayout(cladeRoot);
+          console.log('alignmentWindow.scrollLeft():', alignmentWindow.scrollLeft());
+          alignmentWindow.scrollLeft(alignmentWindow.scrollLeft()*3);
+          console.log('alignmentWindow.scrollLeft():', alignmentWindow.scrollLeft());
         }
         break;
-      case "Amino Acids":
+      case "Amino Acids": // Amino Acids to Codons
         if (displaySeqType != 'AA') {
           displaySeqType = "AA";
           console.log("Displaying amino acids");
@@ -2198,6 +2201,9 @@ $(document).ready(function() {
           $(".aa-sequence").css("display", "block");
           $("#nucleotid").css('color', '#000000');
           $("#aminoacid").css('color', '#FF0000');
+          console.log('alignmentWindow.scrollLeft():', alignmentWindow.scrollLeft());
+          alignmentWindow.scrollLeft(alignmentWindow.scrollLeft()/3);
+          console.log('alignmentWindow.scrollLeft():', alignmentWindow.scrollLeft());
           updateLayout(cladeRoot);
         }
         break;
