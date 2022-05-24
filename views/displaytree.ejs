@@ -30,7 +30,7 @@
     <!-- <div class="btn-group" id="crossref">
     </div> -->
     <!-- Bouton Action -->
-    <div class="btn-group" role="group" id="action">
+    <!-- <div class="btn-group" role="group" id="action">
       <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="Choose action on node"  >
         On click
         <span class="caret"></span>
@@ -41,6 +41,18 @@
         <li><a href="#" id="collapse">Collapse/Expand</a></li>
         <li><a href="#" id="subtree">Sub Tree/Upper Tree</a></li>
       </ul>
+    </div> -->
+    <!-- Bouton Action -->
+    <div class="dropdown">
+      <button id="action" class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Choose action on node">
+        On click
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="action">
+        <li><a id="branchres" class="dropdown-item" href="#">View Branch Results</a></li>
+        <li><a id="switch" class="dropdown-item" href="#">Switch children</a></li>
+        <li><a id="collapse" class="dropdown-item" href="#">Collapse/Expand</a></li>
+        <li><a id="subtree" class="dropdown-item" href="#">Sub Tree/Upper Tree</a></li>
+      </ul>
     </div>
     <!-- Bouton Collapse -->
     <!-- <button type="button" class="btn btn-default btn-sm" aria-label="Collapse" data-toggle="tooltip" data-placement="top" title="Collapse the tree" id="globalcollapse">
@@ -50,29 +62,33 @@
     <button type="button" class="btn btn-default btn-sm" aria-label="Expand"  data-toggle="tooltip" data-placement="top" title="Expand the tree (takes time on big trees!)" id="globalexpand">
       <span>Expand tree</span>
     </button>
-    <!-- Bouton Reduce width -->
-    <button type="button" class="btn btn-default  btn-sm  " aria-label="Left Align" id="lessWidth"  data-toggle="tooltip" data-placement="top" title="Reduce tree width">
-      <span>width</span>
-      <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
-    </button>
-    <!-- Bouton Increase width -->
-    <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="moreWidth"  data-toggle="tooltip" data-placement="top" title="Increase tree width">
-      <span>width</span>
-      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-    </button>
-    <!-- Bouton Reduce height -->
-    <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="lessHeigth"  data-toggle="tooltip" data-placement="top" title="Reduce tree height">
-      <span>height</span>
-      <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
-    </button>
-    <!-- Bouton Increase height -->
-    <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="moreHeigth"  data-toggle="tooltip" data-placement="top" title="Increase tree height">
-      <span>height</span>
-      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-    </button>
+    <div class="button-group" role="group" aria-label="Width buttons">
+      <!-- Bouton Reduce width -->
+      <button type="button" class="btn btn-default  btn-sm  " aria-label="Left Align" id="lessWidth"  data-toggle="tooltip" data-placement="top" title="Reduce tree width">
+        <span>width -</span>
+        <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+      </button>
+      <!-- Bouton Increase width -->
+      <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="moreWidth"  data-toggle="tooltip" data-placement="top" title="Increase tree width">
+        <span>width +</span>
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+      </button>
+    </div>
+    <div class="button-group" role="group" aria-label="Height buttons">
+      <!-- Bouton Reduce height -->
+      <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="lessHeigth"  data-toggle="tooltip" data-placement="top" title="Reduce tree height">
+        <span>height -</span>
+        <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+      </button>
+      <!-- Bouton Increase height -->
+      <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="moreHeigth"  data-toggle="tooltip" data-placement="top" title="Increase tree height">
+        <span>height +</span>
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+      </button>
+    </div>
     <!-- Début modif -->
     <!-- Bouton  Alignement -->
-    <div class="btn-group" role="group" id="alignment-type">
+    <!-- <div class="btn-group" role="group" id="alignment-type">
       <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="Choose type of alignment"  >
         AlignmentNature
         <span class="caret"></span>
@@ -81,11 +97,17 @@
         <li><a href="#" id="aminoacid">Amino Acids</a></li>
         <li><a href="#" id="nucleotid">Codons</a></li>
       </ul>
+    </div> -->
+    <!-- Bouton  Alignement -->
+    <div class="dropdown">
+      <button id="alignment-type" class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Choose alignment type">
+        Alignment type
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="alignment-type">
+        <li><a id="aminoacid" class="dropdown-item" href="#">Amino Acids</a></li>
+        <li><a id="nucleotid" class="dropdown-item" href="#">Codons</a></li>
+      </ul>
     </div>
-    <!-- Bouton Action -->
-    <!-- <button type="button" class="btn btn-default btn-sm" aria-label="Action" data-toggle="tooltip" data-placement="top" title="Switch between collapse and results modes" id="collapse-mode">
-      <span>Collapse Mode</span>
-    </button> -->
     <!-- Bouton  Export -->
     <div class="btn-group" role="group" id="export">
       <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="export figure">
@@ -105,22 +127,19 @@
       <span>Reload global results</span>
     </button>
   </nav>
-  <div id="svg-container-upper">
-    <div style="border:2px solid lightgrey; float: left; overflow-y: hidden; width: 100%; height: 80px;" id="navigator-container">
-      <svg id="svg0"></svg>
-    </div>
+
+  <div id="navigator-container" style="border:2px solid lightgrey; float: left; overflow-y: hidden; width: 100%; height: 80px;">
+    <svg id="svg0"></svg>
   </div>
-  <div id="demo">
-    <div id="svg-container">
-      <div style="border:2px solid lightgrey; float: left; overflow-y: auto; width: 40%;" id="tree-container">
-        <svg id="svg1"></svg>
-      </div>
-      <div style="border:2px solid lightgrey; overflow-x: auto; overflow-y: auto;" id="alignment-container" >
-        <svg id="svg2"></svg>
-      </div>
-    </div>
+
+  <div id="tree-container" style="border:2px solid lightgrey; float: left; overflow-y: auto; width: 40%;">
+    <svg id="svg1"></svg>
   </div>
-  <div id="none"></div>
+
+  <div id="alignment-container" style="border:2px solid lightgrey; overflow-x: auto; overflow-y: auto;">
+    <svg id="svg2"></svg>
+  </div>
+
 </body>
 
 <script src="xmltree.js" charset="utf-8"></script>
@@ -1962,7 +1981,7 @@ $('#selectCrossref').ready(function() {
 $('#action').ready(function() {
   switch (myStorage.getItem("action")) {
     case 'View Branch Results':
-      $('#do-nothing').css('color','#FF0000');
+      $('#branchres').css('color','#FF0000');
       break;
     case "Switch children":
       $('#switch').css('color','#FF0000');
@@ -1982,7 +2001,7 @@ $('#action').on('click', function(event, dropdownData) {
   switch (target.text) {
     case 'View Branch Results':
       action = svgEvents.doNothing;
-      $('#do-nothing').css('color','#FF0000');
+      $('#branchres').css('color','#FF0000');
       $('#switch').css('color','#000000');
       $('#collapse').css('color','#000000');
       $('#subtree').css('color','#000000');
@@ -1990,7 +2009,7 @@ $('#action').on('click', function(event, dropdownData) {
       break;
     case "Switch children":
       action = svgEvents.switchChildren;
-      $('#do-nothing').css('color','#000000');
+      $('#branchres').css('color','#000000');
       $('#switch').css('color','#FF0000');
       $('#collapse').css('color','#000000');
       $('#subtree').css('color','#000000');
@@ -1998,7 +2017,7 @@ $('#action').on('click', function(event, dropdownData) {
       break;
     case "Collapse/Expand":
       action = svgEvents.collapse;
-      $('#do-nothing').css('color','#000000');
+      $('#branchres').css('color','#000000');
       $('#switch').css('color','#000000');
       $('#collapse').css('color','#FF0000');
       $('#subtree').css('color','#000000');
@@ -2006,7 +2025,7 @@ $('#action').on('click', function(event, dropdownData) {
       break;
     case "Sub Tree/Upper Tree":
       action = svgEvents.focus;
-      $('#do-nothing').css('color','#000000');
+      $('#branchres').css('color','#000000');
       $('#switch').css('color','#000000');
       $('#collapse').css('color','#000000');
       $('#subtree').css('color','#FF0000');
@@ -2177,6 +2196,7 @@ $(document).ready(function() {
   $('#alignment-type').on('click', function(event, dropdownData) {
     var target = event.toElement || event.relatedTarget || event.target || function () { throw "Failed to attach an event target!"; }
     myStorage.setItem("alignment-type",target.text);
+    console.log('Alignment type:', target.text);
     switch (target.text) {
       case "Codons": // Codons to Amino Acids
         if (displaySeqType != 'Nuc') {
