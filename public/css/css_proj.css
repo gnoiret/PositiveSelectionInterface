@@ -101,17 +101,14 @@ p {
 }
 
 
-.form{
+.form-mod {
   margin: 0 auto;
   margin-top: 40px;
   margin-bottom: 40px;
   width: 250px; 
 }
 
-label {
-  text-align: center;
-  padding-top: 20px;
-  display: inline-block;
+input[type="checkbox"], input[type="radio"] {
   cursor: pointer;
 }
 
@@ -123,14 +120,14 @@ label {
   cursor: pointer;
 }
 
-#submit{
+/* #submit{
   text-align: center;
   margin-top: 15px;
   margin-left:10%;
   width: 200px;
   background-color: #ffffff;
   border-radius: 5px;
-}
+} */
 
 #submit:hover {
     background-color: #dddddd;
