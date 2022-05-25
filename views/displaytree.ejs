@@ -160,66 +160,66 @@
 
 <!-- Code JS pour l'affichage de l'arbre -->
 <script type="text/javascript">
-  // Recuperation des variables envoyee via Express
-  // ----------------------------------------------
-  var recTree = <%- arbre %>;
-  var pattern = <%- pattern %>;
-  // Variables globales
-  // ------------------
-  var treeRoot;
-  var cladeRoot;
-  var layout = d3.layout.cladogram();   // Fonction  D3 qui transforme les donnees en cladograme
-  var nodeWidth = 80;                  // Largeur
-  var nodeHeight = 15;                  // Hauteur
-  var x0Align = 350;                  // Cordonee horizonatle de l'alignement
-  var stringWidth;                      // Largeur affichage arbre
-  var tagSimpleGene = false;            // True si arbre de gene de type PhyloXML, False si arbre de gene de type RecPhyloXML
-  var svg;                              // La div SVG
-  var g;                                // Conteneur principal
-  var diagonal = svgLinks.shoulder;     // cf links.js
-  var symbol = d3.symbol().size(128);   // Symbol des noeuds
-  var color = d3.scaleOrdinal(d3.schemeCategory20); // Echelle des couleurs
-  var options ;                         // Options d'affichage
-  var action;                           // Action associee au clic
-  var selectedCrossref ;                // Reference croisée choisie (nom de la sequence)
-  var selectedCrossrefURL ;             // URL associe
-  var crossref;                         // Objet decrivant les differentes ref croisees associees a la famille
-  var spattern=pattern.split('\n');     // pattern a chercher et a afficher dans l'arbre
-  // Exemple getfam?fam=CLU_005912_4_2_C&pattern=0:PETMA_GL476433.PE1+0:ANOCA_6.PE486+1:XENTR_GL172641_1.PE38+1:XENTR_GL172642_1.PE97
-  pattern=spattern;
-  var patterns= [];
-  var div;
-  var myStorage = window.localStorage;    // utilisation de localStorage pour consrever les preferences
-  var displaySeqType = 'AA';
-  var hStepBase = 12;
-  var alignmentLetterSpacing = hStepBase - 10;
-  var psThresholdHigh = $('#ps-threshold-high').val() || 1.0;
-  var psThresholdLow = $('#ps-threshold-low').val() || 0.3;
-  // var psThresholdHighBgColor = "#FC6565";
-  var psThresholdHighBgColor = "#FF0000";
-  var psThresholdLowBgColor = "#FFFF00";
-  // var psBelowThresholdBgColor = "#6FDCF7";
-  // var psBelowThresholdBgColor = "#000000";
-  var psBelowThresholdBgColor = "#DDDDDD";
-  // var psBelowThresholdBgColor = "#FFFFFF";
-  var psMissingBgColor = "#FFFFFF";
-  var psThresholdsChanged = false;
-  var seq_lg = xmlparser.flatTree(recTree.phyloxml.phylogeny.maxSeqIdLength)*10;
-  // var resultsText = xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results);
-  var resultsText = '';
-  var collapseMode = 'collapseOff';
-  var navWindowColor = '#000000';
-  var alignmentWindow = $('#alignment-container');
-  var compactWindow = $('#navigator-container');
-  var resultsJSON = null;
+// Recuperation des variables envoyee via Express
+// ----------------------------------------------
+var recTree = <%- arbre %>;
+var pattern = <%- pattern %>;
+// Variables globales
+// ------------------
+var treeRoot;
+var cladeRoot;
+var layout = d3.layout.cladogram();   // Fonction  D3 qui transforme les donnees en cladograme
+var nodeWidth = 80;                  // Largeur
+var nodeHeight = 15;                  // Hauteur
+// var x0Align = 350;                  // Cordonee horizonatle de l'alignement
+var stringWidth;                      // Largeur affichage arbre
+var tagSimpleGene = false;            // True si arbre de gene de type PhyloXML, False si arbre de gene de type RecPhyloXML
+var svg;                              // La div SVG
+var g;                                // Conteneur principal
+var diagonal = svgLinks.shoulder;     // cf links.js
+var symbol = d3.symbol().size(128);   // Symbol des noeuds
+var color = d3.scaleOrdinal(d3.schemeCategory20); // Echelle des couleurs
+var options ;                         // Options d'affichage
+var action;                           // Action associee au clic
+var selectedCrossref ;                // Reference croisée choisie (nom de la sequence)
+var selectedCrossrefURL ;             // URL associe
+var crossref;                         // Objet decrivant les differentes ref croisees associees a la famille
+var spattern=pattern.split('\n');     // pattern a chercher et a afficher dans l'arbre
+// Exemple getfam?fam=CLU_005912_4_2_C&pattern=0:PETMA_GL476433.PE1+0:ANOCA_6.PE486+1:XENTR_GL172641_1.PE38+1:XENTR_GL172642_1.PE97
+pattern=spattern;
+var patterns= [];
+var div;
+var myStorage = window.localStorage;    // utilisation de localStorage pour consrever les preferences
+var displaySeqType = 'AA';
+var hStepBase = 12;
+var alignmentLetterSpacing = hStepBase - 10;
+var psThresholdHigh = $('#ps-threshold-high').val() || 1.0;
+var psThresholdLow = $('#ps-threshold-low').val() || 0.3;
+// var psThresholdHighBgColor = "#FC6565";
+var psThresholdHighBgColor = "#FF0000";
+var psThresholdLowBgColor = "#FFFF00";
+// var psBelowThresholdBgColor = "#6FDCF7";
+// var psBelowThresholdBgColor = "#000000";
+var psBelowThresholdBgColor = "#DDDDDD";
+// var psBelowThresholdBgColor = "#FFFFFF";
+var psMissingBgColor = "#FFFFFF";
+var psThresholdsChanged = false;
+var seq_lg = xmlparser.flatTree(recTree.phyloxml.phylogeny.maxSeqIdLength)*10;
+// var resultsText = xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results);
+var resultsText = '';
+var collapseMode = 'collapseOff';
+var navWindowColor = '#000000';
+var alignmentWindow = $('#alignment-container');
+var compactWindow = $('#navigator-container');
+var resultsJSON = null;
 
-  if (!isStorageSupported(myStorage)) {
-    console.log("window.localStorage problem");
-    $(testnav).append('It seems that <b>window.localStorage</b> is full or is not supported by your browser<br>Please check this <a href="/clear/">here</a> ');
-  }
-  else {
-    main_display();
-  }
+if (!isStorageSupported(myStorage)) {
+  console.log("window.localStorage problem");
+  $(testnav).append('It seems that <b>window.localStorage</b> is full or is not supported by your browser<br>Please check this <a href="/clear/">here</a> ');
+}
+else {
+  main_display();
+}
 
 // Fonction d'affichage principale
 // ---------------------------------------
@@ -1060,6 +1060,14 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       compactWindow.off('mousemove');
     }
   }
+
+  function updateScroll() {
+    // Hack to keep the navigation window visible after a branch change
+    alignmentWindow
+      .scrollLeft(alignmentWindow.scrollLeft()+1)
+      .scrollLeft(alignmentWindow.scrollLeft()-1);
+    console.log('seq_lg', seq_lg);
+  }
   
   compactWindow.on('mousedown', function(e) {
     // console.log(e.type);
@@ -1100,9 +1108,10 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   });
 
   // Hack to keep the navigation window visible after a branch change
-  alignmentWindow
-    .scrollLeft(alignmentWindow.scrollLeft()+1)
-    .scrollLeft(alignmentWindow.scrollLeft()-1);
+  // alignmentWindow
+  //   .scrollLeft(alignmentWindow.scrollLeft()+1)
+  //   .scrollLeft(alignmentWindow.scrollLeft()-1);
+  updateScroll();
   
   // ======================================================
   // | Début : graphe des résultats de sélection positive |
@@ -1249,6 +1258,8 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     // .style('stroke', psThresholdLowBgColor)
     .style('stroke-width', 1+'px')
     .style('stroke-dasharray', ('4, 4'));
+  
+  psGraph.append('br');
   
   psGraph.on('click', function() {
     var coords = d3.mouse(this);
