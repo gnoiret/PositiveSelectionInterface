@@ -3,13 +3,16 @@
 <head>
   <meta charset="utf-8">
   <title>Affichage des données</title>
-  <% include('../partials/head') %>
+
+  <script src="d3.js" charset="urf-8"></script>
+
+  <%- include('../partials/head') %>
 </head>
 
 <body>
-  <!-- <nav id="main-nav" class="navbar navbar-default navbar-fixed-top"> -->
-  <div id="main-nav"></nav>
-    <% include('../partials/header') %>
+  <nav id="main-nav" class="navbar navbar-default navbar-fixed-top">
+  <!-- <div id="main-nav"></nav> -->
+    <%- include('../partials/header') %>
     <!-- Bouton Action -->
     <!-- <div class="btn-group" role="group" id="action">
       <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="Choose action on node">
@@ -46,33 +49,35 @@
     <button id="globalexpand" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Expand" data-toggle="tooltip" data-placement="top" title="Expand the tree (takes time on big trees!)">
       <span>Expand tree</span>
     </button>
-    <div class="btn-group" role="group" aria-label="Width buttons">
-      <!-- Bouton Reduce width -->
-      <!-- <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="lessWidth" data-toggle="tooltip" data-placement="top" title="Reduce tree width">
-        <span>Width -</span>
-        <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
-      </button> -->
-      <button id="lessWidth" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Less width" data-toggle="tooltip" data-placement="top" title="Reduce tree width">
-        <span>Width -</span>
-        <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
-      </button>
-      <!-- Bouton Increase width -->
-      <button id="moreWidth" class="btn btn-sm btn-outline-secondary" type="button" aria-label="More width" data-toggle="tooltip" data-placement="top" title="Increase tree width">
-        <span>Width +</span>
-        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-      </button>
-    </div>
-    <div class="btn-group" role="group" aria-label="Height buttons">
-      <!-- Bouton Reduce height -->
-      <button id="lessHeigth" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Left Align" data-toggle="tooltip" data-placement="top" title="Reduce tree height">
-        <span>Height -</span>
-        <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
-      </button>
-      <!-- Bouton Increase height -->
-      <button id="moreHeigth" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Left Align" data-toggle="tooltip" data-placement="top" title="Increase tree height">
-        <span>Height +</span>
-        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-      </button>
+    <div class="btn-group" role="group" aria-label="Tree size buttons">
+      <div class="btn-group" role="group" aria-label="Width buttons">
+        <!-- Bouton Reduce width -->
+        <!-- <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="lessWidth" data-toggle="tooltip" data-placement="top" title="Reduce tree width">
+          <span>Width -</span>
+          <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+        </button> -->
+        <button id="lessWidth" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Less width" data-toggle="tooltip" data-placement="top" title="Reduce tree width">
+          <span>Width -</span>
+          <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+        </button>
+        <!-- Bouton Increase width -->
+        <button id="moreWidth" class="btn btn-sm btn-outline-secondary" type="button" aria-label="More width" data-toggle="tooltip" data-placement="top" title="Increase tree width">
+          <span>Width +</span>
+          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="btn-group" role="group" aria-label="Height buttons">
+        <!-- Bouton Reduce height -->
+        <button id="lessHeigth" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Left Align" data-toggle="tooltip" data-placement="top" title="Reduce tree height">
+          <span>Height -</span>
+          <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+        </button>
+        <!-- Bouton Increase height -->
+        <button id="moreHeigth" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Left Align" data-toggle="tooltip" data-placement="top" title="Increase tree height">
+          <span>Height +</span>
+          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+        </button>
+      </div>
     </div>
     <!-- Bouton Alignement -->
     <!-- <div class="btn-group" role="group" id="alignment-type">
@@ -126,16 +131,20 @@
    -->
 
     <!-- Champs Seuils sup. et inf. -->
-    <div class="input-group">
-      <label for="ps-threshold-low" style="font-size: 12px;">Lower threshold:</label><input type="number" id="ps-threshold-low" min="0.0" step="0.05" placeholder="PS Threshold" value="0.9" style="width: 5em; font-size: 12px;"/>
-      <label for="ps-threshold-high" style="font-size: 12px;">Upper threshold:</label><input type="number" id="ps-threshold-high" min="0.0" step="0.05" placeholder="PS Threshold" value="1.0" style="width: 5em; font-size: 12px;"/>
-    </div>
+    <button class="btn btn-sm btn-outline-secondary">
+      <div class="input-group">
+        <label for="ps-threshold-low">Lower threshold</label><input id="ps-threshold-low" type="number" min="0.0" step="0.05" placeholder="PS Threshold" value="0.9" style="width: 5em;"/>
+      </div>
+      <div class="input-group">
+        <label for="ps-threshold-high">Upper threshold</label><input id="ps-threshold-high" type="number" min="0.0" step="0.05" placeholder="PS Threshold" value="1.0" style="width: 5em;"/>
+      </div>
+    </button>
     <!-- Bouton de chargement des résultats globaux -->
-    <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="reload-global-results" data-toggle="tooltip" data-placement="top" title="Scroll left">
+    <button id="reload-global-results" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Reload global results" data-toggle="tooltip" data-placement="top" title="Reload default results">
       <span>Reload global results</span>
     </button>
-  <!-- </nav> -->
-  </div>
+  <!-- </div> -->
+  </nav>
 
   <div id="navigator-container" style="border:2px solid lightgrey; float: left; overflow-y: hidden; width: 100%; height: 80px;">
     <svg id="svg0"></svg>
