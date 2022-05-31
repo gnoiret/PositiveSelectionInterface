@@ -23,7 +23,7 @@ svgEvents.collapse = function(d) {
    updateLayout(cladeRoot);
 }
 
-svgEvents.doNothing = function(d) {
+svgEvents.showBranchResults = function(d) {
   // if (d.data.clade) {
   //   d.data._clade = d.data.clade;
   //   d.data.clade = null;

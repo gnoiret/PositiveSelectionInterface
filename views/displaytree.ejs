@@ -31,7 +31,7 @@
         On click
       </button>
       <ul class="dropdown-menu" aria-labelledby="action">
-        <li><a id="branchres" class="dropdown-item" href="#">View Branch Results</a></li>
+        <li><a id="branch-res" class="dropdown-item" href="#">View Branch Results</a></li>
         <li><a id="switch" class="dropdown-item" href="#">Switch children</a></li>
         <li><a id="collapse" class="dropdown-item" href="#">Collapse/Expand</a></li>
         <li><a id="subtree" class="dropdown-item" href="#">Sub Tree/Upper Tree</a></li>
@@ -298,7 +298,7 @@ function  main_display() {
 
   // Action associee au click
   // action = svgEvents.switchChildren;
-  action = svgEvents.doNothing;
+  action = svgEvents.showBranchResults;
   var stringAction = myStorage.getItem("action");
   if ((stringAction === null )||(stringAction === undefined)||(stringAction === "undefined")){
     stringAction = 'View Branch Results';
@@ -306,7 +306,7 @@ function  main_display() {
   }
   switch (myStorage.getItem("action")) {
     case 'View Branch Results':
-      action = svgEvents.doNothing;
+      action = svgEvents.showBranchResults;
       break;
     case "Switch children":
       action = svgEvents.switchChildren;
@@ -652,7 +652,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       //   console.log(elt);
       //   return '#FFFFFF';
       // });
-      if (action == svgEvents.doNothing) {
+      if (action == svgEvents.showBranchResults) {
         resultsJSON = JSON.parse(d.data.branch_info.results);
       }
       // console.log(d.data.branch_info.id, resultsText);
@@ -1162,64 +1162,64 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       return 0;
     }
   }
-  function maxStat(results_list) {
-    var currentmax = results_list[0].stat;
-    results_list.forEach(function(res) {
-      if (res.stat > currentmax) {
-        currentmax = res.stat;
-      }
-    });
-    if (currentmax >= 2) {
-      return 2;
-    } else {
-      return currentmax;
-    }
-    return currentmax;
-  }
-  function minStat(results_list) {
-    var currentmin = results_list[0].stat;
-    results_list.forEach(function(res) {
-      if (res.stat < currentmin) {
-        currentmin = res.stat;
-      }
-    });
-    if (currentmin <= 0) {
-      return currentmin;
-    } else {
-      return 0;
-    }
-  }
-  // Définition de l'échelle pour l'axe x
+  // function maxStat(results_list) {
+  //   var currentmax = results_list[0].stat;
+  //   results_list.forEach(function(res) {
+  //     if (res.stat > currentmax) {
+  //       currentmax = res.stat;
+  //     }
+  //   });
+  //   if (currentmax >= 2) {
+  //     return 2;
+  //   } else {
+  //     return currentmax;
+  //   }
+  //   return currentmax;
+  // }
+  // function minStat(results_list) {
+  //   var currentmin = results_list[0].stat;
+  //   results_list.forEach(function(res) {
+  //     if (res.stat < currentmin) {
+  //       currentmin = res.stat;
+  //     }
+  //   });
+  //   if (currentmin <= 0) {
+  //     return currentmin;
+  //   } else {
+  //     return 0;
+  //   }
+  // }
+  // === Définition de l'échelle pour l'axe x ===
   var x = d3.scaleLinear()
     .domain([1, psResultsDataset.length+1])
     .range([0, psGraphWidth]);
-  // Définition de l'échelle pour l'axe y
+  // === Définition de l'échelle pour l'axe y ===
   var y = d3.scaleLinear()
     .domain([0, maxStatJSON(psResultsDataset)])
     .range([psGraphHeight, 0]);
-  // Ajout du graphe des résultats au SVG
+  // === Ajout du graphe des résultats au SVG ===
   var psGraph = svg2.append('g')
     .attr('id', 'ps-graph')
-    .attr('transform', 'translate('+psGraphMargins.left+', '+psGraphMargins.top+')');
-  // Ajout de l'axe x au graphe
+    .attr('transform', 'translate('+(50 + seq_lg)+', '+psGraphMargins.top+')');
+  // === Ajout de l'axe x au graphe ===
   psGraph.append('g')
     .attr('transform', 'translate(0,' + psGraphHeight + ')')
     .call(d3.axisBottom(x).ticks(psResultsDataset.length/5)); // graduations tous les 5 codons / AA
-  // Ajout de l'axe y au graphe
+  // === Ajout de l'axe y au graphe ===
   psGraph.append('g')
     .call(d3.axisLeft(y));
 
-  // Calcul du décalage des sites pour le positionnement des rectangles du graphe
+  // === Calcul du décalage des sites pour le positionnement des rectangles du graphe ===
   // var siteOffset = 1 - psResultsDataset[0].site;
   // var siteOffset = 0;
-  // Association des données aux futurs rectangles
+  // === Association des données aux futurs rectangles ===
   var rects = psGraph
     .selectAll('.ps-rects')
     .data(function() {
       // console.log('big graph: attaching psResultsDataset', psResultsDataset);
       return psResultsDataset;
     });
-  // Affichage des rectangles
+  // === Affichage des rectangles ===
   var i = 0;
   rects.enter()
     .append('rect')
@@ -2001,7 +2001,7 @@ function removesortDuplicates(target_array) {
 // Actions sur les boutons
 // -----------------------
 $('#selectCrossref').on('click', function(event) {
-  selectedCrossref=$( "#selectCrossref option:selected" ).text();
+  selectedCrossref=$( "#selectCrossref option:selected" ).text(); 
   selectedCrossrefURL=crossref[selectedCrossref].url;
   myStorage.setItem("crossref",selectedCrossref);
   updateLayout(cladeRoot);
@@ -2012,7 +2012,7 @@ $('#selectCrossref').ready(function() {
 $('#action').ready(function() {
   switch (myStorage.getItem("action")) {
     case 'View Branch Results':
-      $('#branchres').css('color','#FF0000');
+      $('#branch-res').css('color','#FF0000');
       break;
     case "Switch children":
       $('#switch').css('color','#FF0000');
@@ -2031,8 +2031,8 @@ $('#action').on('click', function(event, dropdownData) {
   myStorage.setItem("action",target.text);
   switch (target.text) {
     case 'View Branch Results':
-      action = svgEvents.doNothing;
-      $('#branchres').css('color','#FF0000');
+      action = svgEvents.showBranchResults;
+      $('#branch-res').css('color','#FF0000');
       $('#switch').css('color','#000000');
       $('#collapse').css('color','#000000');
       $('#subtree').css('color','#000000');
@@ -2040,7 +2040,7 @@ $('#action').on('click', function(event, dropdownData) {
       break;
     case "Switch children":
       action = svgEvents.switchChildren;
-      $('#branchres').css('color','#000000');
+      $('#branch-res').css('color','#000000');
       $('#switch').css('color','#FF0000');
       $('#collapse').css('color','#000000');
       $('#subtree').css('color','#000000');
@@ -2048,7 +2048,7 @@ $('#action').on('click', function(event, dropdownData) {
       break;
     case "Collapse/Expand":
       action = svgEvents.collapse;
-      $('#branchres').css('color','#000000');
+      $('#branch-res').css('color','#000000');
       $('#switch').css('color','#000000');
       $('#collapse').css('color','#FF0000');
       $('#subtree').css('color','#000000');
@@ -2056,7 +2056,7 @@ $('#action').on('click', function(event, dropdownData) {
       break;
     case "Sub Tree/Upper Tree":
       action = svgEvents.focus;
-      $('#branchres').css('color','#000000');
+      $('#branch-res').css('color','#000000');
       $('#switch').css('color','#000000');
       $('#collapse').css('color','#000000');
       $('#subtree').css('color','#FF0000');
@@ -2140,6 +2140,7 @@ $(document).ready(function() {
     moveTooltip(mouseX, mouseY);
     // console.log(document.getElementsByClassName('tooltip')[0]);
     var tooltipElement = document.getElementsByClassName('tooltip')[0];
+    // tooltipElement.innerHTML = getPositiveSitesJSON(JSON.parse(d.data.branch_info.results), psThresholdHigh).length;
     tooltipElement.innerHTML = getPositiveSitesJSON(JSON.parse(d.data.branch_info.results), psThresholdHigh).length;
     // $('.tooltip').html(getPositiveSites(d.data.branch_info.results, psThresholdHigh).length)
     // .css({
