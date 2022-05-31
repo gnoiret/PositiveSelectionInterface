@@ -106,10 +106,10 @@ router.post("/upload_files", upload.fields([
     sitebranch = false;
   }
 
-  console.log('Tree: ' + fname_t + '\n' +
-  'Alignment: ' + fname_a + '\n' +
-  'Results: ' + fname_r + '\n' +
-  'XML: ' + fname_xml);
+  // console.log('Tree: ' + fname_t + '\n' +
+  // 'Alignment: ' + fname_a + '\n' +
+  // 'Results: ' + fname_r + '\n' +
+  // 'XML: ' + fname_xml);
 
   // console.log(req.files);
   // console.log('req.files.length: '+req.files.length);
