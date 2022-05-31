@@ -203,6 +203,7 @@ var div;
 var myStorage = window.localStorage;    // utilisation de localStorage pour consrever les preferences
 var displaySeqType = 'AA';
 var hStepBase = 12;
+var hStep;
 var alignmentLetterSpacing = hStepBase - 10;
 var psThresholdHigh = $('#ps-threshold-high').val() || 1.0;
 var psThresholdLow = $('#ps-threshold-low').val() || 0.3;
@@ -416,7 +417,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // | Début modif : variables pour graphe et séquences           |
   // ==============================================================
   // Ajustement du pas selon le type de séquences affichées
-  var hStep = displaySeqType == 'AA' ? hStepBase : hStepBase*3;
+  hStep = displaySeqType == 'AA' ? hStepBase : hStepBase*3;
   var seqblocks = d3.selectAll('.seqblock');
   // var results = JSON.parse(resultsText);
   // console.log(results);
@@ -617,9 +618,12 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .attr("class", "symbol")
     .on('mouseover', function(d) {
       showTooltip();
-      var myText = getPositiveSitesJSON(d.data.branch_info.results, psThresholdHigh).length;
-      d3.select('.tooltip')
-      .text(myText);
+      if (d.data.branch_info) {
+        var tooltipText = getPositiveSitesJSON(d.data.branch_info.results, psThresholdHigh).length;
+      } else {
+        var tooltipText = '';
+      }
+      d3.select('.tooltip').text(tooltipText);
       // var mouseX = event.clientX;
       // var mouseY = event.clientY;
       // moveTooltip(mouseX, mouseY);
@@ -1053,33 +1057,6 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       // .style('stroke-width', 0+'px')
       ;
   
-  
-  function scrollAlignment(event) {
-    // var alignmentWindow = $('#alignment-container');
-    // var compactWindow = $('#navigator-container');
-
-    // console.log('scrollAlignment:', event.type, 'on', event.currentTarget);
-
-    // Get the site's number (mouse position in pixels) and navigate to this site in the large window
-    // console.log('compactWindow.scrollLeft()', compactWindow.scrollLeft());
-    var siteNumber = event.pageX + compactWindow.scrollLeft();
-    // console.log('Navigating to site', siteNumber);
-    alignmentWindow.scrollLeft(50 + seq_lg + 10 + siteNumber*hStep - alignmentWindow.innerWidth()/2, 0);
-
-    if (event.type === 'mouseup') {
-      // console.log('mouse released', event.currentTarget.id);
-      compactWindow.off('mousemove');
-    }
-  }
-
-  function updateScroll() {
-    // Hack to keep the navigation window visible after a branch change
-    alignmentWindow
-      .scrollLeft(alignmentWindow.scrollLeft()+1)
-      .scrollLeft(alignmentWindow.scrollLeft()-1);
-    console.log('seq_lg', seq_lg);
-  }
-  
   compactWindow.on('mousedown', function(e) {
     // console.log(e.type);
     scrollAlignment(e);
@@ -1485,6 +1462,32 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
 
 // Autres fonctions utilitaires
 // ----------------------------
+
+function scrollAlignment(event) {
+  // var alignmentWindow = $('#alignment-container');
+  // var compactWindow = $('#navigator-container');
+
+  // console.log('scrollAlignment:', event.type, 'on', event.currentTarget);
+
+  // Get the site's number (mouse position in pixels) and navigate to this site in the large window
+  // console.log('compactWindow.scrollLeft()', compactWindow.scrollLeft());
+  var siteNumber = event.pageX + compactWindow.scrollLeft();
+  // console.log('Navigating to site', siteNumber);
+  alignmentWindow.scrollLeft(50 + seq_lg + 10 + siteNumber*hStep - alignmentWindow.innerWidth()/2, 0);
+
+  if (event.type === 'mouseup') {
+    // console.log('mouse released', event.currentTarget.id);
+    compactWindow.off('mousemove');
+  }
+}
+
+function updateScroll() {
+  // Hack to keep the navigation window visible after a branch change
+  alignmentWindow
+    .scrollLeft(alignmentWindow.scrollLeft()+1)
+    .scrollLeft(alignmentWindow.scrollLeft()-1);
+  console.log('seq_lg', seq_lg);
+}
 
 function reloadGlobalResults() {
   resultsJSON = JSON.parse(xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results));
@@ -2133,15 +2136,19 @@ $(document).ready(function() {
   $('.symbol').on('mouseover', function(event) {
     // console.log('mouseover event', event);
     var scrollTop = $(window).scrollTop();
-    console.log('scrollTop', scrollTop);
     var mouseY = event.clientY + scrollTop;
     var mouseX = event.clientX;
-    console.log('mouseX, mouseY', mouseX, mouseY);
+    // console.log('scrollTop', scrollTop);
+    // console.log('mouseX, mouseY', mouseX, mouseY);
     moveTooltip(mouseX, mouseY);
     // console.log(document.getElementsByClassName('tooltip')[0]);
     var tooltipElement = document.getElementsByClassName('tooltip')[0];
     // tooltipElement.innerHTML = getPositiveSitesJSON(JSON.parse(d.data.branch_info.results), psThresholdHigh).length;
-    tooltipElement.innerHTML = getPositiveSitesJSON(JSON.parse(d.data.branch_info.results), psThresholdHigh).length;
+    // if (d != undefined) {
+    //   tooltipElement.innerHTML = getPositiveSitesJSON(JSON.parse(d.data.branch_info.results), psThresholdHigh).length;
+    // } else {
+    //   tooltipElement.innerHTML = '-1';
+    // }
     // $('.tooltip').html(getPositiveSites(d.data.branch_info.results, psThresholdHigh).length)
     // .css({
     //   'z-index': '1',
@@ -2153,9 +2160,9 @@ $(document).ready(function() {
     // })
     // .show();
   });
-  $('#alugnment-container').on('scroll', function (event) {
-    // console.log('scrolling alignment container', event)
-  });
+  // $('#alugnment-container').on('scroll', function (event) {
+  //   // console.log('scrolling alignment container', event)
+  // });
   // $('#collapse-mode span').text(function() {
   //   console.log('collapseMode:', collapseMode);
   //   switch (collapseMode) {
