@@ -357,7 +357,7 @@ def createPhyloXML(fam,newick, resultsFile):
     famspecies = {}
 
     res_colnames = getColnames(args.resultsFile)[1:]
-    print('res_colnames:', res_colnames)
+    # print('res_colnames:', res_colnames)
     colname_index = 0
     for element in clade[0].iter('clade'):
         # print(element.tag)
