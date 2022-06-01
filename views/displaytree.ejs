@@ -175,6 +175,7 @@
 // ----------------------------------------------
 var recTree = <%- arbre %>;
 var pattern = <%- pattern %>;
+var logBranchLength = <%- logBranchLength %>;
 // Variables globales
 // ------------------
 var treeRoot;
@@ -1730,8 +1731,11 @@ function phylo(n) {
   var dist = 0.0;
   if (n && n.data.branch_length != null) {
     var p = n.parent;
-    dist = Math.log(parseFloat(n.data.branch_length)+1.1) + phylo(p);
-    // dist = parseFloat(n.data.branch_length) + phylo(p);
+    if (logBranchLength) {
+      dist = Math.log(parseFloat(n.data.branch_length)+1.1) + phylo(p);
+    } else {
+      dist = parseFloat(n.data.branch_length) + phylo(p);
+    }
     return dist;
   }
   return dist;
