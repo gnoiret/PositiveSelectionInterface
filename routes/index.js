@@ -83,7 +83,7 @@ router.post("/upload_files", upload.fields([
   // }));
   // Date.now() is the current timestamp in milliseconds
   var fname_xml = currentTimestampMs
-    +'-xml-'
+    // +'-xml-'
     + fname_t.split('-')[1]
     + fname_a.split('-')[1]
     + fname_r.split('-')[1]
@@ -96,6 +96,7 @@ router.post("/upload_files", upload.fields([
   const statcol = req.body.statcol;
   const nostat = req.body.nostat;
   var sitebranch = req.body.sitebranch;
+  var logBranchLength = req.body.logBranchLength;
 
   console.log('sitebranch:', sitebranch);
   if (sitebranch != undefined) {
@@ -104,6 +105,14 @@ router.post("/upload_files", upload.fields([
   } else {
     console.log('not sitebranch');
     sitebranch = false;
+  }
+  console.log('logBranchLength:', logBranchLength);
+  if (logBranchLength != undefined) {
+    console.log('logBranchLength');
+    logBranchLength = true;
+  } else {
+    console.log('not logBranchLength');
+    logBranchLength = false;
   }
 
   // console.log('Tree: ' + fname_t + '\n' +
@@ -172,7 +181,7 @@ router.post("/upload_files", upload.fields([
         var JSONtree = JSON.stringify(results);
         var JSONpattern = JSON.stringify("0:homSapCCDS34680"); // Séquence à mettre en valeur
         console.log('Rendering view');
-        res.render('displaytree.ejs', {arbre:JSONtree,pattern:JSONpattern});
+        res.render('displaytree.ejs', {arbre:JSONtree, pattern:JSONpattern, logBranchLength:logBranchLength});
 
         console.log('Deleting XML tree');
         exec('rm'
