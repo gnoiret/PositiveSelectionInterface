@@ -15,6 +15,7 @@ Positional arguments:
 
 import argparse
 import json
+from modulefinder import AddPackagePath
 import sys
 import re
 import random
@@ -152,14 +153,17 @@ def loadAlignment(alignmentFile):
     maxSeqIdLength = 0
     with open(alignmentFile, 'r') as af:
         for line in af:
-            if line[0] == '>': # FASTA header
+            if line[0] == '>': # sequence id
                 seq_id = line.strip('\n')[1:]
                 if len(seq_id) > maxSeqIdLength:
                     maxSeqIdLength = len(seq_id)
                 alignmentDict[seq_id] = ''
             else: # sequence
                 aligned_seq = line.strip('\n')
-                alignmentDict[seq_id] = aligned_seq
+                if len(alignmentDict[seq_id]) == 0:
+                    alignmentDict[seq_id] = aligned_seq
+                else:
+                    alignmentDict[seq_id] += aligned_seq
     return alignmentDict, maxSeqIdLength
 
 
