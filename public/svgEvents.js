@@ -20,21 +20,14 @@ svgEvents.collapse = function(d) {
     d.data._clade = null;
     d.data.nodeinfo = {status : "extended"};
   }
-   updateLayout(cladeRoot);
+  updateLayout(cladeRoot);
 }
 
 svgEvents.showBranchResults = function(d) {
-  // if (d.data.clade) {
-  //   d.data._clade = d.data.clade;
-  //   d.data.clade = null;
-  //   d.data.nodeinfo = {status : "collapsed"};
-  // }
-  // else if (d.data._clade) {
-  //   d.data.clade = d.data._clade;
-  //   d.data._clade = null;
-  //   d.data.nodeinfo = {status : "extended"};
-  // }
-   updateLayout(cladeRoot);
+  if (d.data.branch_info) {
+    resultsShown = d.data.branch_info.branch_results;
+    updateLayout(cladeRoot);
+  }
 }
 
 svgEvents.openall = function(n) {
