@@ -2,29 +2,14 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Affichage des données</title>
-
+  <title>Data visualization</title>
   <script src="d3.js" charset="urf-8"></script>
-
   <%- include('../partials/head') %>
 </head>
 
 <body>
   <nav id="main-nav" class="navbar navbar-default navbar-fixed-top">
-  <!-- <div id="main-nav"></nav> -->
     <%- include('../partials/header') %>
-    <!-- Bouton Action -->
-    <!-- <div class="btn-group" role="group" id="action">
-      <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="Choose action on node">
-        On click
-      </button>
-      <ul class="dropdown-menu">
-        <li><a href="#" id="do-nothing">View Branch Results</a></li>
-        <li><a href="#" id="switch">Switch children</a></li>
-        <li><a href="#" id="collapse">Collapse/Expand</a></li>
-        <li><a href="#" id="subtree">Sub Tree/Upper Tree</a></li>
-      </ul>
-    </div> -->
     <!-- Bouton Action -->
     <div id="action" class="dropdown">
       <button class="btn dropdown-toggle btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Choose action on node">
@@ -41,21 +26,14 @@
     <!-- <button type="button" class="btn btn-default btn-sm" aria-label="Collapse" data-toggle="tooltip" data-placement="top" title="Collapse the tree" id="globalcollapse">
       <span>Compact tree</span>
     </button> -->
-    <!-- Bouton Exapand all -->
-    <!-- <button type="button" class="btn btn-default btn-sm" aria-label="Expand" data-toggle="tooltip" data-placement="top" title="Expand the tree (takes time on big trees!)" id="globalexpand">
-      <span>Expand tree</span>
-    </button>
-    <div class="btn-group" role="group" aria-label="Width buttons"> -->
+    <!-- Bouton Expand -->
     <button id="globalexpand" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Expand" data-toggle="tooltip" data-placement="top" title="Expand the tree (takes time on big trees!)">
       <span>Expand tree</span>
     </button>
     <div class="btn-group" role="group" aria-label="Tree size buttons">
       <div class="btn-group" role="group" aria-label="Width buttons">
         <!-- Bouton Reduce width -->
-        <!-- <button type="button" class="btn btn-default btn-sm" aria-label="Left Align" id="lessWidth" data-toggle="tooltip" data-placement="top" title="Reduce tree width">
-          <span>Width -</span>
-          <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
-        </button> -->
+        </button>
         <button id="lessWidth" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Less width" data-toggle="tooltip" data-placement="top" title="Reduce tree width">
           <span>Width -</span>
           <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
@@ -80,16 +58,6 @@
       </div>
     </div>
     <!-- Bouton Alignement -->
-    <!-- <div class="btn-group" role="group" id="alignment-type">
-      <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="Choose type of alignment">
-        AlignmentNature
-      </button>
-      <ul class="dropdown-menu">
-        <li><a href="#" id="aminoacid">Amino Acids</a></li>
-        <li><a href="#" id="nucleotid">Codons</a></li>
-      </ul>
-    </div> -->
-    <!-- Bouton Alignement -->
     <div id="alignment-type" class="dropdown">
       <button class="btn dropdown-toggle btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Choose alignment type">
         Alignment type
@@ -100,15 +68,6 @@
       </ul>
     </div>
     <!-- Bouton Export -->
-    <!-- <div class="btn-group" role="group" id="export">
-      <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="export figure">
-        Export
-      </button>
-      <ul class="dropdown-menu">
-        <li><a href="#" id="tree">Tree</a></li>
-        <li><a href="#" id="selecp">Alignment</a></li>
-      </ul>
-    </div> -->
     <div id="export" class="dropdown">
       <button class="btn dropdown-toggle btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Choose alignment type">
         Export
@@ -118,17 +77,6 @@
         <li><a id="selecp" class="dropdown-item" href="#">Alignment</a></li>
       </ul>
     </div>
-    <!--
-    <div class="dropdown">
-      <button id="alignment-type" class="btn dropdown-toggle btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Choose alignment type">
-        Alignment type
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="alignment-type">
-        <li><a id="aminoacid" class="dropdown-item" href="#">Amino Acids</a></li>
-        <li><a id="nucleotid" class="dropdown-item" href="#">Codons</a></li>
-      </ul>
-    </div>
-   -->
 
     <!-- Champs Seuils sup. et inf. -->
     <button class="btn btn-sm btn-outline-secondary">
@@ -160,7 +108,6 @@
     <button id="reload-global-results" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Reload global results" data-toggle="tooltip" data-placement="top" title="Reload default results">
       <span>Reload global results</span>
     </button>
-  <!-- </div> -->
   </nav>
 
   <div id="navigator-container" style="border:2px solid lightgrey; float: left; overflow-y: hidden; width: 100%; height: 80px;">
@@ -247,6 +194,7 @@ var leftBoundary;
 var rightBoundary;
 var resultsShown;
 var boundariesOn;
+var nbSites;
 
 if (!isStorageSupported(myStorage)) {
   console.log("window.localStorage problem");
@@ -261,7 +209,7 @@ else {
 function  main_display() {
   // Arbre d'especes (lu dans monarbre.js)
   // var speciesTreeRoot = d3.hierarchy(cladeRootSpecies, function(d) {
-  //   return d.clade;
+    // return d.clade;
   // });
   // Transforme le tableau de [index:sequences] en tableau de tableau de [sequences].
   // a ameliorer, pas tres propre
@@ -413,26 +361,12 @@ function updateLayout(cRoot,firstLoad=0) {
   } else {
     phylogeny_setloss(treeRoot,nodeWidth);
   }
-
   updateSvg(treeRoot,firstLoad);
 }
 
-function hideTooltip() {
-  $('.tooltip').hide();
-}
-function showTooltip() {
-  $('.tooltip').show();
-}
-function writeTooltip(text) {
-  $('.tooltip').text(text);
-}
-// function moveTooltip(x, y) {
-//   console.log('x:', x, 'y:', y);
-//   $('.tooltip').css({
-//     'left':x-42,
-//     'top':y-45
-//   });
-// }
+function hideTooltip() { $('.tooltip').hide(); }
+function showTooltip() { $('.tooltip').show(); }
+function writeTooltip(text) { $('.tooltip').text(text); }
 
 // Fonction principale : mise a jour du svg
 // ----------------------------------------
@@ -440,9 +374,9 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // Suppression de l'ancien affichage de l'alignement et du graphe
   d3.selectAll('#ps-graph, #sequences-container').remove();
 
-  // ==============================================================
-  // | Début modif : variables pour graphe et séquences           |
-  // ==============================================================
+  // ====================================================
+  // | Début modif : variables pour graphe et séquences |
+  // ====================================================
   // Ajustement du pas selon le type de séquences affichées
   hStep = displaySeqType == 'AA' ? hStepBase : hStepBase*3;
   var seqblocks = d3.selectAll('.seqblock');
@@ -468,6 +402,9 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   //   var results = resultsText;
   // } else if (!firstLoad && resultsText) {
   //   var results = resultsText;
+  } else if (!resultsJSON && !sitebranch) {
+    // resultsJSON = ...
+    print('coucou');
   }
   // else {
   //   // console.log('resultsJSON:', resultsJSON);
@@ -656,6 +593,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
           showTooltip();
           if (d.data.branch_info) {
             writeTooltip(getPositiveSitesJSON(d.data.branch_info.results, psThresholdHigh).length);
+            writeTooltip(getPositiveRateJSON(d.data.branch_info.results, psThresholdHigh).length);
           } else {
             writeTooltip('');
           }
@@ -723,14 +661,14 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .select(".gsymbol")
     .attr("transform", function(d) {
       var str = "";
-      // if (d.data.lastEvent && d.data.lastEvent.eventType === "loss") {
-      //   str += "rotate(45)";
-      // }
-      // if (d.data.lastEvent && d.data.lastEvent.eventType === "leaf")  {
+      if (d.data.lastEvent && d.data.lastEvent.eventType === "loss") {
+        str += "rotate(45)";
+      }
+      if (d.data.lastEvent && d.data.lastEvent.eventType === "leaf")  {
         str += "rotate(90)";
-      // } else {
-      //   str += "";
-      // }
+      } else {
+        str += "";
+      }
       return str;
     });
   allNodes
@@ -978,31 +916,48 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // .attr('stroke', '#000000')
   // .attr('stroke-width', '2px');
 
+  // The color of a node depends on the number of positive sites in its branch
   allNodes.attr('fill', function(d) {
     var nbPositive = undefined;
+    var positiveRate;
     // console.log('allNodes', d.data.branch_info);
     if (d.data.branch_info) {
       // console.log('branch_info is defined');
       nbPositive = getPositiveSitesJSON(d.data.branch_info.results, psThresholdHigh).length;
+      // nbSites = JSON.parse(d.data.branch_info.results).length;
+      // console.log(JSON.parse(d.data.branch_info.results));
+      positiveRate = getPositiveRateJSON(d.data.branch_info.results, psThresholdHigh);
+      console.log(nbPositive, positiveRate);
       // console.log(d.data.branch_info.id, d.data.name, nbPositive);
-      if (nbPositive == 0) {
+      // if (nbPositive == 0) {
+      if (positiveRate <= 0.001) {
         // return 'hsl(0, 100%, 100%)';
         return '#00F'; // blue
       }
-      else if (nbPositive < 5) {
-        return '#F99'; // light red
+      // else if (nbPositive < 5) {
+      else if (positiveRate <= 0.005) {
+        // return '#F99'; // light red
+        return 'hsl(0, 100%, 80%)';
       }
-      else if (nbPositive < 10) {
-        return '#F66'; // light red
+      // else if (nbPositive < 10) {
+      else if (positiveRate <= 0.01) {
+        // return '#F66'; // light red
+        return 'hsl(0, 100%, 65%)';
       }
-      else if (nbPositive < 25) {
-        return '#F44'; // red
+      // else if (nbPositive < 25) {
+      else if (positiveRate <= 0.05) {
+        // return '#F44'; // red
+        return 'hsl(0, 100%, 50%)';
       }
-      else if (nbPositive < 100) {
-        return '#F00'; // dark red
+      // else if (nbPositive < 100) {
+      else if (positiveRate <= 0.1) {
+        // return '#F00'; // dark red
+        return 'hsl(0, 100%, 30%)';
       }
-      else if (nbPositive >= 100) {
-        return '#000'; // black
+      // else if (nbPositive >= 100) {
+      else if (positiveRate > 0.1) {
+        // return '#000'; // black
+        return 'hsl(0, 100%, 0%)';
       }
       else if (!nbPositive) {
         return '#FFF'; // white
@@ -1536,6 +1491,32 @@ function reloadGlobalResults() {
   updateLayout(cladeRoot);
 }
 
+// Get the rate of positive sites in a JSON-formatted results list
+function getPositiveRateJSON(textResultsList, upperThreshold) {
+  if (boundariesOn) {
+    ///
+  } else {
+    var jsonResultsList = JSON.parse(textResultsList);
+    // console.log('jsonResultsList', jsonResultsList);
+    // console.log('jsonResultsList[0]', jsonResultsList[0]);
+    // console.log('jsonResultsList[jsonResultsList.length - 1]', jsonResultsList[jsonResultsList.length - 1]);
+    
+    var positiveSites = [];
+    // console.log(resultsList);
+    jsonResultsList.forEach((r, i) => {
+      // console.log('site', i);
+      var site = i;
+      var value = r;
+      // console.log('site:', i, 'value:', r);
+      if (value >= psThresholdHigh) {
+        positiveSites.push(site);
+      }
+    })
+  }
+  // console.log('positive sites:', positiveSites);
+  // console.log(positiveSites.length, 'positive sites');
+  return positiveSites.length/jsonResultsList.length.toFixed(3);
+}
 // Fonction qui renvoie la liste des positions des sites positifs
 function getPositiveSitesJSON(textResultsList, upperThreshold) {
   if (boundariesOn) {
