@@ -223,7 +223,7 @@ var hStepBase = 12;
 var hStep;
 var alignmentLetterSpacing = hStepBase - 10;
 var psThresholdHigh = $('#ps-threshold-high').val() || 1.0;
-var psThresholdLow = $('#ps-threshold-low').val() || 0.3;
+var psThresholdLow = $('#ps-threshold-low').val() || 0.9;
 var psThresholdsChanged = false;
 // var psThresholdHighBgColor = "#FC6565";
 var psThresholdHighBgColor = "#FF0000";
@@ -711,12 +711,12 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     nodeEnter
     .merge(node)
     .attr("transform", function(d) {
-      // if (d.data.lastEvent && d.data.lastEvent.eventType === "loss") {
-      //   return "translate(" + [d.x, d.y] + ")";
-      // }
-      // else {
-        return "translate(" + [d.x, d.y] + ")"; // *i*
-      // }
+      if (d.data.lastEvent && d.data.lastEvent.eventType === "speciation") {
+        return "translate(" + [d.x, d.y] + ")";
+      }
+      else {
+        return "translate(" + [d.x + 4, d.y] + ")";
+      }
     })
     .on("click",action);
   allNodes
@@ -1798,14 +1798,14 @@ function phylogeny(treeRoot,offset) {
 
 // Fonction qui decale la position x d'un "loss"
 // ---------------------------------------------
-function phylogeny_setloss(treeRoot,offset) {
+// function phylogeny_setloss(treeRoot,offset) {
   // treeRoot.each(function (d) {
   //   if (d.data.lastEvent && d.data.lastEvent.eventType === "loss") {
   //    var lospar = d.parent;
   //    d.x = (d.x+lospar.x)/2
   //   }
   // });
-}
+// }
 
 // Fonction ajoute nb sequences et especes
 // ---------------------------------------
@@ -1868,7 +1868,7 @@ function getSpec (noeud) {
   else {
     var specs = [];
     var fils = noeud.children;
-      fils.forEach(function (d, i ){
+      fils.forEach(function (d, i){
         var spec = getSpec(d);
         var tmp = specs.concat(spec);
         specs = tmp;
