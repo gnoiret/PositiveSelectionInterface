@@ -133,12 +133,27 @@
     <!-- Champs Seuils sup. et inf. -->
     <button class="btn btn-sm btn-outline-secondary">
       <div class="input-group">
-        <label for="ps-threshold-low">Lower threshold</label><input id="ps-threshold-low" type="number" min="0.0" step="0.05" placeholder="PS Threshold" value="0.9" style="width: 5em;"/>
+        <label for="ps-threshold-low">Lower threshold</label>
+        <input id="ps-threshold-low" type="number" min="0.0" step="0.05" placeholder="PS Threshold" value="0.9" style="width: 5em;"/>
       </div>
     </button>
     <button class="btn btn-sm btn-outline-secondary">
       <div class="input-group">
-        <label for="ps-threshold-high">Upper threshold</label><input id="ps-threshold-high" type="number" min="0.0" step="0.05" placeholder="PS Threshold" value="1.0" style="width: 5em;"/>
+        <label for="ps-threshold-high">Upper threshold</label>
+        <input id="ps-threshold-high" type="number" min="0.0" step="0.05" placeholder="PS Threshold" value="1.0" style="width: 5em;"/>
+      </div>
+    </button>
+    <!-- Champs Borne gauche et droite -->
+    <button class="btn btn-sm btn-outline-secondary">
+      <div class="input-group">
+        <label for="left-boundary">Left boundary</label>
+        <input id="left-boundary" type="number" step="1" placeholder="PS Threshold" value="0" style="width: 5em;"/>
+      </div>
+    </button>
+    <button class="btn btn-sm btn-outline-secondary">
+      <div class="input-group">
+        <label for="right-boundary">Right boundary</label>
+        <input id="right-boundary" type="number" step="1" placeholder="PS Threshold" value="102" style="width: 5em;"/>
       </div>
     </button>
     <!-- Bouton de chargement des résultats globaux -->
@@ -208,6 +223,7 @@ var hStep;
 var alignmentLetterSpacing = hStepBase - 10;
 var psThresholdHigh = $('#ps-threshold-high').val() || 1.0;
 var psThresholdLow = $('#ps-threshold-low').val() || 0.3;
+var psThresholdsChanged = false;
 // var psThresholdHighBgColor = "#FC6565";
 var psThresholdHighBgColor = "#FF0000";
 var psThresholdLowBgColor = "#FFFF00";
@@ -216,7 +232,6 @@ var psThresholdLowBgColor = "#FFFF00";
 var psBelowThresholdBgColor = "#DDDDDD";
 // var psBelowThresholdBgColor = "#FFFFFF";
 var psMissingBgColor = "#FFFFFF";
-var psThresholdsChanged = false;
 var seq_lg = xmlparser.flatTree(recTree.phyloxml.phylogeny.maxSeqIdLength)*10;
 // var resultsText = xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results);
 var resultsText = '';
@@ -225,6 +240,10 @@ var navWindowColor = '#000000';
 var alignmentWindow = $('#alignment-container');
 var compactWindow = $('#navigator-container');
 var resultsJSON = null;
+// var x;
+// var y;
+var leftBoundary;
+var rightBoundary;
 
 if (!isStorageSupported(myStorage)) {
   console.log("window.localStorage problem");
@@ -401,12 +420,16 @@ function hideTooltip() {
 function showTooltip() {
   $('.tooltip').show();
 }
-function moveTooltip(x, y) {
-  $('.tooltip').css({
-    'left':x-42,
-    'top':y-45
-  });
+function writeTooltip(text) {
+  $('.tooltip').text(text);
 }
+// function moveTooltip(x, y) {
+//   console.log('x:', x, 'y:', y);
+//   $('.tooltip').css({
+//     'left':x-42,
+//     'top':y-45
+//   });
+// }
 
 // Fonction principale : mise a jour du svg
 // ----------------------------------------
@@ -620,64 +643,51 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .on('mouseover', function(d) {
       showTooltip();
       if (d.data.branch_info) {
-        var tooltipText = getPositiveSitesJSON(d.data.branch_info.results, psThresholdHigh).length;
+        writeTooltip(getPositiveSitesJSON(d.data.branch_info.results, psThresholdHigh).length);
       } else {
-        var tooltipText = '';
+        writeTooltip('');
       }
-      d3.select('.tooltip').text(tooltipText);
-      // var mouseX = event.clientX;
-      // var mouseY = event.clientY;
-      // moveTooltip(mouseX, mouseY);
-      // $('.tooltip').html(getPositiveSites(d.data.branch_info.results, psThresholdHigh).length).show();
-      
-      // console.log('d', d);
-      // console.log(coords);
-      // console.log('mouseover d:', d);
-      // console.log('mouseover node');
-      // mouseover on a node
-      // goal: display the number of positive sites
-      // console.log(getPositiveSites(d.data.branch_info.results, psThresholdHigh).length, 'positive sites');
     })
     .on('mouseout', function() {
       hideTooltip();
     })
-    .on("click", function(d) {
-      // console.log('click node');
-      // if (d.data.lastEvent.crossref) {
-      //   // Si la balise crossref est presente on fait un lien vers l'url
-      //   // qui requete l'identifiant dans la base de donnees selectionnee
-      //   var cross=d.data.lastEvent.crossref;
-      //   if (selectedCrossref !== null) {
-      //     name = cross[selectedCrossref];
-      //     url = selectedCrossrefURL.replace("IDENTIFIANT",name);
-      //   }
-      //   window.open(url);
-      // }
-      // d3.select(this).attr('fill', function(elt) {
-      //   console.log(elt);
-      //   return '#FFFFFF';
-      // });
+    .on('click', function(d) {
+      if (d.data.lastEvent.crossref) {
+        // Si la balise crossref est presente on fait un lien vers l'url
+        // qui requete l'identifiant dans la base de donnees selectionnee
+        var cross=d.data.lastEvent.crossref;
+        if (selectedCrossref !== null) {
+          name = cross[selectedCrossref];
+          url = selectedCrossrefURL.replace("IDENTIFIANT",name);
+        }
+        window.open(url);
+      }
+      d3.select(this)
+        .attr('fill', function(elt) {
+          console.log(elt);
+          return '#FFF';
+        })
+        .attr('stroke', '#000')
+        .attr('stroke-width', '2');
       if (action == svgEvents.showBranchResults) {
         resultsJSON = JSON.parse(d.data.branch_info.results);
       }
-      // console.log(d.data.branch_info.id, resultsText);
-      // updateSvg(treeRoot, firstLoad, d.data.branch_info.results);
       updateLayout(treeRoot, firstLoad);
     });
   nodeEnter
     .append("text")
     .attr("class", "label")
     .on("click", function(d) {
-      // if (d.data.lastEvent.crossref) {
-      //   // Si la balise crossref est presente on fait un lien vers l'url
-      //   // qui requete l'identifiant dans la base de donnees selectionnee
-      //   var cross=d.data.lastEvent.crossref;
-      //   if (selectedCrossref !== null) {
-      //     name = cross[selectedCrossref];
-      //     url = selectedCrossrefURL.replace("IDENTIFIANT",name);
-      //   }
-      //   window.open(url);
-      // }
+      if (d.data.lastEvent.crossref) {
+        // Si la balise crossref est presente on fait un lien vers l'url
+        // qui requete l'identifiant dans la base de donnees selectionnee
+        var cross=d.data.lastEvent.crossref;
+        if (selectedCrossref !== null) {
+          name = cross[selectedCrossref];
+          url = selectedCrossrefURL.replace("IDENTIFIANT",name);
+        }
+        window.open(url);
+      }
       // console.log(d.data.branch_info.id, d.data.branch_info.results);
     });
   nodeEnter
@@ -752,48 +762,52 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     //   })
     .attr("d", function(d) { //Type de symbol
        // Verification si le noeud est collapse
-      if (d.data.nodeinfo) {
+      if (d.data.nodeinfo && d.data.lastEvent) {
           if (d.data.nodeinfo.status === "collapsed") {
             return symbol.type(d3.symbolCircle)()
           }
       }
-      switch (d.data.lastEvent.eventType) {
-        case "monophyletic":          // cas ou le noeud monophyletic n'est pas pas collapse
-          return symbol.type(d3[configLayout.symbols.speciation])()
-          break;
-        case "speciation":
-          return symbol.type(d3[configLayout.symbols.speciation])()
-          break;
-        case "speciationOutLoss":
-          return symbol.type(d3[configLayout.symbols.speciationOutLoss])()
-          break;
-        case "branchingOut":
-          return symbol.type(d3[configLayout.symbols.branchingOut])()
-          break;
-        case "speciationOut":
-          return symbol.type(d3[configLayout.symbols.speciationOut])()
-          break;
-        case "bifurcationOut":
-          return symbol.type(d3[configLayout.symbols.bifurcationOut])()
-          break;
-        case "transferBack":
-          return symbol.type(d3[configLayout.symbols.transferBack])()
-          break;
-        case "duplication":
-          return symbol.type(d3[configLayout.symbols.duplication])()
-          break;
-        case "speciationLoss":
-          return symbol.type(d3[configLayout.symbols.speciationLoss])()
-          break;
-        case "leaf":
-          return symbol.type(d3.symbolTriangle)()
-          break;
-        case "loss":
-          return symbol.type(d3.symbolCross)()
-          break;
-        default:
-          return symbol.type(d3.symbolCross)()
-          break;
+      if (d.data.lastEvent) {
+        switch (d.data.lastEvent.eventType) {
+          case "monophyletic":          // cas ou le noeud monophyletic n'est pas pas collapse
+            return symbol.type(d3[configLayout.symbols.speciation])();
+            break;
+          case "speciation":
+            return symbol.type(d3[configLayout.symbols.speciation])();
+            break;
+          case "speciationOutLoss":
+            return symbol.type(d3[configLayout.symbols.speciationOutLoss])();
+            break;
+          case "branchingOut":
+            return symbol.type(d3[configLayout.symbols.branchingOut])();
+            break;
+          case "speciationOut":
+            return symbol.type(d3[configLayout.symbols.speciationOut])();
+            break;
+          case "bifurcationOut":
+            return symbol.type(d3[configLayout.symbols.bifurcationOut])();
+            break;
+          case "transferBack":
+            return symbol.type(d3[configLayout.symbols.transferBack])();
+            break;
+          case "duplication":
+            return symbol.type(d3[configLayout.symbols.duplication])();
+            break;
+          case "speciationLoss":
+            return symbol.type(d3[configLayout.symbols.speciationLoss])();
+            break;
+          case "leaf":
+            return symbol.type(d3.symbolTriangle)();
+            break;
+          case "loss":
+            return symbol.type(d3.symbolCross)();
+            break;
+          default:
+            return symbol.type(d3.symbolCross)();
+            break;
+        }
+      } else {
+        return symbol.type(d3.symbolCross)();
       }
     })
     // .attr("stroke-width", "0px")
@@ -874,15 +888,15 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
           name = ">>>>"+name+"<<<<";
         }
       }
-      if (options.includes("species")&& d.data.lastEvent.eventType === "leaf") {
-        // name += " " + d.data.lastEvent.speciesLocation.replace("(INTERNAL)","") ;
-      }
-      if (options.includes("species")&& d.data.lastEvent.eventType === "monophyletic") {
-        // name += " " + d.data.lastEvent.speciesLocation.replace("(INTERNAL)","") ;
-      }
-      if (d.data.lastEvent.destinationSpecies) {
-        name += " ( -> " + d.data.lastEvent.destinationSpecies + ")";
-      }
+      // if (options.includes("species")&& d.data.lastEvent.eventType === "leaf") {
+      //   name += " " + d.data.lastEvent.speciesLocation.replace("(INTERNAL)","") ;
+      // }
+      // if (options.includes("species")&& d.data.lastEvent.eventType === "monophyletic") {
+      //   name += " " + d.data.lastEvent.speciesLocation.replace("(INTERNAL)","") ;
+      // }
+      // if (d.data.lastEvent.destinationSpecies) {
+      //   name += " ( -> " + d.data.lastEvent.destinationSpecies + ")";
+      // }
       return name;
     })
     .style("fill",function (d) {
@@ -903,21 +917,21 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       }
       else return "none";
     });
-  // allNodes
-  //   .select(".internal")
-  //   .transition()
-  //   .attr("y", 11)
-  //   .attr("x", -10)
-  //   .style("text-anchor","end")
-  //   .text(function(d) {
-  //     var name = "";
-  //     if (options.includes("intname")) {
-  //       if (d.data.confidence) {
-  //         var name = d.data.confidence._text;
-  //       }
-  //     }
-  //     return name
-  //   });
+  allNodes
+    .select(".internal")
+    .transition()
+    .attr("y", 11)
+    .attr("x", -10)
+    .style("text-anchor","end")
+    .text(function(d) {
+      var name = "";
+      if (options.includes("intname")) {
+        if (d.data.confidence) {
+          var name = d.data.confidence._text;
+        }
+      }
+      return name
+    });
   
   
   
@@ -1225,7 +1239,13 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         }
       })
       .style('stroke', '#000000')
-      .style('stroke-width', 0+'px');
+      .style('stroke-width', 0+'px')
+      .on('mouseover', function(d) {
+        console.log(d);
+        writeTooltip(d);
+        showTooltip();
+      })
+      .on('mouseout', hideTooltip);
   
   // Ajout du seuil supérieur au graphe
   psGraph.append('line')
@@ -1732,7 +1752,7 @@ function phylo(n) {
   if (n && n.data.branch_length != null) {
     var p = n.parent;
     if (logBranchLength) {
-      dist = Math.log(parseFloat(n.data.branch_length)+1.1) + phylo(p);
+      dist = Math.log(parseFloat(n.data.branch_length)+1.15) + phylo(p);
     } else {
       dist = parseFloat(n.data.branch_length) + phylo(p);
     }
@@ -1932,8 +1952,8 @@ function collapseVeryBigTree(treeRoot,patterns) {
     }
   });
 }
-// Fonction  suppression d'un element unique dans un tableau
-// ----------------------------------------------------------
+// Fonction de suppression d'un element unique dans un tableau
+// -----------------------------------------------------------
 function removeSingle(target_array) {
   target_array.sort();
   var i = 0;
@@ -1947,8 +1967,8 @@ function removeSingle(target_array) {
   }
   return target_array;
 }
-// Fonction  suppression des  elements multiples dans un tableau
-// --------------------------------------------------------------
+// Fonction de suppression des  elements multiples dans un tableau
+// ---------------------------------------------------------------
 function removeDuplicates(target_array) {
   target_array.sort();
   var i = 0;
@@ -2126,7 +2146,7 @@ $('#export').on('click', function(event, dropdownData) {
         'font-family':'Courier',
       });
       $('.seqblock g text').css({
-        'letter-spacing':(alignmentLetterSpacing)+'px',
+        'letter-spacing': (alignmentLetterSpacing)+'px',
         'font-size': '16.667px',
       });
       break;
@@ -2136,34 +2156,47 @@ $('#export').on('click', function(event, dropdownData) {
 
 // Actions à la fin du chargement de la page
 $(document).ready(function() {
-  $('button#reload-global-results').click(reloadGlobalResults);
-  $('.symbol').on('mouseover', function(event) {
-    // console.log('mouseover event', event);
-    var scrollTop = $(window).scrollTop();
-    var mouseY = event.clientY + scrollTop;
-    var mouseX = event.clientX;
-    // console.log('scrollTop', scrollTop);
-    // console.log('mouseX, mouseY', mouseX, mouseY);
-    moveTooltip(mouseX, mouseY);
-    // console.log(document.getElementsByClassName('tooltip')[0]);
-    var tooltipElement = document.getElementsByClassName('tooltip')[0];
-    // tooltipElement.innerHTML = getPositiveSitesJSON(JSON.parse(d.data.branch_info.results), psThresholdHigh).length;
-    // if (d != undefined) {
-    //   tooltipElement.innerHTML = getPositiveSitesJSON(JSON.parse(d.data.branch_info.results), psThresholdHigh).length;
-    // } else {
-    //   tooltipElement.innerHTML = '-1';
-    // }
-    // $('.tooltip').html(getPositiveSites(d.data.branch_info.results, psThresholdHigh).length)
-    // .css({
-    //   'z-index': '1',
-    //   'background':'#FFFFFF',
-    //   'width':'100px',
-    //   'height':'100px',
-    //   'top':'500px',
-    //   'left':'500px'
-    // })
-    // .show();
+  // Gestion de la modification des seuils
+  $('#left-boundary, #right-boundary').on('change', function(event) {
+    // On a modifié un des seuils
+    // Correction des valeurs en présence d'incohérences
+    var psHighVal = parseFloat($('#ps-threshold-high').val());
+    var psLowVal = parseFloat($('#ps-threshold-low').val());
+    // console.log('Thresholds:', psHighVal, '>=', psLowVal);
+    if (psHighVal < psLowVal) {
+      if (event.currentTarget.id == 'ps-threshold-high') {
+        // On a descendu le seuil supérieur plus bas que le seuil inférieur
+        // ex : psHighVal = 0.95 | psLowVal = 1.0
+        // On veut donc redecsendre le seuil inférieur en conséquence
+        $('#ps-threshold-low').val(psHighVal);
+        psLowVal = psHighVal;
+      } else {
+        // On a monté le seuil inférieur plus haut que le seuil supérieur
+        // ex : psHighVal = 1.0 | psLowVal = 1.05
+        // On veut donc remonter le seuil supérieur en conséquence
+        $('#ps-threshold-high').val(psLowVal);
+        psHighVal = psLowVal;
+      }
+    }
+    // Réaffectation des variables globales
+    psThresholdHigh = psHighVal;
+    psThresholdLow = psLowVal;
+    // console.log('>> ', psThresholdHigh, '>=', psThresholdLow);
   });
+});
+
+  hideTooltip();
+  // var tooltips = document.querySelectorAll('.tooltip span');
+  var tooltips = document.querySelectorAll('.tooltip');
+  window.onmousemove = function (e) {
+      var x = (e.clientX + 20) + 'px';
+      var y = (e.clientY + 20 + window.scrollY) + 'px';
+      for (var i = 0; i < tooltips.length; i++) {
+          tooltips[i].style.top = y;
+          tooltips[i].style.left = x;
+      }
+  };
+  $('button#reload-global-results').click(reloadGlobalResults);
   // $('#alugnment-container').on('scroll', function (event) {
   //   // console.log('scrolling alignment container', event)
   // });
@@ -2276,7 +2309,7 @@ $(document).ready(function() {
   // Gestion de la modification des seuils
   $('#ps-threshold-high, #ps-threshold-low').on('change', function(event) {
     // On a modifié un des seuils
-    psThresholdsChanged = true;
+    // psThresholdsChanged = true;
     // Correction des valeurs en présence d'incohérences
     var psHighVal = parseFloat($('#ps-threshold-high').val());
     var psLowVal = parseFloat($('#ps-threshold-low').val());
@@ -2300,11 +2333,11 @@ $(document).ready(function() {
     psThresholdHigh = psHighVal;
     psThresholdLow = psLowVal;
     // console.log('>> ', psThresholdHigh, '>=', psThresholdLow);
-    if (psThresholdsChanged) {
-      // console.log('Updating... (lower = '+psThresholdLow+' ; upper = '+psThresholdHigh+')');
-      updateLayout(cladeRoot);
-      psThresholdsChanged = false;
-    }
+    // if (psThresholdsChanged) {
+    //   // console.log('Updating... (lower = '+psThresholdLow+' ; upper = '+psThresholdHigh+')');
+    //   updateLayout(cladeRoot);
+    //   psThresholdsChanged = false;
+    // }
   });
 });
 </script>
