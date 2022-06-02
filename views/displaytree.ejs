@@ -190,6 +190,7 @@
 // ----------------------------------------------
 var recTree = <%- arbre %>;
 var pattern = <%- pattern %>;
+var sitebranch = <%- sitebranch %>;
 var logBranchLength = <%- logBranchLength %>;
 // Variables globales
 // ------------------
@@ -234,7 +235,7 @@ var psBelowThresholdBgColor = "#DDDDDD";
 var psMissingBgColor = "#FFFFFF";
 var seq_lg = xmlparser.flatTree(recTree.phyloxml.phylogeny.maxSeqIdLength)*10;
 // var resultsText = xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results);
-var resultsText = '';
+// var resultsText = '';
 var collapseMode = 'collapseOff';
 var navWindowColor = '#000000';
 var alignmentWindow = $('#alignment-container');
@@ -244,6 +245,8 @@ var resultsJSON = null;
 // var y;
 var leftBoundary;
 var rightBoundary;
+var resultsShown;
+var boundariesOn;
 
 if (!isStorageSupported(myStorage)) {
   console.log("window.localStorage problem");
@@ -448,20 +451,29 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // var results = resultsText;
   // console.log('firstLoad:', firstLoad);
   // console.log('results:', results);
-  if (!resultsJSON) {
+  if (!resultsJSON && sitebranch) {
+    resultsJSON = JSON.parse(xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results));
+    resultsJSON = new Array(resultsJSON.length).fill(-1);
+    showTooltip();
+    writeTooltip('Please click on a node to display branch data');
+    // var fakeResults = resultsJSON.forEach(function (i) {
+    //   console.log(i);
+    //   return 0;
+    // });
+    // resultsJSON = fakeResults;
     // console.log('!resultsJSON', resultsJSON);
     // console.log('global results:', xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results));
-    resultsJSON = JSON.parse(xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results));
     // console.log('global results JSON:', resultsJSON);
   // } else if (firstLoad && resultsText) {
   //   var results = resultsText;
   // } else if (!firstLoad && resultsText) {
   //   var results = resultsText;
-  } else {
-    // console.log('resultsJSON:', resultsJSON);
-    // resultsJSON = JSON.parse(resultsText);
-    resultsJSON = resultsJSON;
   }
+  // else {
+  //   // console.log('resultsJSON:', resultsJSON);
+  //   // resultsJSON = JSON.parse(resultsText);
+  //   resultsJSON = resultsJSON;
+  // }
   // var results = xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results);
 
   // console.log('resultsJSON', resultsJSON);
@@ -637,48 +649,49 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .attr("class", "node");
   nodeEnter
     .append("g")
-    .attr("class", "gsymbol")
-    .append("path")
-    .attr("class", "symbol")
-    .on('mouseover', function(d) {
-      showTooltip();
-      if (d.data.branch_info) {
-        writeTooltip(getPositiveSitesJSON(d.data.branch_info.results, psThresholdHigh).length);
-      } else {
-        writeTooltip('');
-      }
-    })
-    .on('mouseout', function() {
-      hideTooltip();
-    })
-    .on('click', function(d) {
-      if (d.data.lastEvent.crossref) {
-        // Si la balise crossref est presente on fait un lien vers l'url
-        // qui requete l'identifiant dans la base de donnees selectionnee
-        var cross=d.data.lastEvent.crossref;
-        if (selectedCrossref !== null) {
-          name = cross[selectedCrossref];
-          url = selectedCrossrefURL.replace("IDENTIFIANT",name);
-        }
-        window.open(url);
-      }
-      d3.select(this)
-        .attr('fill', function(elt) {
-          console.log(elt);
-          return '#FFF';
+      .attr("class", "gsymbol")
+      .append("path")
+        .attr("class", "symbol")
+        .on('mouseover', function(d) {
+          showTooltip();
+          if (d.data.branch_info) {
+            writeTooltip(getPositiveSitesJSON(d.data.branch_info.results, psThresholdHigh).length);
+          } else {
+            writeTooltip('');
+          }
         })
-        .attr('stroke', '#000')
-        .attr('stroke-width', '2');
-      if (action == svgEvents.showBranchResults) {
-        resultsJSON = JSON.parse(d.data.branch_info.results);
-      }
-      updateLayout(treeRoot, firstLoad);
-    });
+        .on('mouseout', function() {
+          hideTooltip();
+        })
+        .on('click', function(d) {
+          console.log('nodeEnter g.gsymbol path.symbol clicked');
+          if (d.data.lastEvent && d.data.lastEvent.crossref) {
+            // Si la balise crossref est presente on fait un lien vers l'url
+            // qui requete l'identifiant dans la base de donnees selectionnee
+            var cross=d.data.lastEvent.crossref;
+            if (selectedCrossref !== null) {
+              name = cross[selectedCrossref];
+              url = selectedCrossrefURL.replace("IDENTIFIANT",name);
+            }
+            window.open(url);
+          }
+          d3.select(this)
+            .attr('fill', function(elt) {
+              console.log(elt);
+              return '#FFF';
+            })
+            .attr('stroke', '#000')
+            .attr('stroke-width', '2');
+          if (action == svgEvents.showBranchResults) {
+            resultsJSON = JSON.parse(d.data.branch_info.results);
+          }
+          updateLayout(treeRoot, firstLoad);
+        });
   nodeEnter
     .append("text")
     .attr("class", "label")
     .on("click", function(d) {
-      if (d.data.lastEvent.crossref) {
+      if (d.data.lastEvent && d.data.lastEvent.crossref) {
         // Si la balise crossref est presente on fait un lien vers l'url
         // qui requete l'identifiant dans la base de donnees selectionnee
         var cross=d.data.lastEvent.crossref;
@@ -698,7 +711,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     nodeEnter
     .merge(node)
     .attr("transform", function(d) {
-      // if (d.data.lastEvent.eventType === "loss") {
+      // if (d.data.lastEvent && d.data.lastEvent.eventType === "loss") {
       //   return "translate(" + [d.x, d.y] + ")";
       // }
       // else {
@@ -710,10 +723,10 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .select(".gsymbol")
     .attr("transform", function(d) {
       var str = "";
-      // if (d.data.lastEvent.eventType === "loss") {
+      // if (d.data.lastEvent && d.data.lastEvent.eventType === "loss") {
       //   str += "rotate(45)";
       // }
-      // if (d.data.lastEvent.eventType === "leaf")  {
+      // if (d.data.lastEvent && d.data.lastEvent.eventType === "leaf")  {
         str += "rotate(90)";
       // } else {
       //   str += "";
@@ -875,7 +888,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         }
       }
       if (d.data.name && options.includes("name") && d.data.lastEvent.eventType === "leaf") {
-        if (d.data.lastEvent.crossref) {
+        if (d.data.lastEvent && d.data.lastEvent.crossref) {
           var cross=d.data.lastEvent.crossref;
           if (selectedCrossref !== null) {
             name += cross[selectedCrossref];
@@ -884,7 +897,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         else {
           name += (d.data.name || d.data.lastEvent.geneName);
         }
-        if (d.data.lastEvent.pattern !==undefined) {
+        if (d.data.lastEvent && d.data.lastEvent.pattern !==undefined) {
           name = ">>>>"+name+"<<<<";
         }
       }
@@ -894,7 +907,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       // if (options.includes("species")&& d.data.lastEvent.eventType === "monophyletic") {
       //   name += " " + d.data.lastEvent.speciesLocation.replace("(INTERNAL)","") ;
       // }
-      // if (d.data.lastEvent.destinationSpecies) {
+      // if (d.data.lastEvent && d.data.lastEvent.destinationSpecies) {
       //   name += " ( -> " + d.data.lastEvent.destinationSpecies + ")";
       // }
       return name;
@@ -911,7 +924,11 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .style("font-size","12px")
     .style("font-weight","bold")
     .style("text-decoration",function (d) {
-      var pa = d.data.lastEvent.pattern;
+      if (d.data.lastEvent) {
+        var pa = d.data.lastEvent.pattern;
+      } else {
+        var pa = undefined;
+      }
       if (pa != undefined) {
         return "wavy underline overline";
       }
@@ -970,26 +987,28 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       // console.log(d.data.branch_info.id, d.data.name, nbPositive);
       if (nbPositive == 0) {
         // return 'hsl(0, 100%, 100%)';
-        return '#0000FF'; // blue
+        return '#00F'; // blue
       }
       else if (nbPositive < 5) {
-        return 'hsl(0, 100%, 80%)'; // light red
-        // return '#0000FF';
+        return '#F99'; // light red
       }
       else if (nbPositive < 10) {
-        return 'hsl(0, 100%, 65%)'; // light red
-        // return '#0000FF';
+        return '#F66'; // light red
       }
       else if (nbPositive < 25) {
-        return 'hsl(0, 100%, 50%)'; // red
-        // return '#0000FF';
+        return '#F44'; // red
       }
       else if (nbPositive < 100) {
-        return 'hsl(0, 100%, 35%)'; // dark red
-        // return '#0000FF';
+        return '#F00'; // dark red
+      }
+      else if (nbPositive >= 100) {
+        return '#000'; // black
+      }
+      else if (!nbPositive) {
+        return '#FFF'; // white
       }
       else {
-        return 'hsl(0, 100%, 0%)';
+        return '#FF0'; // yellow
         // return '#FF0000';
       }
     }
@@ -1064,6 +1083,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         } else if (d >= 0) {
           return psBelowThresholdBgColor;
         } else {
+          console.log(d);
           return psMissingBgColor;
         }
         // return 'transparent';
@@ -1283,19 +1303,19 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // ==============================
   seq_dataset = [];
   var leaves_sequences = leaves.filter(function(d) {return(d.data.lastEvent.dnaAlign)});
-  leaves_sequences.forEach (function (d,i) {
-    var leaf_name = d.data.lastEvent.name;
-    var dna_sequence = d.data.lastEvent.dnaAlign;
-    var aa_sequence = d.data.lastEvent.aaAlign;
-    var lengthmax=d.data.lastEvent.lengthMax;
-    var locnode = {
-      name:d.data.name,
-      y:d.y,
-      dna:d.data.lastEvent.dnaAlign,
-      aa:d.data.lastEvent.aaAlign,
-    };
-    seq_dataset.push(locnode);
-  });
+    leaves_sequences.forEach (function (d,i) {
+      var leaf_name = d.data.lastEvent.name;
+      var dna_sequence = d.data.lastEvent.dnaAlign;
+      var aa_sequence = d.data.lastEvent.aaAlign;
+      var lengthmax=d.data.lastEvent.lengthMax;
+      var locnode = {
+        name:d.data.name,
+        y:d.y,
+        dna:d.data.lastEvent.dnaAlign,
+        aa:d.data.lastEvent.aaAlign,
+      };
+      seq_dataset.push(locnode);
+    });
   var seqDiv = d3.select('#svg2')
     .append('g')
     .attr('id', 'sequences-container')
@@ -1348,12 +1368,13 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
 
   // Alignement : ajout des rectangles (version séquence entière)
   var aaSequence = d3.select('.aa-sequence');
-  var nucSequence = d3.select('.dna-sequence');
+  var dnaSequence = d3.select('.dna-sequence');
   // console.log('First site ID', psResultsDataset[0].site);
+  var targetSequence = displaySeqType == 'AA' ? aaSequence : dnaSequence;
   for (i = 0; i < psResultsDataset.length; i ++) {
-    if (displaySeqType == 'AA') {
+    // if (displaySeqType == 'AA') {
       // Ajout d'un rectangle coloré par AA
-      aaSequence.append('rect')
+      targetSequence.append('rect')
         .attr('x', function(d) {return i*hStep;})
         .attr('width', hStep)
         .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
@@ -1369,25 +1390,25 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
             return psMissingBgColor;
           }
         });
-    } else {
-      // Ajout d'un rectangle coloré par codon
-      nucSequence.append('rect')
-        .attr('x', function(d) {return i*hStep;})
-        .attr('width', hStep)
-        .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
-        .attr('height', maxYSeq - minYSeq + hStepBase*2)
-        .style('fill', () => {
-          if (psResultsDataset[i] >= psThresholdHigh) {
-            return psThresholdHighBgColor;
-          } else if (psResultsDataset[i] >= psThresholdLow) {
-            return psThresholdLowBgColor;
-          } else if (psResultsDataset[i] >= 0) {
-            return psBelowThresholdBgColor;
-          } else {
-            return psMissingBgColor;
-          }
-        });
-    }
+    // } else {
+    //   // Ajout d'un rectangle coloré par codon
+    //   dnaSequence.append('rect')
+    //     .attr('x', function(d) {return i*hStep;})
+    //     .attr('width', hStep)
+    //     .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
+    //     .attr('height', maxYSeq - minYSeq + hStepBase*2)
+    //     .style('fill', () => {
+    //       if (psResultsDataset[i] >= psThresholdHigh) {
+    //         return psThresholdHighBgColor;
+    //       } else if (psResultsDataset[i] >= psThresholdLow) {
+    //         return psThresholdLowBgColor;
+    //       } else if (psResultsDataset[i] >= 0) {
+    //         return psBelowThresholdBgColor;
+    //       } else {
+    //         return psMissingBgColor;
+    //       }
+    //     });
+    // }
   }
   // for (i = psResultsDataset[0].site; i < psResultsDataset.length; i ++) {
   //   if (displaySeqType == 'AA') {
@@ -1410,7 +1431,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   //       });
   //   } else {
   //     // Ajout d'un rectangle coloré par codon
-  //     nucSequence.append('rect')
+  //     dnaSequence.append('rect')
   //       .attr('x', function(d) {return i*hStep;})
   //       .attr('width', hStep)
   //       .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
@@ -1517,22 +1538,26 @@ function reloadGlobalResults() {
 
 // Fonction qui renvoie la liste des positions des sites positifs
 function getPositiveSitesJSON(textResultsList, upperThreshold) {
-  var jsonResultsList = JSON.parse(textResultsList);
-  // console.log('jsonResultsList', jsonResultsList);
-  // console.log('jsonResultsList[0]', jsonResultsList[0]);
-  // console.log('jsonResultsList[jsonResultsList.length - 1]', jsonResultsList[jsonResultsList.length - 1]);
-  
-  var positiveSites = [];
-  // console.log(resultsList);
-  jsonResultsList.forEach((r, i) => {
-    // console.log('site', i);
-    var site = i;
-    var value = r;
-    // console.log('site:', i, 'value:', r);
-    if (value >= psThresholdHigh) {
-      positiveSites.push(site);
-    }
-  })
+  if (boundariesOn) {
+    ///
+  } else {
+    var jsonResultsList = JSON.parse(textResultsList);
+    // console.log('jsonResultsList', jsonResultsList);
+    // console.log('jsonResultsList[0]', jsonResultsList[0]);
+    // console.log('jsonResultsList[jsonResultsList.length - 1]', jsonResultsList[jsonResultsList.length - 1]);
+    
+    var positiveSites = [];
+    // console.log(resultsList);
+    jsonResultsList.forEach((r, i) => {
+      // console.log('site', i);
+      var site = i;
+      var value = r;
+      // console.log('site:', i, 'value:', r);
+      if (value >= psThresholdHigh) {
+        positiveSites.push(site);
+      }
+    })
+  }
   // console.log('positive sites:', positiveSites);
   // console.log(positiveSites.length, 'positive sites');
   return positiveSites;
@@ -1694,7 +1719,7 @@ function subnode(nodes, pattern, colPattern) {
     if (d.depth == 0) {
       racine = d;
     }
-    // if (d.data.lastEvent.crossref) {
+    // if (d.data.lastEvent && d.data.lastEvent.crossref) {
     //   // Si la balise crossref est presente on
     //   // l'utilise plutot que le nom du gene
     //   var cross=d.data.lastEvent.crossref;
@@ -1775,7 +1800,7 @@ function phylogeny(treeRoot,offset) {
 // ---------------------------------------------
 function phylogeny_setloss(treeRoot,offset) {
   // treeRoot.each(function (d) {
-  //   if (d.data.lastEvent.eventType === "loss") {
+  //   if (d.data.lastEvent && d.data.lastEvent.eventType === "loss") {
   //    var lospar = d.parent;
   //    d.x = (d.x+lospar.x)/2
   //   }
@@ -2183,9 +2208,8 @@ $(document).ready(function() {
     psThresholdLow = psLowVal;
     // console.log('>> ', psThresholdHigh, '>=', psThresholdLow);
   });
-});
 
-  hideTooltip();
+  // hideTooltip();
   // var tooltips = document.querySelectorAll('.tooltip span');
   var tooltips = document.querySelectorAll('.tooltip');
   window.onmousemove = function (e) {
@@ -2338,6 +2362,7 @@ $(document).ready(function() {
     //   updateLayout(cladeRoot);
     //   psThresholdsChanged = false;
     // }
+    updateLayout(cladeRoot);
   });
 });
 </script>
