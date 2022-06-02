@@ -37,9 +37,10 @@
     </header>
 
     <main>
-      <!-- <div><h3>Tree</h3><p id="tree-file-content"></p></div> -->
-      <!-- <div><h3>Alignment</h3><p id="alignment-file-content"></p></div> -->
-      <!-- <div><h3>Results</h3><p id="results-file-content"></p></div> -->
+      <div><h3>Tree</h3><p id="tree-file-content"></p></div>
+      <div><h3>Alignment</h3><p id="alignment-file-content"></p></div>
+      <div><h3>Results</h3><p id="results-file-content"></p></div>
+
       <div class="form-mod">
         <form method="post" action="/upload_files" enctype="multipart/form-data">
           <div class="row mb-3">
@@ -56,14 +57,14 @@
             </div>
           </div>
 
-          <div class="row mb-1">
+          <div class="row mb-2">
             <label class="btn btn-primary btn-sm btn-file d-flex flex-column justify-content-center">
               <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Tree file</i>
               <input id="tree-file-input" type="file" name="file_t" class="inputfile" style="display: none;" required />
               <p class="filename"></p>
             </label>
           </div>
-          <div class="row mb-1">
+          <div class="row mb-2">
             <label class="btn btn-primary btn-sm btn-file d-flex flex-column justify-content-center">
               <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Alignment file</i>
               <input id="alignment-file-input" type="file" name="file_a" class="inputfile" style="display: none;" required />
@@ -71,11 +72,22 @@
             </label>
           </div>
           <div id="results-files-container" class="row mb-3">
-            <label class="btn btn-primary btn-sm btn-file d-flex flex-column justify-content-center">
-              <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Results file</i>
-              <input id="results-file-input" type="file" name="file_r" clas="inputfile" style="display: none;" required />
-              <p class="filename"></p>
-            </label>
+            <div class="row mb-2">
+              <label class="btn btn-primary btn-sm btn-file d-flex flex-column justify-content-center">
+                <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Results file</i>
+                <input id="results-file-input" type="file" name="file_r" clas="inputfile" style="display: none;" required />
+                <p class="filename"></p>
+              </label>
+              <input type="text" value="dN" />
+            </div>
+            <!-- <div class="row mb-2">
+              <label class="btn btn-primary btn-sm btn-file d-flex flex-column justify-content-center">
+                <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Results file</i>
+                <input id="results-file-input" type="file" name="file_r" clas="inputfile" style="display: none;" required />
+                <p class="filename"></p>
+              </label>
+              <input type="text" value="dS" />
+            </div> -->
           </div>
           
           <div class="row mb-3">
@@ -88,34 +100,9 @@
             <input id="nostat" class="form-control" type="number" name="nostat" value="-1" step="1" required />
           </div>
 
-          <!-- <div class="row mb-3">
-            <label>Formula</label>
-            <div class="row mb-1">
-              <select id="formula-select-1" class="form-select">
-                <option></option>
-                <option>dN</option>
-                <option>dS</option>
-              </select>
-            </div>
-            <div class="row mb-1">
-              <select id="formula-select-2" class="form-select">
-                <option></option>
-                <option>*</option>
-                <option>/</option>
-              </select>
-            </div>
-            <div class="row mb-3">
-              <select id="formula-select-3" class="form-select">
-                <option></option>
-                <option>dN</option>
-                <option>dS</option>
-              </select>
-            </div>
-          </div> -->
-
-          <!-- <div class="row mb-3">
-            <input id="formula-concat" class="form-control" name="formula-concat" />
-          </div> -->
+          <div class="row mb-3">
+            <input id="formula-concat" class="form-control" name="formula-concat" value="dN/dS" />
+          </div>
 
           <div class="row mb-3">
             <button id="submit" class="btn btn-primary" type="submit">Display</button>
@@ -141,42 +128,36 @@
             <p class="text-center">Reverse branches Select nodes to display</p>
           </div>
         </div>
-
         <div class="d-flex col align-items-start">
           <div>
             <h5 class="Option">Expand/Compact tree</h5>
             <p class="text-center">Increase/Decrease spaces between branches</p>
           </div>
         </div>
-
         <div class="d-flex col align-items-start">
           <div>
             <h5 class="Option text-center">AlignmentNature</h5>
             <p class="text-center">Display of nucleotid or protein sequences</p>
           </div>
         </div>
-
         <div class="d-flex col align-items-start">
           <div>
             <h5 class="Option">WidthSize +/-</h5>
             <p class="text-center">Increase/Decrease the tree's width</p>
           </div>
         </div>
-
         <div class="d-flex col align-items-start">
           <div>
             <h5 class="Option">HeightSize +/-</h5>
             <p class="text-center">Increase/Decrease the tree's height</p>
           </div>
         </div>
-
         <div class="d-flex col align-items-start">
           <div>
             <h5 class="Option">ExportSVG</h5>
             <p class="text-center">Results export in svg format</p>
           </div>
         </div>
-
         <div class="d-flex col align-items-start">
           <div>
             <h5 class="Option">Upper / Lower threshold</h5>
@@ -192,7 +173,6 @@
         <p>Université Lyon 1 - Master Bioinformatique</p>
       </footer>
     </main>
-
   </body>
   <script type="text/javascript">
   var uploadIconHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-arrow-up" viewBox="0 0 16 16">'
@@ -221,7 +201,7 @@
     function isChecked(checkboxId) {
       return $('#'+checkboxId).is(':checked');
     }
-    $('#sitebranch').ready(function (e) {
+    $('#sitebranch').ready(function(e) {
       console.log('sitebranch ready');
       console.log('checked:',   isChecked('sitebranch'));
       if (isChecked('sitebranch')) {
@@ -261,7 +241,7 @@
       var reader = new FileReader();
       reader.onload = function(event) {
         var lines = this.result.split('\n');
-        var treeRegex = new RegExp('^[\(][\w:0-9\.\-_,\(\);]+');
+        var treeRegex = new RegExp('^[\(][\w0-9\.\-_,\(\):;]+');
         var alignmentRegex = new RegExp('^>.*(\r)?\n[ACGTU\-]+');
         var resultsRegex = new RegExp('[0-9]+((\t| )[\-]?[0-9]+[\.]?[0-9]+)+');
         console.log(reader.result);
@@ -281,11 +261,11 @@
         } else {
           $("#"+e.target.id+" + .filename").html(warningIconHTML+'<br/>'+filename); 
         }
-        // content.innerHTML = '';
-        // for (var i = 0; i < Math.min(lines.length, 4); i ++) {
-        //   content.innerHTML += lines[i].substring(0, 80)+'<br>';
-        //   console.log(lines[i].substring(0, 80));
-        // }
+        content.innerHTML = '';
+        for (var i = 0; i < Math.min(lines.length, 4); i ++) {
+          content.innerHTML += lines[i].substring(0, 80)+'<br>';
+          console.log(lines[i].substring(0, 80));
+        }
       };
       reader.readAsText(selectedFile);
     });
