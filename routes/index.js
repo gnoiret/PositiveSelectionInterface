@@ -181,7 +181,7 @@ router.post("/upload_files", upload.fields([
         var JSONtree = JSON.stringify(results);
         var JSONpattern = JSON.stringify("0:homSapCCDS34680"); // Séquence à mettre en valeur
         console.log('Rendering view');
-        res.render('displaytree.ejs', {arbre:JSONtree, pattern:JSONpattern, logBranchLength:logBranchLength});
+        res.render('displaytree.ejs', {arbre:JSONtree, pattern:JSONpattern, sitebranch:sitebranch, logBranchLength:logBranchLength});
 
         console.log('Deleting XML tree');
         exec('rm'
