@@ -171,7 +171,7 @@ var hStep;
 var alignmentLetterSpacing = hStepBase - 10;
 var psThresholdHigh = $('#ps-threshold-high').val() || 1.0;
 var psThresholdLow = $('#ps-threshold-low').val() || 0.9;
-var psThresholdsChanged = false;
+// var psThresholdsChanged = false;
 // var psThresholdHighBgColor = "#FC6565";
 var psThresholdHighBgColor = "#FF0000";
 var psThresholdLowBgColor = "#FFFF00";
@@ -190,9 +190,9 @@ var compactWindow = $('#navigator-container');
 var resultsJSON = null;
 // var x;
 // var y;
-var boundariesOn;
-var leftBoundary;
-var rightBoundary;
+var boundariesOn = true;
+var leftBoundary = $('#left-boundary').val();
+var rightBoundary = $('#right-boundary').val();
 var resultsShown;
 // var nbSites;
 // var maxSeqLen = xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.maxSeqLen);
@@ -597,8 +597,8 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         .on('mouseover', function(d) {
           showTooltip();
           if (d.data.branch_info) {
-            writeTooltip(getPositiveSitesJSON(d.data.branch_info.results, psThresholdHigh).length);
-            writeTooltip(getPositiveRateJSON(d.data.branch_info.results, psThresholdHigh).length);
+            // writeTooltip(getPositiveSitesJSON(d.data.branch_info.results, psThresholdHigh).length);
+            writeTooltip(getPositiveRateJSON(d.data.branch_info.results, psThresholdHigh).toFixed(3));
           } else {
             writeTooltip('');
           }
@@ -923,54 +923,58 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
 
   // The color of a node depends on the number of positive sites in its branch
   allNodes.attr('fill', function(d) {
-    var nbPositive = undefined;
-    var positiveRate;
+    // var nbPositive = undefined;
     // console.log('allNodes', d.data.branch_info);
     if (d.data.branch_info) {
       // console.log('branch_info is defined');
-      nbPositive = getPositiveSitesJSON(d.data.branch_info.results, psThresholdHigh).length;
+      // nbPositive = getPositiveSitesJSON(d.data.branch_info.results, psThresholdHigh).length;
       // nbSites = JSON.parse(d.data.branch_info.results).length;
       // console.log(JSON.parse(d.data.branch_info.results));
-      positiveRate = getPositiveRateJSON(d.data.branch_info.results, psThresholdHigh);
+      var positiveRate = getPositiveRateJSON(d.data.branch_info.results, psThresholdHigh);
       // console.log(nbPositive, positiveRate);
       // console.log(d.data.branch_info.id, d.data.name, nbPositive);
       // if (nbPositive == 0) {
-      if (positiveRate <= 0.001) {
-        // return 'hsl(0, 100%, 100%)';
-        return '#00F'; // blue
+      if (positiveRate > 0) {
+        return 'hsl(0, 100%, '+(100-2*positiveRate*100-10)+'%)';
+      } else {
+        return 'hsl(240, 100%, 50%)'; // blue
       }
-      // else if (nbPositive < 5) {
-      else if (positiveRate <= 0.005) {
-        // return '#F99'; // light red
-        return 'hsl(0, 100%, 80%)';
-      }
-      // else if (nbPositive < 10) {
-      else if (positiveRate <= 0.01) {
-        // return '#F66'; // light red
-        return 'hsl(0, 100%, 65%)';
-      }
-      // else if (nbPositive < 25) {
-      else if (positiveRate <= 0.05) {
-        // return '#F44'; // red
-        return 'hsl(0, 100%, 50%)';
-      }
-      // else if (nbPositive < 100) {
-      else if (positiveRate <= 0.1) {
-        // return '#F00'; // dark red
-        return 'hsl(0, 100%, 30%)';
-      }
-      // else if (nbPositive >= 100) {
-      else if (positiveRate > 0.1) {
-        // return '#000'; // black
-        return 'hsl(0, 100%, 0%)';
-      }
-      else if (!nbPositive) {
-        return '#FFF'; // white
-      }
-      else {
-        return '#FF0'; // yellow
-        // return '#FF0000';
-      }
+      // if (positiveRate <= 0.01) {
+      //   // return 'hsl(0, 100%, 100%)';
+      //   return 'hsl(240, 100%, 50%)'; // blue
+      // }
+      // // else if (nbPositive < 5) {
+      // else if (positiveRate <= 0.05) {
+      //   // return '#F99'; // light red
+      //   return 'hsl(0, 100%, 80%)';
+      // }
+      // // else if (nbPositive < 10) {
+      // else if (positiveRate <= 0.1) {
+      //   // return '#F66'; // light red
+      //   return 'hsl(0, 100%, 65%)';
+      // }
+      // // else if (nbPositive < 25) {
+      // else if (positiveRate <= 0.25) {
+      //   // return '#F44'; // red
+      //   return 'hsl(0, 100%, 50%)';
+      // }
+      // // else if (nbPositive < 100) {
+      // else if (positiveRate <= 0.5) {
+      //   // return '#F00'; // dark red
+      //   return 'hsl(0, 100%, 30%)';
+      // }
+      // // else if (nbPositive >= 100) {
+      // else if (positiveRate > 0.5) {
+      //   // return '#000'; // black
+      //   return 'hsl(0, 100%, 0%)';
+      // }
+      // else if (!positiveRate) {
+      //   return '#FFF'; // white
+      // }
+      // else {
+      //   return '#FF0'; // yellow
+      //   // return '#FF0000';
+      // }
     }
   })
 
@@ -1498,56 +1502,56 @@ function reloadGlobalResults() {
 
 // Get the rate of positive sites in a JSON-formatted results list
 function getPositiveRateJSON(textResultsList, upperThreshold) {
+  var jsonResultsList = JSON.parse(textResultsList);
+  var positiveSites = [];
   if (boundariesOn) {
-    ///
-  } else {
-    var jsonResultsList = JSON.parse(textResultsList);
-    // console.log('jsonResultsList', jsonResultsList);
-    // console.log('jsonResultsList[0]', jsonResultsList[0]);
-    // console.log('jsonResultsList[jsonResultsList.length - 1]', jsonResultsList[jsonResultsList.length - 1]);
-    
-    var positiveSites = [];
-    // console.log(resultsList);
-    jsonResultsList.forEach((r, i) => {
-      // console.log('site', i);
+    jsonResultsList.forEach((res, i) => {
       var site = i;
-      var value = r;
-      // console.log('site:', i, 'value:', r);
-      if (value >= psThresholdHigh) {
+      var value = res;
+      if (value >= psThresholdHigh && site >= leftBoundary && site <= rightBoundary) {
+        positiveSites.push(site);
+
+      }
+    });
+  } else {
+    jsonResultsList.forEach((res, i) => {
+      var site = i;
+      var value = res;
+      if (value >= psThresholdHigh && site >= leftBoundary && site <= rightBoundary) {
         positiveSites.push(site);
       }
-    })
+    });
   }
-  // console.log('positive sites:', positiveSites);
-  // console.log(positiveSites.length, 'positive sites');
-  return positiveSites.length/jsonResultsList.length.toFixed(3);
+  // console.log(positiveSites.length,'of',rightBoundary-leftBoundary,'positive sites:',positiveSites);
+  return positiveSites.length/(rightBoundary - leftBoundary);
 }
-// Fonction qui renvoie la liste des positions des sites positifs
-function getPositiveSitesJSON(textResultsList, upperThreshold) {
-  if (boundariesOn) {
-    ///
-  } else {
-    var jsonResultsList = JSON.parse(textResultsList);
-    // console.log('jsonResultsList', jsonResultsList);
-    // console.log('jsonResultsList[0]', jsonResultsList[0]);
-    // console.log('jsonResultsList[jsonResultsList.length - 1]', jsonResultsList[jsonResultsList.length - 1]);
+
+// Fonction qui renvoie la liste des positions des sites positifs (format JSON)
+// function getPositiveSitesJSON(textResultsList, upperThreshold) {
+//   if (boundariesOn) {
+//     ///
+//   } else {
+//     var jsonResultsList = JSON.parse(textResultsList);
+//     // console.log('jsonResultsList', jsonResultsList);
+//     // console.log('jsonResultsList[0]', jsonResultsList[0]);
+//     // console.log('jsonResultsList[jsonResultsList.length - 1]', jsonResultsList[jsonResultsList.length - 1]);
     
-    var positiveSites = [];
-    // console.log(resultsList);
-    jsonResultsList.forEach((r, i) => {
-      // console.log('site', i);
-      var site = i;
-      var value = r;
-      // console.log('site:', i, 'value:', r);
-      if (value >= psThresholdHigh) {
-        positiveSites.push(site);
-      }
-    })
-  }
-  // console.log('positive sites:', positiveSites);
-  // console.log(positiveSites.length, 'positive sites');
-  return positiveSites;
-}
+//     var positiveSites = [];
+//     // console.log(resultsList);
+//     jsonResultsList.forEach((r, i) => {
+//       // console.log('site', i);
+//       var site = i;
+//       var value = r;
+//       // console.log('site:', i, 'value:', r);
+//       if (value >= psThresholdHigh) {
+//         positiveSites.push(site);
+//       }
+//     })
+//   }
+//   // console.log('positive sites:', positiveSites);
+//   // console.log(positiveSites.length, 'positive sites');
+//   return positiveSites;
+// }
 
 // // Fonction qui renvoie la liste des positions des sites positifs
 // function getPositiveSites(resultsText, upperThreshold) {
@@ -2167,34 +2171,6 @@ $('#export').on('click', function(event, dropdownData) {
 
 // Actions à la fin du chargement de la page
 $(document).ready(function() {
-  // Gestion de la modification des seuils
-  $('#left-boundary, #right-boundary').on('change', function(event) {
-    // On a modifié un des seuils
-    // Correction des valeurs en présence d'incohérences
-    var psHighVal = parseFloat($('#ps-threshold-high').val());
-    var psLowVal = parseFloat($('#ps-threshold-low').val());
-    // console.log('Thresholds:', psHighVal, '>=', psLowVal);
-    if (psHighVal < psLowVal) {
-      if (event.currentTarget.id == 'ps-threshold-high') {
-        // On a descendu le seuil supérieur plus bas que le seuil inférieur
-        // ex : psHighVal = 0.95 | psLowVal = 1.0
-        // On veut donc redecsendre le seuil inférieur en conséquence
-        $('#ps-threshold-low').val(psHighVal);
-        psLowVal = psHighVal;
-      } else {
-        // On a monté le seuil inférieur plus haut que le seuil supérieur
-        // ex : psHighVal = 1.0 | psLowVal = 1.05
-        // On veut donc remonter le seuil supérieur en conséquence
-        $('#ps-threshold-high').val(psLowVal);
-        psHighVal = psLowVal;
-      }
-    }
-    // Réaffectation des variables globales
-    psThresholdHigh = psHighVal;
-    psThresholdLow = psLowVal;
-    // console.log('>> ', psThresholdHigh, '>=', psThresholdLow);
-  });
-
   // hideTooltip();
   // var tooltips = document.querySelectorAll('.tooltip span');
   var tooltips = document.querySelectorAll('.tooltip');
@@ -2315,6 +2291,36 @@ $(document).ready(function() {
         break;
       default:
     }
+  });
+  leftBoundary = $('#left-boundary').val();
+  rightBoundary = $('#right-boundary').val();
+  // Gestion de la modification des limites
+  $('#left-boundary, #right-boundary').on('change', function(event) {
+    // On a modifié un des seuils
+    // Correction des valeurs en présence d'incohérences
+    var leftB = parseFloat($('#left-boundary').val());
+    var rightB = parseFloat($('#right-boundary').val());
+    // console.log('Thresholds:', psHighVal, '>=', psLowVal);
+    if (rightB - 1 < leftB) {
+      if (event.currentTarget.id == 'right-boundary') {
+        // On a descendu le seuil supérieur plus bas que le seuil inférieur
+        // ex : psHighVal = 0.95 | psLowVal = 1.0
+        // On veut donc redecsendre le seuil inférieur en conséquence
+        $('#left-boundary').val(rightB);
+        leftB = rightB - 1;
+      } else if (leftB + 1 > rightB) {
+        // On a monté le seuil inférieur plus haut que le seuil supérieur
+        // ex : psHighVal = 1.0 | psLowVal = 1.05
+        // On veut donc remonter le seuil supérieur en conséquence
+        $('#right-boundary').val(leftB);
+        rightB = leftB + 1;
+      }
+    }
+    // Réaffectation des variables globales
+    rightBoundary = rightB;
+    leftBoundary = leftB;
+    // console.log('>> ', psThresholdHigh, '>=', psThresholdLow);
+    updateLayout(cladeRoot);
   });
   // Gestion de la modification des seuils
   $('#ps-threshold-high, #ps-threshold-low').on('change', function(event) {
