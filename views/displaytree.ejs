@@ -190,11 +190,13 @@ var compactWindow = $('#navigator-container');
 var resultsJSON = null;
 // var x;
 // var y;
+var boundariesOn;
 var leftBoundary;
 var rightBoundary;
 var resultsShown;
-var boundariesOn;
-var nbSites;
+// var nbSites;
+// var maxSeqLen = xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.maxSeqLen);
+var maxSeqLen = 0;
 
 if (!isStorageSupported(myStorage)) {
   console.log("window.localStorage problem");
@@ -386,11 +388,12 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // console.log('firstLoad:', firstLoad);
   // console.log('results:', results);
   if (!resultsJSON && branchSite) {
-    console.log('Results undefined, branch-site');
-    resultsJSON = JSON.parse(xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results));
-    resultsJSON = new Array(resultsJSON.length).fill(-1);
     showTooltip();
     writeTooltip('Please click on a node to display branch data');
+    resultsJSON = new Array(maxSeqLen).fill(-1);
+    // console.log('Results undefined, branch-site');
+    // resultsJSON = JSON.parse(xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results));
+    // resultsJSON = undefined;
     // var fakeResults = resultsJSON.forEach(function (i) {
     //   console.log(i);
     //   return 0;
@@ -404,8 +407,9 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // } else if (!firstLoad && resultsText) {
   //   var results = resultsText;
   } else if (!resultsJSON && !branchSite) {
-    console.log('Results undefined, not branch-site');
+    hideTooltip();
     resultsJSON = JSON.parse(xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results));
+    // console.log('Results undefined, not branch-site');
   }
   // else {
   //   // console.log('resultsJSON:', resultsJSON);
@@ -417,18 +421,18 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // console.log('resultsJSON', resultsJSON);
   
   // results = results.split(' ');
-  // var psResultsDataset = [];
+  // var resultsJSON = [];
   // // var site = 0;
   // // var stat = 0.0;
   // results.forEach(function (d,i) {
   //   d = d.split(':');
   //   result = {site:parseInt(d[0]), stat:parseFloat(d[1])};
-  //   psResultsDataset.push(result);
+  //   resultsJSON.push(result);
   // });
-  psResultsDataset = resultsJSON;
-  // console.log(psResultsDataset);
+  resultsJSON = resultsJSON;
+  // console.log(resultsJSON);
   var psGraphMargins = {top: 20, right: 50, bottom: 50, left: 50+seq_lg};
-  var psGraphWidth = psResultsDataset.length*hStep;
+  var psGraphWidth = resultsJSON.length*hStep;
   var psGraphHeight = 100;
   // ==============================================================
   // Fin modif : variables pour graphe et séquences
@@ -495,7 +499,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   });
   var widthSVG = maxX - minX;
   var heightSVG = maxY - minY;
-  var ajustementX = psResultsDataset.length*hStep - 120;
+  var ajustementX = resultsJSON.length*hStep - 120;
   var ajustementY = -200;
   var decalageY = -90;
 
@@ -603,7 +607,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
           hideTooltip();
         })
         .on('click', function(d) {
-          console.log('nodeEnter g.gsymbol path.symbol clicked');
+          // console.log('symbol clicked');
           if (d.data.lastEvent && d.data.lastEvent.crossref) {
             // Si la balise crossref est presente on fait un lien vers l'url
             // qui requete l'identifiant dans la base de donnees selectionnee
@@ -616,7 +620,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
           }
           d3.select(this)
             .attr('fill', function(elt) {
-              console.log(elt);
+              // console.log(elt);
               return '#FFF';
             })
             .attr('stroke', '#000')
@@ -928,7 +932,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       // nbSites = JSON.parse(d.data.branch_info.results).length;
       // console.log(JSON.parse(d.data.branch_info.results));
       positiveRate = getPositiveRateJSON(d.data.branch_info.results, psThresholdHigh);
-      console.log(nbPositive, positiveRate);
+      // console.log(nbPositive, positiveRate);
       // console.log(d.data.branch_info.id, d.data.name, nbPositive);
       // if (nbPositive == 0) {
       if (positiveRate <= 0.001) {
@@ -979,14 +983,14 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     return !e.children;
   });
   
-  var widthSVG0 = psResultsDataset.length;
+  var widthSVG0 = resultsJSON.length;
   var heightSVG0 = 80;
-  var psGraphGlobalWidth = psResultsDataset.length;
+  var psGraphGlobalWidth = resultsJSON.length;
   var psGraphGlobalHeight = 50;
   var psGraphGlobalMargins = {top:15, right:0, bottom:15, left:0};
   var svg0 = d3.select('#svg0');
   svg0
-    .attr('width', widthSVG0)
+    .attr('width', widthSVG0 + 15)
     .attr('height',  heightSVG0);
 
   d3.select('#ps-graph-global').remove();
@@ -995,21 +999,20 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     // Ajout du graphe des résultats au SVG
     svg0.append('g')
       .attr('id', 'ps-graph-global')
-      .attr('transform', 'translate('+psGraphGlobalMargins.left+', '+psGraphGlobalMargins.top+')');
-    
+      .attr('transform', 'translate('+psGraphGlobalMargins.left+', '+psGraphGlobalMargins.top+')'); 
   }
 
   var psGraphGlobal = d3.select('#ps-graph-global');
 
   // Calcul du décalage des sites pour le positionnement des rectangles du graphe
-  // var siteOffset = 1 - psResultsDataset[0].site;
+  // var siteOffset = 1 - resultsJSON[0].site;
   var siteOffset = 0;
   // Association des données aux futurs rectangles
   var globalRects = psGraphGlobal
     .selectAll('.ps-rects-global')
     .data(function() {
-      // console.log('compact graph: attaching psResultsDataset', psResultsDataset);
-      return psResultsDataset;
+      // console.log('compact graph: attaching resultsJSON', resultsJSON);
+      return resultsJSON;
     });
   globalRects.exit().remove();
   // Affichage des rectangles
@@ -1039,7 +1042,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         } else if (d >= 0) {
           return psBelowThresholdBgColor;
         } else {
-          console.log(d);
+          // console.log(d);
           return psMissingBgColor;
         }
         // return 'transparent';
@@ -1066,7 +1069,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
 
   alignmentWindow.on('scroll', function() {
     // Draw a rectangle surrounding the site that was clicked
-    console.log('scrolling alignment');
+    // console.log('scrolling alignment');
     $('.navigation-window').remove();
     // var largeWindow = $('#alignment-container');
     var siteNumber = - (50 + seq_lg + 10 - alignmentWindow.scrollLeft() - alignmentWindow.innerWidth()/2)/hStep;
@@ -1090,7 +1093,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // alignmentWindow
   //   .scrollLeft(alignmentWindow.scrollLeft()+1)
   //   .scrollLeft(alignmentWindow.scrollLeft()-1);
-  updateScroll();
+  // updateScroll();
   
   // ======================================================
   // | Début : graphe des résultats de sélection positive |
@@ -1100,7 +1103,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   //   .attr("height",  heightSVG + margin.top + margin.down + 100);
   // console.log('seq_lg:', seq_lg);
   svg2
-    .attr("width",  50 + seq_lg + 10 + psResultsDataset.length*hStep + 10 + seq_lg + 50)
+    .attr("width",  50 + seq_lg + 10 + resultsJSON.length*hStep + 10 + seq_lg + 50)
     .attr("height",  heightSVG + margin.top + margin.down + 100);
   // Fonction de calcul de la statistique maximale dans les résultats
   function maxStatJSON(jsonResultsList) {
@@ -1159,11 +1162,11 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // }
   // === Définition de l'échelle pour l'axe x ===
   var x = d3.scaleLinear()
-    .domain([1, psResultsDataset.length+1])
+    .domain([1, resultsJSON.length+1])
     .range([0, psGraphWidth]);
   // === Définition de l'échelle pour l'axe y ===
   var y = d3.scaleLinear()
-    .domain([0, maxStatJSON(psResultsDataset)])
+    .domain([0, maxStatJSON(resultsJSON)])
     .range([psGraphHeight, 0]);
   // === Ajout du graphe des résultats au SVG ===
   var psGraph = svg2.append('g')
@@ -1172,20 +1175,20 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // === Ajout de l'axe x au graphe ===
   psGraph.append('g')
     .attr('transform', 'translate(0,' + psGraphHeight + ')')
-    .call(d3.axisBottom(x).ticks(psResultsDataset.length/5)); // graduations tous les 5 codons / AA
+    .call(d3.axisBottom(x).ticks(resultsJSON.length/5)); // graduations tous les 5 codons / AA
   // === Ajout de l'axe y au graphe ===
   psGraph.append('g')
     .call(d3.axisLeft(y));
 
   // === Calcul du décalage des sites pour le positionnement des rectangles du graphe ===
-  // var siteOffset = 1 - psResultsDataset[0].site;
+  // var siteOffset = 1 - resultsJSON[0].site;
   // var siteOffset = 0;
   // === Association des données aux futurs rectangles ===
   var rects = psGraph
     .selectAll('.ps-rects')
     .data(function() {
-      // console.log('big graph: attaching psResultsDataset', psResultsDataset);
-      return psResultsDataset;
+      // console.log('big graph: attaching resultsJSON', resultsJSON);
+      return resultsJSON;
     });
   // === Affichage des rectangles ===
   var i = 0;
@@ -1217,7 +1220,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       .style('stroke', '#000000')
       .style('stroke-width', 0+'px')
       .on('mouseover', function(d) {
-        console.log(d);
+        // console.log(d);
         writeTooltip(d);
         showTooltip();
       })
@@ -1227,7 +1230,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   psGraph.append('line')
     .attr('x1', x(1))
     .attr('y1', y(psThresholdHigh))
-    .attr('x2', x(psResultsDataset.length+1))
+    .attr('x2', x(resultsJSON.length+1))
     .attr('y2', y(psThresholdHigh))
     .style('stroke', '#000000')
     // .style('stroke', psThresholdHighBgColor)
@@ -1237,7 +1240,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   psGraph.append('line')
     .attr('x1', x(1))
     .attr('y1', y(psThresholdLow))
-    .attr('x2', x(psResultsDataset.length+1))
+    .attr('x2', x(resultsJSON.length+1))
     .attr('y2', y(psThresholdLow))
     .style('stroke', '#000000')
     // .style('stroke', psThresholdLowBgColor)
@@ -1325,9 +1328,9 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // Alignement : ajout des rectangles (version séquence entière)
   var aaSequence = d3.select('.aa-sequence');
   var dnaSequence = d3.select('.dna-sequence');
-  // console.log('First site ID', psResultsDataset[0].site);
+  // console.log('First site ID', resultsJSON[0].site);
   var targetSequence = displaySeqType == 'AA' ? aaSequence : dnaSequence;
-  for (i = 0; i < psResultsDataset.length; i ++) {
+  for (i = 0; i < resultsJSON.length; i ++) {
     // if (displaySeqType == 'AA') {
       // Ajout d'un rectangle coloré par AA
       targetSequence.append('rect')
@@ -1336,11 +1339,11 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
         .attr('height', maxYSeq - minYSeq + hStepBase*2)
         .style('fill', () => {
-          if (psResultsDataset[i] >= psThresholdHigh) {
+          if (resultsJSON[i] >= psThresholdHigh) {
             return psThresholdHighBgColor;
-          } else if (psResultsDataset[i] >= psThresholdLow) {
+          } else if (resultsJSON[i] >= psThresholdLow) {
             return psThresholdLowBgColor;
-          } else if (psResultsDataset[i] >= 0) {
+          } else if (resultsJSON[i] >= 0) {
             return psBelowThresholdBgColor;
           } else {
             return psMissingBgColor;
@@ -1354,11 +1357,11 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     //     .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
     //     .attr('height', maxYSeq - minYSeq + hStepBase*2)
     //     .style('fill', () => {
-    //       if (psResultsDataset[i] >= psThresholdHigh) {
+    //       if (resultsJSON[i] >= psThresholdHigh) {
     //         return psThresholdHighBgColor;
-    //       } else if (psResultsDataset[i] >= psThresholdLow) {
+    //       } else if (resultsJSON[i] >= psThresholdLow) {
     //         return psThresholdLowBgColor;
-    //       } else if (psResultsDataset[i] >= 0) {
+    //       } else if (resultsJSON[i] >= 0) {
     //         return psBelowThresholdBgColor;
     //       } else {
     //         return psMissingBgColor;
@@ -1366,7 +1369,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     //     });
     // }
   }
-  // for (i = psResultsDataset[0].site; i < psResultsDataset.length; i ++) {
+  // for (i = resultsJSON[0].site; i < resultsJSON.length; i ++) {
   //   if (displaySeqType == 'AA') {
   //     // Ajout d'un rectangle coloré par AA
   //     aaSequence.append('rect')
@@ -1375,11 +1378,11 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   //       .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
   //       .attr('height', maxYSeq - minYSeq + hStepBase*2)
   //       .style('fill', () => {
-  //         if (psResultsDataset[i].stat >= psThresholdHigh) {
+  //         if (resultsJSON[i].stat >= psThresholdHigh) {
   //           return psThresholdHighBgColor;
-  //         } else if (psResultsDataset[i].stat >= psThresholdLow) {
+  //         } else if (resultsJSON[i].stat >= psThresholdLow) {
   //           return psThresholdLowBgColor;
-  //         } else if (psResultsDataset[i].stat >= 0) {
+  //         } else if (resultsJSON[i].stat >= 0) {
   //           return psBelowThresholdBgColor;
   //         } else {
   //           return psMissingBgColor;
@@ -1393,11 +1396,11 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   //       .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
   //       .attr('height', maxYSeq - minYSeq + hStepBase*2)
   //       .style('fill', () => {
-  //         if (psResultsDataset[i].stat >= psThresholdHigh) {
+  //         if (resultsJSON[i].stat >= psThresholdHigh) {
   //           return psThresholdHighBgColor;
-  //         } else if (psResultsDataset[i].stat >= psThresholdLow) {
+  //         } else if (resultsJSON[i].stat >= psThresholdLow) {
   //           return psThresholdLowBgColor;
-  //         } else if (psResultsDataset[i].stat >= 0) {
+  //         } else if (resultsJSON[i].stat >= 0) {
   //           return psBelowThresholdBgColor;
   //         } else {
   //           return psMissingBgColor;
@@ -1426,9 +1429,9 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   //   var siteNumber = $(this).attr('title').split('-')[0];
   //   var target = document.getElementById('alignment-container');
   //   // console.log(target);œ
-  //   // largeur svg2 : 50 + seq_lg + 10 + psResultsDataset.length*12 + 50
+  //   // largeur svg2 : 50 + seq_lg + 10 + resultsJSON.length*12 + 50
   //   // 0 : 50 | seq_lg | 10
-  //   // max : 50 | seq_lg | 10 psResultsDataset.length*hStep
+  //   // max : 50 | seq_lg | 10 resultsJSON.length*hStep
   //   target.scrollTo(siteNumber*hStep + seq_lg + 50 - target.clientWidth/2, 0); // use offsetWidth for paddings, borders and margins
   // });
   // $('.symbol').on('mouseover', function(event) {
@@ -1454,6 +1457,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // $('#alugnment-container').on('scroll', function (event) {
   //   console.log('scrolling alignment container', event)
   // });
+  updateScroll();
 }
 // Fin de la fonction updateSvg
 // ----------------------------
@@ -1484,7 +1488,7 @@ function updateScroll() {
   alignmentWindow
     .scrollLeft(alignmentWindow.scrollLeft()+1)
     .scrollLeft(alignmentWindow.scrollLeft()-1);
-  console.log('seq_lg', seq_lg);
+  // console.log('seq_lg', seq_lg);
 }
 
 function reloadGlobalResults() {
@@ -2278,34 +2282,34 @@ $(document).ready(function() {
   $('#alignment-type').on('click', function(event, dropdownData) {
     var target = event.toElement || event.relatedTarget || event.target || function () { throw "Failed to attach an event target!"; }
     myStorage.setItem("alignment-type",target.text);
-    console.log('Alignment type:', target.text);
+    // console.log('Alignment type:', target.text);
     switch (target.text) {
       case "Codons": // Codons to Amino Acids
         if (displaySeqType != 'Nuc') {
           displaySeqType = "Nuc";
-          console.log("Displaying codons");
+          // console.log("Displaying codons");
           $(".aa-sequence").css("display", "none");
           $(".dna-sequence").css("display", "block");
           $("#toggle-seqtype").html("Current display: "+displaySeqType);
           $("#nucleotid").css('color', '#FF0000');
           $("#aminoacid").css('color', '#000000');
           updateLayout(cladeRoot);
-          console.log('alignmentWindow.scrollLeft():', alignmentWindow.scrollLeft());
+          // console.log('alignmentWindow.scrollLeft():', alignmentWindow.scrollLeft());
           alignmentWindow.scrollLeft(alignmentWindow.scrollLeft()*3);
-          console.log('alignmentWindow.scrollLeft():', alignmentWindow.scrollLeft());
+          // console.log('alignmentWindow.scrollLeft():', alignmentWindow.scrollLeft());
         }
         break;
       case "Amino Acids": // Amino Acids to Codons
         if (displaySeqType != 'AA') {
           displaySeqType = "AA";
-          console.log("Displaying amino acids");
+          // console.log("Displaying amino acids");
           $(".dna-sequence").css("display", "none");
           $(".aa-sequence").css("display", "block");
           $("#nucleotid").css('color', '#000000');
           $("#aminoacid").css('color', '#FF0000');
-          console.log('alignmentWindow.scrollLeft():', alignmentWindow.scrollLeft());
+          // console.log('alignmentWindow.scrollLeft():', alignmentWindow.scrollLeft());
           alignmentWindow.scrollLeft(alignmentWindow.scrollLeft()/3);
-          console.log('alignmentWindow.scrollLeft():', alignmentWindow.scrollLeft());
+          // console.log('alignmentWindow.scrollLeft():', alignmentWindow.scrollLeft());
           updateLayout(cladeRoot);
         }
         break;

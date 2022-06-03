@@ -97,6 +97,7 @@ router.post("/upload_files", upload.fields([
   const nostat = req.body.nostat;
   var branchSite = req.body.branchSite;
   var logBranchLength = req.body.logBranchLength;
+  var skipMissingSites = req.body.skipMissingSites;
 
   console.log('branchSite:', branchSite);
   if (branchSite != undefined) {
@@ -113,6 +114,14 @@ router.post("/upload_files", upload.fields([
   } else {
     console.log('not logBranchLength');
     logBranchLength = false;
+  }
+  console.log('skipMissingSites:', skipMissingSites);
+  if (skipMissingSites != undefined) {
+    console.log('skipMissingSites');
+    skipMissingSites = true;
+  } else {
+    console.log('not skipMissingSites');
+    skipMissingSites = false;
   }
 
   // console.log('Tree: ' + fname_t + '\n' +
@@ -132,7 +141,8 @@ router.post("/upload_files", upload.fields([
       +' -o '+xml_dir+fname_xml
       +' -c '+statcol
       +' -n '+nostat
-      +(branchSite?' -b ':''),
+      +(branchSite?' -b ':'')
+      +(skipMissingSites?' --skipmissing ':''),
   (error, stdout, stderr) => {
     if (error) {
       console.log(`error: ${error.message}`);
@@ -183,19 +193,19 @@ router.post("/upload_files", upload.fields([
         console.log('Rendering view');
         res.render('displaytree.ejs', {arbre:JSONtree, pattern:JSONpattern, branchSite:branchSite, logBranchLength:logBranchLength});
 
-        console.log('Deleting XML tree');
-        exec('rm'
-          +' '+xml_dir+fname_xml,
-          (error, stdout, stderr) => {
-            if (error) {
-              console.log(`error: ${error.message}`);
-            }
-            if (stderr) {
-              console.log(`error: ${stderr}`);
-            }
-            console.log(`${stdout}`);
-          }
-        )
+        // console.log('Deleting XML tree');
+        // exec('rm'
+        //   +' '+xml_dir+fname_xml,
+        //   (error, stdout, stderr) => {
+        //     if (error) {
+        //       console.log(`error: ${error.message}`);
+        //     }
+        //     if (stderr) {
+        //       console.log(`error: ${stderr}`);
+        //     }
+        //     console.log(`${stdout}`);
+        //   }
+        // )
       });
     });
   });

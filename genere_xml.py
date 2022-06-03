@@ -46,29 +46,33 @@ parser = argparse.ArgumentParser(description='Generate an XML file from \
     a tree, an alignment and statistics.')
 parser.add_argument('-t', '--tree', dest='treeFile', action='store',\
     required=True,\
-    help='file containing a tree in Newick format')
+    help='File containing a tree in Newick format')
 parser.add_argument('-a', '--align', dest='alignmentFile', action='store',\
     required=True,\
-    help='file containing an alignment in FASTA format')
+    help='File containing an alignment in FASTA format')
 parser.add_argument('-r', '--results', dest='resultsFile', action='store',\
     required=True,\
-    help='file containing the results')
+    help='File containing the results')
 parser.add_argument('-s', '--sep', dest='sep', action='store',\
     required=False,\
     default='\t',\
-    help='column separator')
+    help='Column separator')
 parser.add_argument('-b', '--branchsite', dest='isBranchsite', action='store_true',\
     required=False,\
-    help='view site-branch data')
+    help='View site-branch data')
 parser.add_argument('-c', '--col', dest='statcol', action='store', type=int,\
     default=1,\
-    help='index of the results column to use')
+    help='Index of the results column to use')
 parser.add_argument('-n', '--nostat', dest='nostat', action='store', type=float,\
     default=-1.0,\
-    help='value to use in case there is no statistic associated\
+    help='Value to use in case there is no statistic associated\
     with a site in the sequence')
+parser.add_argument('--skipmissing', dest='skipMissingSites', action='store_true',\
+    required=False,\
+    help='Prevent the addition of special values (-n, --nostat) for sites that are absent from the results file. \
+        This results in sites being next to each other on the graph even though their positions are distant.')
 parser.add_argument('-o', '--output', dest='output', action='store',\
-    help='name of the output XML file (if not specified, the XML will have \
+    help='Name of the output XML file (if not specified, the XML will have \
     the same name as the tree file)')
 args = parser.parse_args()
 
@@ -167,7 +171,7 @@ def loadAlignment(alignmentFile):
     return alignmentDict, maxSeqIdLength
 
 
-def loadResultsSites(resultsFile, statcol=1, nostat_value=-1.0, sep='\t'):
+def loadResultsSites(resultsFile, statcol=1, nostat_value=-1.0, sep='\t', skipMissingSites=False):
     """Loads site results from column with index <statcol>."""
 
     resultsDict = {}
@@ -186,8 +190,11 @@ def loadResultsSites(resultsFile, statcol=1, nostat_value=-1.0, sep='\t'):
                         i = site
                     while i < site: # in case there is no statistic for
                                     # a site, give it a default value
-                        print(f'Site {i} missing (current line: site {site})')
-                        resultsDict[i] = nostat_value
+                        if not skipMissingSites:
+                            print(f'Site {i} missing (current line: site {site})')
+                            resultsDict[i] = nostat_value
+                        else:
+                            print(f'Site {i} skipped')
                         i += 1
                     resultsDict[i] = res
             else: # other line (e.g. header)
@@ -196,16 +203,16 @@ def loadResultsSites(resultsFile, statcol=1, nostat_value=-1.0, sep='\t'):
             i += 1
 
     resultsText = ''
+    resultsList = []
     for key, item in resultsDict.items():
-        # resultsText += f'{key}:{item}'
-        resultsText += f'{item}, '
-        # if key != max(resultsDict.keys()):
-        #     resultsText += ', '
-    resultsText = '['+resultsText[:-2]+']' # remove last space and comma
-    return resultsText
+        # resultsText += f'{item}, '
+        resultsList.append(item)
+    # resultsText = '['+resultsText[:-2]+']' # remove last space and comma
+    # return resultsText
+    return resultsList
 
 
-def loadResultsBranchSite(resultsFile, sep='\t'):
+def loadResultsBranchSite(resultsFile, sep='\t', skipMissingSites=False):
     """Loads site-branch results."""
 
     d_cols = {}
@@ -441,7 +448,8 @@ def createPhyloXML(fam,newick, resultsFile):
 
     ## Ajout des résultats
     globalResultsElement = etree.Element('global_results')
-    globalResultsElement.set('results', resultsText)
+    # globalResultsElement.set('results', resultsText)
+    globalResultsElement.set('results', str(resultsList))
     # globalResultsElement.text = resultsText
 
     LengthMaxSeqID = etree.Element('maxSeqIdLength')
@@ -469,8 +477,10 @@ alignmentDict, maxSeqIdLength = loadedAlignment[0], loadedAlignment[1]
 print ("OK")
 
 print ("Loading results... ")
-resultsText =  loadResultsSites(args.resultsFile, args.statcol, args.nostat, sep=args.sep)
-dict_results = loadResultsBranchSite(args.resultsFile, sep=args.sep)
+# resultsText =  loadResultsSites(args.resultsFile, args.statcol, args.nostat, sep=args.sep)
+resultsList =  loadResultsSites(args.resultsFile, args.statcol, args.nostat, sep=args.sep, skipMissingSites=args.skipMissingSites)
+if args.isBranchsite:
+    dict_results = loadResultsBranchSite(args.resultsFile, sep=args.sep)
 print ("OK")
 
 #Creates empty phyloxml document
