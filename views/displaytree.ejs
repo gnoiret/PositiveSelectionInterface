@@ -137,7 +137,7 @@
 // ----------------------------------------------
 var recTree = <%- arbre %>;
 var pattern = <%- pattern %>;
-var sitebranch = <%- sitebranch %>;
+var branchSite = <%- branchSite %>;
 var logBranchLength = <%- logBranchLength %>;
 // Variables globales
 // ------------------
@@ -385,7 +385,8 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // var results = resultsText;
   // console.log('firstLoad:', firstLoad);
   // console.log('results:', results);
-  if (!resultsJSON && sitebranch) {
+  if (!resultsJSON && branchSite) {
+    console.log('Results undefined, branch-site');
     resultsJSON = JSON.parse(xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results));
     resultsJSON = new Array(resultsJSON.length).fill(-1);
     showTooltip();
@@ -402,9 +403,9 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   //   var results = resultsText;
   // } else if (!firstLoad && resultsText) {
   //   var results = resultsText;
-  } else if (!resultsJSON && !sitebranch) {
-    // resultsJSON = ...
-    print('coucou');
+  } else if (!resultsJSON && !branchSite) {
+    console.log('Results undefined, not branch-site');
+    resultsJSON = JSON.parse(xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results));
   }
   // else {
   //   // console.log('resultsJSON:', resultsJSON);

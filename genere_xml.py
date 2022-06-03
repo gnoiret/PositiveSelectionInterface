@@ -57,7 +57,7 @@ parser.add_argument('-s', '--sep', dest='sep', action='store',\
     required=False,\
     default='\t',\
     help='column separator')
-parser.add_argument('-b', '--sitebranch', dest='isSitebranch', action='store_true',\
+parser.add_argument('-b', '--branchsite', dest='isBranchsite', action='store_true',\
     required=False,\
     help='view site-branch data')
 parser.add_argument('-c', '--col', dest='statcol', action='store', type=int,\
@@ -205,7 +205,7 @@ def loadResultsSites(resultsFile, statcol=1, nostat_value=-1.0, sep='\t'):
     return resultsText
 
 
-def loadResultsSiteBranch(resultsFile, sep='\t'):
+def loadResultsBranchSite(resultsFile, sep='\t'):
     """Loads site-branch results."""
 
     d_cols = {}
@@ -304,7 +304,7 @@ def normalizeTree(tree:str):
 def createPhyloXML(fam,newick, resultsFile):
     # print ("Loading results... ")
     # resultsText =  loadResultsSites(args.resultsFile, 0, args.nostat, sep=args.sep)
-    # dict_results = loadResultsSiteBranch(resultsFile, sep=args.sep)
+    # dict_results = loadResultsBranchSite(resultsFile, sep=args.sep)
     # # print(dict_results)
     # print ("OK")
 
@@ -414,7 +414,7 @@ def createPhyloXML(fam,newick, resultsFile):
             evrec.append(leaf)
             element.append(evrec)
         
-        if args.isSitebranch:
+        if args.isBranchsite:
             if element.find('branch_length') is not None:
                 branch_info = etree.Element('branch_info')
                 branch_info.set('id', str(res_colnames[colname_index]))
@@ -470,7 +470,7 @@ print ("OK")
 
 print ("Loading results... ")
 resultsText =  loadResultsSites(args.resultsFile, args.statcol, args.nostat, sep=args.sep)
-dict_results = loadResultsSiteBranch(args.resultsFile, sep=args.sep)
+dict_results = loadResultsBranchSite(args.resultsFile, sep=args.sep)
 print ("OK")
 
 #Creates empty phyloxml document

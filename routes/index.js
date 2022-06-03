@@ -95,16 +95,16 @@ router.post("/upload_files", upload.fields([
   const full_path_xml = xml_dir + fname_xml;
   const statcol = req.body.statcol;
   const nostat = req.body.nostat;
-  var sitebranch = req.body.sitebranch;
+  var branchSite = req.body.branchSite;
   var logBranchLength = req.body.logBranchLength;
 
-  console.log('sitebranch:', sitebranch);
-  if (sitebranch != undefined) {
-    console.log('sitebranch');
-    sitebranch = true;
+  console.log('branchSite:', branchSite);
+  if (branchSite != undefined) {
+    console.log('branchSite');
+    branchSite = true;
   } else {
-    console.log('not sitebranch');
-    sitebranch = false;
+    console.log('not branchSite');
+    branchSite = false;
   }
   console.log('logBranchLength:', logBranchLength);
   if (logBranchLength != undefined) {
@@ -132,7 +132,7 @@ router.post("/upload_files", upload.fields([
       +' -o '+xml_dir+fname_xml
       +' -c '+statcol
       +' -n '+nostat
-      +(sitebranch?' -b ':''),
+      +(branchSite?' -b ':''),
   (error, stdout, stderr) => {
     if (error) {
       console.log(`error: ${error.message}`);
@@ -181,7 +181,7 @@ router.post("/upload_files", upload.fields([
         var JSONtree = JSON.stringify(results);
         var JSONpattern = JSON.stringify("0:homSapCCDS34680"); // Séquence à mettre en valeur
         console.log('Rendering view');
-        res.render('displaytree.ejs', {arbre:JSONtree, pattern:JSONpattern, sitebranch:sitebranch, logBranchLength:logBranchLength});
+        res.render('displaytree.ejs', {arbre:JSONtree, pattern:JSONpattern, branchSite:branchSite, logBranchLength:logBranchLength});
 
         console.log('Deleting XML tree');
         exec('rm'

@@ -45,8 +45,8 @@
         <form method="post" action="/upload_files" enctype="multipart/form-data">
           <div class="row mb-3">
             <div class="form-check form-switch">
-              <input id="sitebranch" class="form-check-input" type="checkbox" name="sitebranch">
-              <label class="form-check-label" for="sitebranch">Site-branch</label>
+              <input id="branchSite" class="form-check-input" type="checkbox" name="branchSite">
+              <label class="form-check-label" for="branchSite">Branch-site</label>
             </div>
           </div>
 
@@ -201,19 +201,19 @@
     function isChecked(checkboxId) {
       return $('#'+checkboxId).is(':checked');
     }
-    $('#sitebranch').ready(function(e) {
-      console.log('sitebranch ready');
-      console.log('checked:',   isChecked('sitebranch'));
-      if (isChecked('sitebranch')) {
+    $('#branchSite').ready(function(e) {
+      console.log('branchSite ready');
+      console.log('checked:',   isChecked('branchSite'));
+      if (isChecked('branchSite')) {
         // add name fields to results file(s)
       } else {
         // remove name fields from results file(s)
       }
     });
-    $('#sitebranch').change(function (e) {
-      console.log('sitebranch updated');
-      console.log('checked:', isChecked('sitebranch'));
-      if (isChecked('sitebranch')) {
+    $('#branchSite').change(function (e) {
+      console.log('branchSite updated');
+      console.log('checked:', isChecked('branchSite'));
+      if (isChecked('branchSite')) {
         // add name fields to results file(s)
       } else {
         // remove name fields from results file(s)
