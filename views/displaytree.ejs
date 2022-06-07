@@ -95,13 +95,13 @@
     <button class="btn btn-sm btn-outline-secondary">
       <div class="input-group">
         <label for="left-boundary">Left boundary</label>
-        <input id="left-boundary" type="number" step="1" placeholder="PS Threshold" value="0" style="width: 5em;"/>
+        <input id="left-boundary" type="number" step="1" placeholder="Left boundary" value="0" style="width: 5em;"/>
       </div>
     </button>
     <button class="btn btn-sm btn-outline-secondary">
       <div class="input-group">
         <label for="right-boundary">Right boundary</label>
-        <input id="right-boundary" type="number" step="1" placeholder="PS Threshold" value="102" style="width: 5em;"/>
+        <input id="right-boundary" type="number" step="1" placeholder="Right boundary" value="10000" style="width: 5em;"/>
       </div>
     </button>
     <!-- Bouton de chargement des résultats globaux -->
@@ -197,6 +197,7 @@ var resultsShown;
 // var nbSites;
 // var maxSeqLen = xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.maxSeqLen);
 var maxSeqLen = 0;
+var updateNodesTimeout = null;
 
 if (!isStorageSupported(myStorage)) {
   console.log("window.localStorage problem");
@@ -364,6 +365,7 @@ function updateLayout(cRoot,firstLoad=0) {
     phylogeny_setloss(treeRoot,nodeWidth);
   }
   updateSvg(treeRoot,firstLoad);
+  updateScroll();
 }
 
 function hideTooltip() { $('.tooltip').hide(); }
@@ -598,7 +600,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
           showTooltip();
           if (d.data.branch_info) {
             // writeTooltip(getPositiveSitesJSON(d.data.branch_info.results, psThresholdHigh).length);
-            writeTooltip(getPositiveRateJSON(d.data.branch_info.results, psThresholdHigh).toFixed(3));
+            writeTooltip(getPositiveRateJSON(d.data.branch_info.results, psThresholdHigh, leftBoundary, rightBoundary).toFixed(3));
           } else {
             writeTooltip('');
           }
@@ -892,91 +894,28 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       }
       return name
     });
-  
-  
-  
-  // console.log(d3.selectAll('path.symbol'));
-  // var nodeSymbols = d3.selectAll('path.symbol');
-  // nodeSymbols.attr('fill', function(d) {
-  //   console.log('coucou', d.data); // d: branch data
-  //   // var nbPositive = getPositiveSites(d.data.branch_info.results, psThresholdHigh).length;
-  //   var nbPositive = 0;
-  //   if (nbPositive == 0) {
-  //     return 'hsl(0, 100%, 100%)';
-  //     // return '#0000FF';
-  //   }
-  //   else if (nbPositive < 10) {
-  //     return 'hsl(0, 100%, 80%)';
-  //     // return '#0000FF';
-  //   }
-  //   else if (nbPositive < 100) {
-  //     return 'hsl(0, 100%, 60%)';
-  //     // return '#0000FF';
-  //   }
-  //   else {
-  //     return 'hsl(0, 100%, 40%)';
-  //     // return '#FF0000';
+
+  // // The color of a node depends on the number of positive sites in its branch
+  // g.selectAll('path.symbol').attr('fill', function(d) {
+  //   if (d.data.branch_info) {
+  //     var positiveRate = getPositiveRateJSON(d.data.branch_info.results, psThresholdHigh, leftBoundary, rightBoundary);
+  //     if (positiveRate > 0) {
+  //       return 'hsl(0, 100%, '+(100 - 2*positiveRate*100 - 10)+'%)';
+  //     } else {
+  //       return 'hsl(240, 100%, 50%)'; // blue
+  //     }
   //   }
   // })
-  // .attr('stroke', '#000000')
-  // .attr('stroke-width', '2px');
-
-  // The color of a node depends on the number of positive sites in its branch
-  allNodes.attr('fill', function(d) {
-    // var nbPositive = undefined;
-    // console.log('allNodes', d.data.branch_info);
-    if (d.data.branch_info) {
-      // console.log('branch_info is defined');
-      // nbPositive = getPositiveSitesJSON(d.data.branch_info.results, psThresholdHigh).length;
-      // nbSites = JSON.parse(d.data.branch_info.results).length;
-      // console.log(JSON.parse(d.data.branch_info.results));
-      var positiveRate = getPositiveRateJSON(d.data.branch_info.results, psThresholdHigh);
-      // console.log(nbPositive, positiveRate);
-      // console.log(d.data.branch_info.id, d.data.name, nbPositive);
-      // if (nbPositive == 0) {
-      if (positiveRate > 0) {
-        return 'hsl(0, 100%, '+(100-2*positiveRate*100-10)+'%)';
-      } else {
-        return 'hsl(240, 100%, 50%)'; // blue
-      }
-      // if (positiveRate <= 0.01) {
-      //   // return 'hsl(0, 100%, 100%)';
-      //   return 'hsl(240, 100%, 50%)'; // blue
-      // }
-      // // else if (nbPositive < 5) {
-      // else if (positiveRate <= 0.05) {
-      //   // return '#F99'; // light red
-      //   return 'hsl(0, 100%, 80%)';
-      // }
-      // // else if (nbPositive < 10) {
-      // else if (positiveRate <= 0.1) {
-      //   // return '#F66'; // light red
-      //   return 'hsl(0, 100%, 65%)';
-      // }
-      // // else if (nbPositive < 25) {
-      // else if (positiveRate <= 0.25) {
-      //   // return '#F44'; // red
-      //   return 'hsl(0, 100%, 50%)';
-      // }
-      // // else if (nbPositive < 100) {
-      // else if (positiveRate <= 0.5) {
-      //   // return '#F00'; // dark red
-      //   return 'hsl(0, 100%, 30%)';
-      // }
-      // // else if (nbPositive >= 100) {
-      // else if (positiveRate > 0.5) {
-      //   // return '#000'; // black
-      //   return 'hsl(0, 100%, 0%)';
-      // }
-      // else if (!positiveRate) {
-      //   return '#FFF'; // white
-      // }
-      // else {
-      //   return '#FF0'; // yellow
-      //   // return '#FF0000';
-      // }
-    }
-  })
+  // allNodes.attr('fill', function(d) {
+  //   if (d.data.branch_info) {
+  //     var positiveRate = getPositiveRateJSON(d.data.branch_info.results, psThresholdHigh, leftBoundary, rightBoundary);
+  //     if (positiveRate > 0) {
+  //       return 'hsl(0, 100%, '+(100 - 2*positiveRate*100 - 10)+'%)';
+  //     } else {
+  //       return 'hsl(240, 100%, 50%)'; // blue
+  //     }
+  //   }
+  // })
 
 
 
@@ -1055,28 +994,45 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       // .style('stroke-width', 0+'px')
       ;
   
+  // Handle click-drag events on the small graph
+  compactWindow.off('mousedown mousemove mouseup');
   compactWindow.on('mousedown', function(e) {
-    // console.log(e.type);
     scrollAlignment(e);
-
     compactWindow.on('mousemove', function (e) {
-      // console.log(e.type);
       scrollAlignment(e);
     });
-
     compactWindow.on('mouseup', function (e) {
-      // console.log(e.type);
       scrollAlignment(e);
-      compactWindow.off('mousemove');
+      compactWindow.off('mousemove mouseup');
+      // leftBoundary = $('#left-boundary').val();
+      // rightBoundary = $('#right-boundary').val();
     });
   });
 
   alignmentWindow.on('scroll', function() {
+    // if (updateNodesTimeout != null) {
+    //   clearTimeout(updateNodesTimeout);
+    //   updateNodesTimeout = null;
+    //   console.log('timeout cleared', updateNodesTimeout);
+    // } else {
+    //   updateNodesTimeout = setTimeout(updateLayout(cladeRoot), 1000);
+    //   console.log('timeout set', updateNodesTimeout);
+    // }
+
+    // let timeout;
+    // alignmentWindow.on('scroll', () => {
+    //   clearTimeout(timeout);
+    //   timeout = setTimeout(updateNodeColors(), 500);
+    // });
+    console.log('scrolling');
+    updateNodeColors();
+
     // Draw a rectangle surrounding the site that was clicked
     // console.log('scrolling alignment');
     $('.navigation-window').remove();
     // var largeWindow = $('#alignment-container');
-    var siteNumber = - (50 + seq_lg + 10 - alignmentWindow.scrollLeft() - alignmentWindow.innerWidth()/2)/hStep;
+    var siteNumber = - (60 + seq_lg - alignmentWindow.scrollLeft() - alignmentWindow.innerWidth()/2)/hStep;
+
     var navWindowWidth = alignmentWindow.innerWidth()/hStep + 2;
     var navWindowRect = psGraphGlobal
       .append('rect')
@@ -1461,7 +1417,8 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // $('#alugnment-container').on('scroll', function (event) {
   //   console.log('scrolling alignment container', event)
   // });
-  updateScroll();
+  // updateScroll();
+  updateNodeColors();
 }
 // Fin de la fonction updateSvg
 // ----------------------------
@@ -1469,7 +1426,24 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
 // Autres fonctions utilitaires
 // ----------------------------
 
+function updateNodeColors() {
+  // The color of a node depends on the number of positive sites in its branch
+  g.selectAll('path.symbol').attr('fill', function(d) {
+    if (d.data.branch_info) {
+      var positiveRate = getPositiveRateJSON(d.data.branch_info.results, psThresholdHigh, leftBoundary, rightBoundary);
+      if (positiveRate > 0) {
+        return 'hsl(0, 100%, '+(100 - 2*positiveRate*100 - 10)+'%)';
+      } else {
+        return 'hsl(240, 100%, 50%)'; // blue
+      }
+    }
+  })
+}
+
 function scrollAlignment(event) {
+  // var coucouSite = - (50 + seq_lg + 10 - alignmentWindow.scrollLeft() - alignmentWindow.innerWidth()/2)/hStep;
+  // console.log('coucouSite', Math.trunc(siteNumber));
+
   // var alignmentWindow = $('#alignment-container');
   // var compactWindow = $('#navigator-container');
 
@@ -1479,20 +1453,29 @@ function scrollAlignment(event) {
   // console.log('compactWindow.scrollLeft()', compactWindow.scrollLeft());
   var siteNumber = event.pageX + compactWindow.scrollLeft();
   // console.log('Navigating to site', siteNumber);
-  alignmentWindow.scrollLeft(50 + seq_lg + 10 + siteNumber*hStep - alignmentWindow.innerWidth()/2, 0);
+  var leftScroll = 50 + seq_lg + 10 + siteNumber*hStep - alignmentWindow.innerWidth()/2;
+  var rightScroll = 50 + seq_lg + 10 + siteNumber*hStep + alignmentWindow.innerWidth()/2;
+  var leftSiteNumber = Math.trunc((leftScroll - (60 + seq_lg))/hStep)+2;
+  var rightSiteNumber = Math.trunc((rightScroll - (60 + seq_lg))/hStep)+2;
+  // console.log(leftSiteNumber, rightSiteNumber);
+  alignmentWindow.scrollLeft(leftScroll, 0);
 
-  if (event.type === 'mouseup') {
-    // console.log('mouse released', event.currentTarget.id);
-    compactWindow.off('mousemove');
-  }
+  $('#left-boundary').val(leftSiteNumber);
+  $('#right-boundary').val(rightSiteNumber);
+  leftBoundary = parseInt($('#left-boundary').val());
+  rightBoundary = parseInt($('#right-boundary').val());
+
+  // if (event.type === 'mouseup') {
+  //   updateLayout(cladeRoot);
+  // }
 }
 
 function updateScroll() {
+  console.log('update scroll');
   // Hack to keep the navigation window visible after a branch change
   alignmentWindow
     .scrollLeft(alignmentWindow.scrollLeft()+1)
     .scrollLeft(alignmentWindow.scrollLeft()-1);
-  // console.log('seq_lg', seq_lg);
 }
 
 function reloadGlobalResults() {
@@ -1501,10 +1484,10 @@ function reloadGlobalResults() {
 }
 
 // Get the rate of positive sites in a JSON-formatted results list
-function getPositiveRateJSON(textResultsList, upperThreshold) {
+function getPositiveRateJSON(textResultsList, upperThreshold, leftB, rightB) {
   var jsonResultsList = JSON.parse(textResultsList);
   var positiveSites = [];
-  if (boundariesOn) {
+  if (leftB && rightB) {
     jsonResultsList.forEach((res, i) => {
       var site = i;
       var value = res;
@@ -1522,6 +1505,24 @@ function getPositiveRateJSON(textResultsList, upperThreshold) {
       }
     });
   }
+  // if (boundariesOn) {
+  //   jsonResultsList.forEach((res, i) => {
+  //     var site = i;
+  //     var value = res;
+  //     if (value >= psThresholdHigh && site >= leftBoundary && site <= rightBoundary) {
+  //       positiveSites.push(site);
+
+  //     }
+  //   });
+  // } else {
+  //   jsonResultsList.forEach((res, i) => {
+  //     var site = i;
+  //     var value = res;
+  //     if (value >= psThresholdHigh && site >= leftBoundary && site <= rightBoundary) {
+  //       positiveSites.push(site);
+  //     }
+  //   });
+  // }
   // console.log(positiveSites.length,'of',rightBoundary-leftBoundary,'positive sites:',positiveSites);
   return positiveSites.length/(rightBoundary - leftBoundary);
 }
