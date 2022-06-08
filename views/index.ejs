@@ -37,9 +37,9 @@
     </header>
 
     <main>
-      <div><h3>Tree</h3><p id="tree-file-content"></p></div>
+      <!-- <div><h3>Tree</h3><p id="tree-file-content"></p></div>
       <div><h3>Alignment</h3><p id="alignment-file-content"></p></div>
-      <div><h3>Results</h3><p id="results-file-content"></p></div>
+      <div><h3>Results</h3><p id="results-file-content"></p></div> -->
 
       <div class="form-mod">
         <form method="post" action="/upload_files" enctype="multipart/form-data">
@@ -97,7 +97,7 @@
             </div> -->
           </div>
           
-          <div class="row mb-3">
+          <div id="statcol-field" class="row mb-3">
             <label for="statcol">Global statistics column</label>
             <input id="statcol" class="form-control" type="number" name="statcol" value="1" min="0" step="1" required />
           </div>
@@ -202,29 +202,24 @@
     +'</svg>';
 
   $(document).ready(function() {
-    function addFileInput() {
-      //
+    function updateForm() {
+      console.log('checked:', isChecked('branchSite'));
+      if (isChecked('branchSite')) {
+        $('#statcol-field').hide();
+      } else {
+        $('#statcol-field').show();
+      }
     }
     function isChecked(checkboxId) {
       return $('#'+checkboxId).is(':checked');
     }
     $('#branchSite').ready(function(e) {
       console.log('branchSite ready');
-      console.log('checked:',   isChecked('branchSite'));
-      if (isChecked('branchSite')) {
-        // add name fields to results file(s)
-      } else {
-        // remove name fields from results file(s)
-      }
+      updateForm();
     });
     $('#branchSite').change(function (e) {
       console.log('branchSite updated');
-      console.log('checked:', isChecked('branchSite'));
-      if (isChecked('branchSite')) {
-        // add name fields to results file(s)
-      } else {
-        // remove name fields from results file(s)
-      }
+      updateForm();
     });
 
     $('[id^="formula-select-"]').change(function(event) {
