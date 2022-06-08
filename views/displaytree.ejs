@@ -8,111 +8,112 @@
 </head>
 
 <body>
-  <nav id="main-nav" class="navbar navbar-default navbar-fixed-top">
-    <%- include('../partials/header') %>
-    <!-- Bouton Action -->
-    <div id="action" class="dropdown">
-      <button class="btn dropdown-toggle btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Choose action on node">
-        On click
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="action">
-        <li><a id="branch-res" class="dropdown-item" href="#">View Branch Results</a></li>
-        <li><a id="switch" class="dropdown-item" href="#">Switch children</a></li>
-        <li><a id="collapse" class="dropdown-item" href="#">Collapse/Expand</a></li>
-        <li><a id="subtree" class="dropdown-item" href="#">Sub Tree/Upper Tree</a></li>
-      </ul>
-    </div>
-    <!-- Bouton Collapse -->
-    <!-- <button type="button" class="btn btn-default btn-sm" aria-label="Collapse" data-toggle="tooltip" data-placement="top" title="Collapse the tree" id="globalcollapse">
-      <span>Compact tree</span>
-    </button> -->
-    <!-- Bouton Expand -->
-    <button id="globalexpand" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Expand" data-toggle="tooltip" data-placement="top" title="Expand the tree (takes time on big trees!)">
-      <span>Expand tree</span>
-    </button>
-    <div class="btn-group" role="group" aria-label="Tree size buttons">
-      <div class="btn-group" role="group" aria-label="Width buttons">
-        <!-- Bouton Reduce width -->
+  <header>
+    <nav id="main-nav" class="navbar navbar-default navbar-fixed-top">
+      <%- include('../partials/header') %>
+      <!-- Bouton Action -->
+      <div id="action" class="dropdown">
+        <button class="btn dropdown-toggle btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Choose action on node">
+          On click
         </button>
-        <button id="lessWidth" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Less width" data-toggle="tooltip" data-placement="top" title="Reduce tree width">
-          <span>Width -</span>
-          <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
-        </button>
-        <!-- Bouton Increase width -->
-        <button id="moreWidth" class="btn btn-sm btn-outline-secondary" type="button" aria-label="More width" data-toggle="tooltip" data-placement="top" title="Increase tree width">
-          <span>Width +</span>
-          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-        </button>
+        <ul class="dropdown-menu" aria-labelledby="action">
+          <li><a id="branch-res" class="dropdown-item" href="#">View Branch Results</a></li>
+          <li><a id="switch" class="dropdown-item" href="#">Switch children</a></li>
+          <li><a id="collapse" class="dropdown-item" href="#">Collapse/Expand</a></li>
+          <li><a id="subtree" class="dropdown-item" href="#">Sub Tree/Upper Tree</a></li>
+        </ul>
       </div>
-      <div class="btn-group" role="group" aria-label="Height buttons">
-        <!-- Bouton Reduce height -->
-        <button id="lessHeigth" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Left Align" data-toggle="tooltip" data-placement="top" title="Reduce tree height">
-          <span>Height -</span>
-          <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
-        </button>
-        <!-- Bouton Increase height -->
-        <button id="moreHeigth" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Left Align" data-toggle="tooltip" data-placement="top" title="Increase tree height">
-          <span>Height +</span>
-          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-        </button>
+      <!-- Bouton Collapse -->
+      <!-- <button type="button" class="btn btn-default btn-sm" aria-label="Collapse" data-toggle="tooltip" data-placement="top" title="Collapse the tree" id="globalcollapse">
+        <span>Compact tree</span>
+      </button> -->
+      <!-- Bouton Expand -->
+      <button id="globalexpand" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Expand" data-toggle="tooltip" data-placement="top" title="Expand the tree (takes time on big trees!)">
+        <span>Expand tree</span>
+      </button>
+      <div class="btn-group" role="group" aria-label="Tree size buttons">
+        <div class="btn-group" role="group" aria-label="Width buttons">
+          <!-- Bouton Reduce width -->
+          </button>
+          <button id="lessWidth" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Less width" data-toggle="tooltip" data-placement="top" title="Reduce tree width">
+            <span>Width -</span>
+            <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+          </button>
+          <!-- Bouton Increase width -->
+          <button id="moreWidth" class="btn btn-sm btn-outline-secondary" type="button" aria-label="More width" data-toggle="tooltip" data-placement="top" title="Increase tree width">
+            <span>Width +</span>
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+          </button>
+        </div>
+        <div class="btn-group" role="group" aria-label="Height buttons">
+          <!-- Bouton Reduce height -->
+          <button id="lessHeigth" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Left Align" data-toggle="tooltip" data-placement="top" title="Reduce tree height">
+            <span>Height -</span>
+            <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+          </button>
+          <!-- Bouton Increase height -->
+          <button id="moreHeigth" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Left Align" data-toggle="tooltip" data-placement="top" title="Increase tree height">
+            <span>Height +</span>
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+          </button>
+        </div>
       </div>
-    </div>
-    <!-- Bouton Alignement -->
-    <div id="alignment-type" class="dropdown">
-      <button class="btn dropdown-toggle btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Choose alignment type">
-        Alignment type
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="alignment-type">
-        <li><a id="aminoacid" class="dropdown-item" href="#">Amino Acids</a></li>
-        <li><a id="nucleotid" class="dropdown-item" href="#">Codons</a></li>
-      </ul>
-    </div>
-    <!-- Bouton Export -->
-    <div id="export" class="dropdown">
-      <button class="btn dropdown-toggle btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Choose alignment type">
-        Export
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="export">
-        <li><a id="tree" class="dropdown-item" href="#">Tree</a></li>
-        <li><a id="selecp" class="dropdown-item" href="#">Alignment</a></li>
-      </ul>
-    </div>
+      <!-- Bouton Alignement -->
+      <div id="alignment-type" class="dropdown">
+        <button class="btn dropdown-toggle btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Choose alignment type">
+          Alignment type
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="alignment-type">
+          <li><a id="aminoacid" class="dropdown-item" href="#">Amino Acids</a></li>
+          <li><a id="nucleotid" class="dropdown-item" href="#">Codons</a></li>
+        </ul>
+      </div>
+      <!-- Bouton Export -->
+      <div id="export" class="dropdown">
+        <button class="btn dropdown-toggle btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Choose alignment type">
+          Export
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="export">
+          <li><a id="tree" class="dropdown-item" href="#">Tree</a></li>
+          <li><a id="selecp" class="dropdown-item" href="#">Alignment</a></li>
+        </ul>
+      </div>
 
-    <!-- Champs Seuils sup. et inf. -->
-    <button class="btn btn-sm btn-outline-secondary">
-      <div class="input-group">
-        <label for="ps-threshold-low">Lower threshold</label>
-        <input id="ps-threshold-low" type="number" min="0.0" step="0.05" placeholder="PS Threshold" value="0.9" style="width: 5em;"/>
-      </div>
-    </button>
-    <button class="btn btn-sm btn-outline-secondary">
-      <div class="input-group">
-        <label for="ps-threshold-high">Upper threshold</label>
-        <input id="ps-threshold-high" type="number" min="0.0" step="0.05" placeholder="PS Threshold" value="1.0" style="width: 5em;"/>
-      </div>
-    </button>
-    <!-- Champs Borne gauche et droite -->
-    <button class="btn btn-sm btn-outline-secondary">
-      <div class="input-group">
-        <label for="left-boundary">Left boundary</label>
-        <input id="left-boundary" type="number" step="1" placeholder="Left boundary" value="0" style="width: 5em;"/>
-      </div>
-    </button>
-    <button class="btn btn-sm btn-outline-secondary">
-      <div class="input-group">
-        <label for="right-boundary">Right boundary</label>
-        <input id="right-boundary" type="number" step="1" placeholder="Right boundary" value="10000" style="width: 5em;"/>
-      </div>
-    </button>
-    <!-- Bouton de chargement des résultats globaux -->
-    <button id="reload-global-results" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Reload global results" data-toggle="tooltip" data-placement="top" title="Reload default results">
-      <span>Reload global results</span>
-    </button>
-  </nav>
-
-  <div id="navigator-container" style="border:2px solid lightgrey; float: left; overflow-y: hidden; width: 100%; height: 80px;">
-    <svg id="svg0"></svg>
-  </div>
+      <!-- Champs Seuils sup. et inf. -->
+      <button class="btn btn-sm btn-outline-secondary">
+        <div class="input-group">
+          <label for="ps-threshold-low">Lower threshold</label>
+          <input id="ps-threshold-low" type="number" min="0.0" step="0.05" placeholder="PS Threshold" value="0.9" style="width: 5em;"/>
+        </div>
+      </button>
+      <button class="btn btn-sm btn-outline-secondary">
+        <div class="input-group">
+          <label for="ps-threshold-high">Upper threshold</label>
+          <input id="ps-threshold-high" type="number" min="0.0" step="0.05" placeholder="PS Threshold" value="1.0" style="width: 5em;"/>
+        </div>
+      </button>
+      <!-- Champs Borne gauche et droite -->
+      <button class="btn btn-sm btn-outline-secondary">
+        <div class="input-group">
+          <label for="left-boundary">Left boundary</label>
+          <input id="left-boundary" type="number" step="1" placeholder="Left boundary" value="0" style="width: 5em;"/>
+        </div>
+      </button>
+      <button class="btn btn-sm btn-outline-secondary">
+        <div class="input-group">
+          <label for="right-boundary">Right boundary</label>
+          <input id="right-boundary" type="number" step="1" placeholder="Right boundary" value="10000" style="width: 5em;"/>
+        </div>
+      </button>
+      <!-- Bouton de chargement des résultats globaux -->
+      <button id="reload-global-results" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Reload global results" data-toggle="tooltip" data-placement="top" title="Reload default results">
+        <span>Reload global results</span>
+      </button>
+    </nav>
+    <div id="navigator-container" style="border:2px solid lightgrey; overflow-y: hidden; width: 100%; height: 80px;">
+      <svg id="svg0"></svg>
+    </div>
+  </header>
 
   <div id="tree-container" style="border:2px solid lightgrey; float: left; overflow-y: auto; width: 40%;">
     <svg id="svg1"></svg>
@@ -121,7 +122,6 @@
   <div id="alignment-container" style="border:2px solid lightgrey; overflow-x: auto; overflow-y: auto;">
     <svg id="svg2"></svg>
   </div>
-
 </body>
 
 <script src="xmltree.js" charset="utf-8"></script>
@@ -198,6 +198,7 @@ var resultsShown;
 // var maxSeqLen = xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.maxSeqLen);
 var maxSeqLen = 0;
 var updateNodesTimeout = null;
+var selectedNode = null;
 
 if (!isStorageSupported(myStorage)) {
   console.log("window.localStorage problem");
@@ -364,13 +365,11 @@ function updateLayout(cRoot,firstLoad=0) {
   } else {
     phylogeny_setloss(treeRoot,nodeWidth);
   }
+  // updateBoundaries();
   updateSvg(treeRoot,firstLoad);
+  // updateNodeColors();
   updateScroll();
 }
-
-function hideTooltip() { $('.tooltip').hide(); }
-function showTooltip() { $('.tooltip').show(); }
-function writeTooltip(text) { $('.tooltip').text(text); }
 
 // Fonction principale : mise a jour du svg
 // ----------------------------------------
@@ -412,6 +411,8 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     hideTooltip();
     resultsJSON = JSON.parse(xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results));
     // console.log('Results undefined, not branch-site');
+  } else {
+    maxSeqLen = resultsJSON.length;
   }
   // else {
   //   // console.log('resultsJSON:', resultsJSON);
@@ -596,6 +597,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       .attr("class", "gsymbol")
       .append("path")
         .attr("class", "symbol")
+        .style('stroke-width', '0')
         .on('mouseover', function(d) {
           showTooltip();
           if (d.data.branch_info) {
@@ -620,17 +622,16 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
             }
             window.open(url);
           }
-          d3.select(this)
-            .attr('fill', function(elt) {
-              // console.log(elt);
-              return '#FFF';
-            })
-            .attr('stroke', '#000')
-            .attr('stroke-width', '2');
+          // d3.select(this)
+          //   .style('stroke', '#000')
+          //   .style('stroke-width', '2');
           if (action == svgEvents.showBranchResults) {
             resultsJSON = JSON.parse(d.data.branch_info.results);
           }
-          updateLayout(treeRoot, firstLoad);
+          selectedNode = d3.select(this);
+          // updateLayout(treeRoot, firstLoad);
+          updateNodeColors(selectedNode);
+          updateLayout(cladeRoot);
         });
   nodeEnter
     .append("text")
@@ -1010,22 +1011,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   });
 
   alignmentWindow.on('scroll', function() {
-    // if (updateNodesTimeout != null) {
-    //   clearTimeout(updateNodesTimeout);
-    //   updateNodesTimeout = null;
-    //   console.log('timeout cleared', updateNodesTimeout);
-    // } else {
-    //   updateNodesTimeout = setTimeout(updateLayout(cladeRoot), 1000);
-    //   console.log('timeout set', updateNodesTimeout);
-    // }
-
-    // let timeout;
-    // alignmentWindow.on('scroll', () => {
-    //   clearTimeout(timeout);
-    //   timeout = setTimeout(updateNodeColors(), 500);
-    // });
     console.log('scrolling');
-    updateNodeColors();
 
     // Draw a rectangle surrounding the site that was clicked
     // console.log('scrolling alignment');
@@ -1046,22 +1032,13 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         .style('fill', 'rgba(0,0,0,0.1)')
         // .style('stroke', '#00FFFF')
         .style('stroke', navWindowColor)
-        .style('stroke-width', 2+'px');
+        .style('stroke-width', '2');
   });
-
-  // Hack to keep the navigation window visible after a branch change
-  // alignmentWindow
-  //   .scrollLeft(alignmentWindow.scrollLeft()+1)
-  //   .scrollLeft(alignmentWindow.scrollLeft()-1);
-  // updateScroll();
   
   // ======================================================
   // | Début : graphe des résultats de sélection positive |
   // ======================================================
   var svg2 = d3.select("#svg2");
-  // svg2.attr("width", widthSVG + margin.right + ajustementX)
-  //   .attr("height",  heightSVG + margin.top + margin.down + 100);
-  // console.log('seq_lg:', seq_lg);
   svg2
     .attr("width",  50 + seq_lg + 10 + resultsJSON.length*hStep + 10 + seq_lg + 50)
     .attr("height",  heightSVG + margin.top + margin.down + 100);
@@ -1093,33 +1070,6 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       return 0;
     }
   }
-  // function maxStat(results_list) {
-  //   var currentmax = results_list[0].stat;
-  //   results_list.forEach(function(res) {
-  //     if (res.stat > currentmax) {
-  //       currentmax = res.stat;
-  //     }
-  //   });
-  //   if (currentmax >= 2) {
-  //     return 2;
-  //   } else {
-  //     return currentmax;
-  //   }
-  //   return currentmax;
-  // }
-  // function minStat(results_list) {
-  //   var currentmin = results_list[0].stat;
-  //   results_list.forEach(function(res) {
-  //     if (res.stat < currentmin) {
-  //       currentmin = res.stat;
-  //     }
-  //   });
-  //   if (currentmin <= 0) {
-  //     return currentmin;
-  //   } else {
-  //     return 0;
-  //   }
-  // }
   // === Définition de l'échelle pour l'axe x ===
   var x = d3.scaleLinear()
     .domain([1, resultsJSON.length+1])
@@ -1178,7 +1128,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         }
       })
       .style('stroke', '#000000')
-      .style('stroke-width', 0+'px')
+      .style('stroke-width', '0')
       .on('mouseover', function(d) {
         // console.log(d);
         writeTooltip(d);
@@ -1194,7 +1144,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .attr('y2', y(psThresholdHigh))
     .style('stroke', '#000000')
     // .style('stroke', psThresholdHighBgColor)
-    .style('stroke-width', 2+'px')
+    .style('stroke-width', '2')
     .style('stroke-dasharray', ('4, 4'));
   // Ajout du seuil inférieur au graphe
   psGraph.append('line')
@@ -1204,15 +1154,11 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .attr('y2', y(psThresholdLow))
     .style('stroke', '#000000')
     // .style('stroke', psThresholdLowBgColor)
-    .style('stroke-width', 1+'px')
+    .style('stroke-width', '1')
     .style('stroke-dasharray', ('4, 4'));
   
   psGraph.append('br');
-  
-  psGraph.on('click', function() {
-    var coords = d3.mouse(this);
-    // console.log(event.target.title);
-  });
+
   // ====================================================
   // | Fin : graphe des résultats de sélection positive |
   // ====================================================
@@ -1384,41 +1330,12 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // ==============================================================
   // Fin modif : blocs de séquences
   // ==============================================================
-  // $('.ps-rects-global').on('click', function(event) {
-  //   console.log('coucou', $(this).attr('title').split('-')[0]);
-  //   var siteNumber = $(this).attr('title').split('-')[0];
-  //   var target = document.getElementById('alignment-container');
-  //   // console.log(target);œ
-  //   // largeur svg2 : 50 + seq_lg + 10 + resultsJSON.length*12 + 50
-  //   // 0 : 50 | seq_lg | 10
-  //   // max : 50 | seq_lg | 10 resultsJSON.length*hStep
-  //   target.scrollTo(siteNumber*hStep + seq_lg + 50 - target.clientWidth/2, 0); // use offsetWidth for paddings, borders and margins
-  // });
-  // $('.symbol').on('mouseover', function(event) {
-  //   // console.log('mouseover event', event);
-  //   var mouseY = event.clientX;
-  //   var mouseX = event.clientY;
-  //   // console.log(mouseX, mouseY);
-  //   moveTooltip(mouseX, mouseY);
-  //   // console.log(document.getElementsByClassName('tooltip')[0]);
-  //   var tooltipElement = document.getElementsByClassName('tooltip')[0];
-  //   tooltipElement.innerHTML = getPositiveSites(d.data.branch_info.results, psThresholdHigh).length;
-  //   // $('.tooltip').html(getPositiveSites(d.data.branch_info.results, psThresholdHigh).length)
-  //   // .css({
-  //   //   'z-index': '1',
-  //   //   'background':'#FFFFFF',
-  //   //   'width':'100px',
-  //   //   'height':'100px',
-  //   //   'top':'500px',
-  //   //   'left':'500px'
-  //   // })
-  //   // .show();
-  // });
-  // $('#alugnment-container').on('scroll', function (event) {
-  //   console.log('scrolling alignment container', event)
+  
+  // $('#alignment-container').on('scroll', function (event) {
+  //   console.log('scrolling alignment container');
   // });
   // updateScroll();
-  updateNodeColors();
+  // updateNodeColors();
 }
 // Fin de la fonction updateSvg
 // ----------------------------
@@ -1426,29 +1343,30 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
 // Autres fonctions utilitaires
 // ----------------------------
 
-function updateNodeColors() {
+function updateBoundaries() {
+  leftBoundary = $('#left-boundary').val();
+  rightBoundary = $('#right-boundary').val();
+}
+
+function updateNodeColors(thisNode) {
   // The color of a node depends on the number of positive sites in its branch
-  g.selectAll('path.symbol').attr('fill', function(d) {
-    if (d.data.branch_info) {
-      var positiveRate = getPositiveRateJSON(d.data.branch_info.results, psThresholdHigh, leftBoundary, rightBoundary);
-      if (positiveRate > 0) {
-        return 'hsl(0, 100%, '+(100 - 2*positiveRate*100 - 10)+'%)';
-      } else {
-        return 'hsl(240, 100%, 50%)'; // blue
+  g.selectAll('path.symbol')
+    // .style('stroke-width', '0')
+    .style('fill', function(d) {
+      if (d.data.branch_info) {
+        var positiveRate = getPositiveRateJSON(d.data.branch_info.results, psThresholdHigh, leftBoundary, rightBoundary);
+        if (positiveRate > 0) {
+          return 'hsl(0, 100%, '+(100 - 2*positiveRate*100)+'%)';
+        } else {
+          return 'hsl(240, 100%, 50%)'; // blue
+        }
       }
-    }
-  })
+    })
+    .style('stroke-width', '0');
+  selectedNode.style('stroke-width', '2');
 }
 
 function scrollAlignment(event) {
-  // var coucouSite = - (50 + seq_lg + 10 - alignmentWindow.scrollLeft() - alignmentWindow.innerWidth()/2)/hStep;
-  // console.log('coucouSite', Math.trunc(siteNumber));
-
-  // var alignmentWindow = $('#alignment-container');
-  // var compactWindow = $('#navigator-container');
-
-  // console.log('scrollAlignment:', event.type, 'on', event.currentTarget);
-
   // Get the site's number (mouse position in pixels) and navigate to this site in the large window
   // console.log('compactWindow.scrollLeft()', compactWindow.scrollLeft());
   var siteNumber = event.pageX + compactWindow.scrollLeft();
@@ -1460,14 +1378,12 @@ function scrollAlignment(event) {
   // console.log(leftSiteNumber, rightSiteNumber);
   alignmentWindow.scrollLeft(leftScroll, 0);
 
-  $('#left-boundary').val(leftSiteNumber);
-  $('#right-boundary').val(rightSiteNumber);
+  $('#left-boundary').val(leftSiteNumber>=0?leftSiteNumber:0);
+  $('#right-boundary').val(rightSiteNumber<=maxSeqLen?rightSiteNumber:maxSeqLen);
   leftBoundary = parseInt($('#left-boundary').val());
   rightBoundary = parseInt($('#right-boundary').val());
-
-  // if (event.type === 'mouseup') {
-  //   updateLayout(cladeRoot);
-  // }
+  
+  updateNodeColors(selectedNode);
 }
 
 function updateScroll() {
@@ -1482,6 +1398,10 @@ function reloadGlobalResults() {
   resultsJSON = JSON.parse(xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results));
   updateLayout(cladeRoot);
 }
+
+function hideTooltip() { $('.tooltip').hide(); }
+function showTooltip() { $('.tooltip').show(); }
+function writeTooltip(text) { $('.tooltip').text(text); }
 
 // Get the rate of positive sites in a JSON-formatted results list
 function getPositiveRateJSON(textResultsList, upperThreshold, leftB, rightB) {
@@ -1505,72 +1425,13 @@ function getPositiveRateJSON(textResultsList, upperThreshold, leftB, rightB) {
       }
     });
   }
-  // if (boundariesOn) {
-  //   jsonResultsList.forEach((res, i) => {
-  //     var site = i;
-  //     var value = res;
-  //     if (value >= psThresholdHigh && site >= leftBoundary && site <= rightBoundary) {
-  //       positiveSites.push(site);
-
-  //     }
-  //   });
-  // } else {
-  //   jsonResultsList.forEach((res, i) => {
-  //     var site = i;
-  //     var value = res;
-  //     if (value >= psThresholdHigh && site >= leftBoundary && site <= rightBoundary) {
-  //       positiveSites.push(site);
-  //     }
-  //   });
-  // }
+  rightBoundary = $('#right-boundary').val();
+  leftBoundary = $('#left-boundary').val();
+  // console.log('rightBoundary', rightBoundary);
+  // console.log('leftBoundary', leftBoundary);
   // console.log(positiveSites.length,'of',rightBoundary-leftBoundary,'positive sites:',positiveSites);
   return positiveSites.length/(rightBoundary - leftBoundary);
 }
-
-// Fonction qui renvoie la liste des positions des sites positifs (format JSON)
-// function getPositiveSitesJSON(textResultsList, upperThreshold) {
-//   if (boundariesOn) {
-//     ///
-//   } else {
-//     var jsonResultsList = JSON.parse(textResultsList);
-//     // console.log('jsonResultsList', jsonResultsList);
-//     // console.log('jsonResultsList[0]', jsonResultsList[0]);
-//     // console.log('jsonResultsList[jsonResultsList.length - 1]', jsonResultsList[jsonResultsList.length - 1]);
-    
-//     var positiveSites = [];
-//     // console.log(resultsList);
-//     jsonResultsList.forEach((r, i) => {
-//       // console.log('site', i);
-//       var site = i;
-//       var value = r;
-//       // console.log('site:', i, 'value:', r);
-//       if (value >= psThresholdHigh) {
-//         positiveSites.push(site);
-//       }
-//     })
-//   }
-//   // console.log('positive sites:', positiveSites);
-//   // console.log(positiveSites.length, 'positive sites');
-//   return positiveSites;
-// }
-
-// // Fonction qui renvoie la liste des positions des sites positifs
-// function getPositiveSites(resultsText, upperThreshold) {
-//   var resultsList = resultsText.split(' ');
-//   var positiveSites = [];
-//   // console.log(resultsList);
-//   resultsList.forEach((r) => {
-//     var site = r.split(':')[0];
-//     var value = r.split(':')[1];
-//     // console.log('site:', r.split(':')[0], 'value:', r.split(':')[1]);
-//     if (value >= psThresholdHigh) {
-//       positiveSites.push(site);
-//     }
-//   })
-//   // console.log('positive sites:', positiveSites);
-//   // console.log(positiveSites.length, 'positive sites');
-//   return positiveSites;
-// }
 
 // Fonction de test du support local.storage
 // ------------------------------------------
@@ -1586,36 +1447,10 @@ function isStorageSupported(storage) {
   }
 }
 
-// Fonction d'export du SVG
-// ------------------------
-// // saveSVG()
-// function saveSVG(){
-//   // get styles from all required stylesheets
-//   // http://www.coffeegnome.net/converting-svg-to-png-with-canvg/
-//   var style = "\n";
-//   var requiredSheets = ['phylogram_d3.css', 'open_sans.css'];
-//   console.log('requiredSheets:');
-//   console.log(requiredSheets);
-//   var img = new Image();
-//   var serializer = new XMLSerializer();
-//   // prepend style to svg
-//   svg1.insert('defs',":first-child");
-//   d3.select("svg defs")
-//       .append('style')
-//       .attr('type','text/css')
-//       .html(style);
-//   var svgStr = serializer.serializeToString(svg1.node());
-//   img.src = 'data:image/svg+xml;base64,'+window.btoa(unescape(encodeURIComponent(svgStr)));
-//   window.open().document.write('<p>Please copy or save the the image <img src="' + img.src + '"/>');
-// };
-
 function saveSVGTree(){
   $("a#tree").css('color', '#FF0000');
   $("a#selecp").css('color', '#000000');
-  // get styles from all required stylesheets
-  // http://www.coffeegnome.net/converting-svg-to-png-with-canvg/
   var style = "\n";
-  // var requiredSheets = ['phylogram_d3.css', 'open_sans.css'];
   var img = new Image();
   // prepend style to svg
   const treeSvg = d3.select('#svg1');
@@ -1641,10 +1476,7 @@ function saveSVGAlignment(){
     'letter-spacing':(alignmentLetterSpacing)+'px',
     'font-size': '16.667px',
   });
-  // get styles from all required stylesheets
-  // http://www.coffeegnome.net/converting-svg-to-png-with-canvg/
   var style = "\n";
-  // var requiredSheets = ['phylogram_d3.css', 'open_sans.css'];
   var img = new Image();
   // prepend style to svg
   const alignmentSvg = d3.select('#svg2');
@@ -1656,6 +1488,9 @@ function saveSVGAlignment(){
   var as_text = new XMLSerializer().serializeToString(alignmentSvg.node());
   img.src = 'data:image/svg+xml;base64,'+window.btoa(unescape(encodeURIComponent(as_text)));
   window.open().document.write('<p>Please copy or save the the image (it may not display if it is too large) <img src="' + img.src + '"/>');
+  // var as_text = new XMLSerializer().serializeToString(alignmentSvg.node());
+  // img.src = 'data:image/svg+xml;base64,'+window.btoa(unescape(encodeURIComponent(as_text)));
+  // window.open().document.write('<p>Please copy or save the the image (it may not display if it is too large) <img src="' + img.src + '"/>');
 };
 
 // Fonction recursive qui renvoie les noeuds ancestraux communs a
@@ -1710,21 +1545,21 @@ function subnode(nodes, pattern, colPattern) {
     if (d.depth == 0) {
       racine = d;
     }
-    // if (d.data.lastEvent && d.data.lastEvent.crossref) {
-    //   // Si la balise crossref est presente on
-    //   // l'utilise plutot que le nom du gene
-    //   var cross=d.data.lastEvent.crossref;
-    //   for(var exKey in cross) {
-    //     var nomFeuille = cross[exKey];
-    //     pattern.forEach(function (p){
-    //       var nomPattern = p.replace(/[\n\r]/g, '');
-    //       if (nomFeuille === nomPattern) {
-    //         selection.push(d);
-    //         scrollref=d.y;
-    //       }
-    //     })
-    //   }
-    // }
+    if (d.data.lastEvent && d.data.lastEvent.crossref) {
+      // Si la balise crossref est presente on
+      // l'utilise plutot que le nom du gene
+      var cross=d.data.lastEvent.crossref;
+      for(var exKey in cross) {
+        var nomFeuille = cross[exKey];
+        pattern.forEach(function (p){
+          var nomPattern = p.replace(/[\n\r]/g, '');
+          if (nomFeuille === nomPattern) {
+            selection.push(d);
+            scrollref=d.y;
+          }
+        })
+      }
+    }
     if (d.data.name){
       var nomFeuille = d.data.name;
       pattern.forEach(function (p){
@@ -1789,14 +1624,14 @@ function phylogeny(treeRoot,offset) {
 
 // Fonction qui decale la position x d'un "loss"
 // ---------------------------------------------
-// function phylogeny_setloss(treeRoot,offset) {
-  // treeRoot.each(function (d) {
-  //   if (d.data.lastEvent && d.data.lastEvent.eventType === "loss") {
-  //    var lospar = d.parent;
-  //    d.x = (d.x+lospar.x)/2
-  //   }
-  // });
-// }
+function phylogeny_setloss(treeRoot,offset) {
+  treeRoot.each(function (d) {
+    if (d.data.lastEvent && d.data.lastEvent.eventType === "loss") {
+     var lospar = d.parent;
+     d.x = (d.x+lospar.x)/2
+    }
+  });
+}
 
 // Fonction ajoute nb sequences et especes
 // ---------------------------------------
@@ -2184,40 +2019,6 @@ $(document).ready(function() {
       }
   };
   $('button#reload-global-results').click(reloadGlobalResults);
-  // $('#alugnment-container').on('scroll', function (event) {
-  //   // console.log('scrolling alignment container', event)
-  // });
-  // $('#collapse-mode span').text(function() {
-  //   console.log('collapseMode:', collapseMode);
-  //   switch (collapseMode) {
-  //     case 'collapseOn':
-  //       return 'Collapse On';
-  //       break;
-  //     case 'collapseOff':
-  //     return 'Collapse Off';
-  //       break;
-  //     default:
-  //       return collapseMode;
-  //       break;
-  //   }
-  // });
-  // $('#collapse-mode').on('click', function(event, dropdownData) {
-  //   switch (collapseMode) {
-  //     case 'collapseOff':
-  //       collapseMode = 'collapseOn';
-  //       $('#collapse-mode span').text('Collapse On');
-  //       break;
-  //     case 'collapseOn':
-  //       collapseMode = 'collapseOff';
-  //       $('#collapse-mode span').text('Collapse Off');
-  //       break;
-  //     default:
-  //       collapseMode = 'collapseOff';
-  //       $('#collapse-mode span').text('Collapse Off');
-  //       break;
-  //   }
-  //   console.log('collapseMode:', collapseMode);
-  // });
   switch (displaySeqType) {
     case 'AA':
       $('a#aminoacid').css('color', '#FF0000');
@@ -2233,13 +2034,8 @@ $(document).ready(function() {
       break;
   }
   $('div.demo').css({
-    'margin-top': $('nav').outerHeight(),
-    // 'width': $(window).width(),
-    // 'height': $(window).height() - $('nav').outerHeight() - 100,
+    'margin-top': $('header').outerHeight(),
   });
-  // $('#svg-container').attr('height', $('.demo').outerHeight() - 50);
-  // $('#tree-container').attr('height', $('.demo').outerHeight() - 50);
-  // $('#alignment-container').attr('height', $('.demo').outerHeight() - 50);
   // Gestion du redimensionnement de la fenêtre
   $(window).ready(function() {
     $('#svg-container').css({
@@ -2293,8 +2089,8 @@ $(document).ready(function() {
       default:
     }
   });
-  leftBoundary = $('#left-boundary').val();
-  rightBoundary = $('#right-boundary').val();
+  // leftBoundary = $('#left-boundary').val();
+  // rightBoundary = $('#right-boundary').val();
   // Gestion de la modification des limites
   $('#left-boundary, #right-boundary').on('change', function(event) {
     // On a modifié un des seuils
@@ -2307,19 +2103,19 @@ $(document).ready(function() {
         // On a descendu le seuil supérieur plus bas que le seuil inférieur
         // ex : psHighVal = 0.95 | psLowVal = 1.0
         // On veut donc redecsendre le seuil inférieur en conséquence
-        $('#left-boundary').val(rightB);
         leftB = rightB - 1;
+        $('#left-boundary').val(leftB);
       } else if (leftB + 1 > rightB) {
         // On a monté le seuil inférieur plus haut que le seuil supérieur
         // ex : psHighVal = 1.0 | psLowVal = 1.05
         // On veut donc remonter le seuil supérieur en conséquence
-        $('#right-boundary').val(leftB);
         rightB = leftB + 1;
+        $('#right-boundary').val(rightB);
       }
     }
     // Réaffectation des variables globales
-    rightBoundary = rightB;
     leftBoundary = leftB;
+    rightBoundary = rightB;
     // console.log('>> ', psThresholdHigh, '>=', psThresholdLow);
     updateLayout(cladeRoot);
   });
