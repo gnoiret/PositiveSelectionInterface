@@ -78,7 +78,6 @@
           <li><a id="selecp" class="dropdown-item" href="#">Alignment</a></li>
         </ul>
       </div>
-
       <!-- Champs Seuils sup. et inf. -->
       <button class="btn btn-sm btn-outline-secondary">
         <div class="input-group">
@@ -106,21 +105,21 @@
         </div>
       </button>
       <!-- Bouton de chargement des résultats globaux -->
-      <button id="reload-global-results" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Reload global results" data-toggle="tooltip" data-placement="top" title="Reload default results">
+      <!-- <button id="reload-global-results" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Reload global results" data-toggle="tooltip" data-placement="top" title="Reload default results">
         <span>Reload global results</span>
-      </button>
+      </button> -->
     </nav>
     <div id="navigator-container" style="border:2px solid lightgrey; overflow-y: hidden; width: 100%; height: 80px;">
       <svg id="svg0"></svg>
     </div>
   </header>
-
-  <div id="tree-container" style="border:2px solid lightgrey; float: left; overflow-y: auto; width: 40%;">
-    <svg id="svg1"></svg>
-  </div>
-
-  <div id="alignment-container" style="border:2px solid lightgrey; overflow-x: auto; overflow-y: auto;">
-    <svg id="svg2"></svg>
+  <div id="content">
+    <div id="tree-container" style="border:2px solid lightgrey; float: left; overflow-y: auto; width: 40%;">
+      <svg id="svg1"></svg>
+    </div>
+    <div id="alignment-container" style="border:2px solid lightgrey; overflow-x: auto; overflow-y: auto;">
+      <svg id="svg2"></svg>
+    </div>
   </div>
 </body>
 
@@ -199,6 +198,7 @@ var resultsShown;
 var maxSeqLen = 0;
 var updateNodesTimeout = null;
 var selectedNode = null;
+var globalI = 0;
 
 if (!isStorageSupported(myStorage)) {
   console.log("window.localStorage problem");
@@ -612,16 +612,16 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         })
         .on('click', function(d) {
           // console.log('symbol clicked');
-          if (d.data.lastEvent && d.data.lastEvent.crossref) {
-            // Si la balise crossref est presente on fait un lien vers l'url
-            // qui requete l'identifiant dans la base de donnees selectionnee
-            var cross=d.data.lastEvent.crossref;
-            if (selectedCrossref !== null) {
-              name = cross[selectedCrossref];
-              url = selectedCrossrefURL.replace("IDENTIFIANT",name);
-            }
-            window.open(url);
-          }
+          // if (d.data.lastEvent && d.data.lastEvent.crossref) {
+          //   // Si la balise crossref est presente on fait un lien vers l'url
+          //   // qui requete l'identifiant dans la base de donnees selectionnee
+          //   var cross=d.data.lastEvent.crossref;
+          //   if (selectedCrossref !== null) {
+          //     name = cross[selectedCrossref];
+          //     url = selectedCrossrefURL.replace("IDENTIFIANT",name);
+          //   }
+          //   window.open(url);
+          // }
           // d3.select(this)
           //   .style('stroke', '#000')
           //   .style('stroke-width', '2');
@@ -631,23 +631,24 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
           selectedNode = d3.select(this);
           // updateLayout(treeRoot, firstLoad);
           updateNodeColors(selectedNode);
-          updateLayout(cladeRoot);
+          // updateLayout(cladeRoot);
         });
   nodeEnter
     .append("text")
     .attr("class", "label")
     .on("click", function(d) {
-      if (d.data.lastEvent && d.data.lastEvent.crossref) {
-        // Si la balise crossref est presente on fait un lien vers l'url
-        // qui requete l'identifiant dans la base de donnees selectionnee
-        var cross=d.data.lastEvent.crossref;
-        if (selectedCrossref !== null) {
-          name = cross[selectedCrossref];
-          url = selectedCrossrefURL.replace("IDENTIFIANT",name);
-        }
-        window.open(url);
-      }
+      // if (d.data.lastEvent && d.data.lastEvent.crossref) {
+      //   // Si la balise crossref est presente on fait un lien vers l'url
+      //   // qui requete l'identifiant dans la base de donnees selectionnee
+      //   var cross=d.data.lastEvent.crossref;
+      //   if (selectedCrossref !== null) {
+      //     name = cross[selectedCrossref];
+      //     url = selectedCrossrefURL.replace("IDENTIFIANT",name);
+      //   }
+      //   window.open(url);
+      // }
       // console.log(d.data.branch_info.id, d.data.branch_info.results);
+      console.log('coucou');
     });
   nodeEnter
     .append("text")
@@ -998,11 +999,14 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // Handle click-drag events on the small graph
   compactWindow.off('mousedown mousemove mouseup');
   compactWindow.on('mousedown', function(e) {
+    // console.log(e.type);
     scrollAlignment(e);
     compactWindow.on('mousemove', function (e) {
+      // console.log(e.type);
       scrollAlignment(e);
     });
     compactWindow.on('mouseup', function (e) {
+      // console.log(e.type);
       scrollAlignment(e);
       compactWindow.off('mousemove mouseup');
       // leftBoundary = $('#left-boundary').val();
@@ -1011,12 +1015,11 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   });
 
   alignmentWindow.on('scroll', function() {
-    console.log('scrolling');
+    // console.log('scrolling');
 
     // Draw a rectangle surrounding the site that was clicked
     // console.log('scrolling alignment');
     $('.navigation-window').remove();
-    // var largeWindow = $('#alignment-container');
     var siteNumber = - (60 + seq_lg - alignmentWindow.scrollLeft() - alignmentWindow.innerWidth()/2)/hStep;
 
     var navWindowWidth = alignmentWindow.innerWidth()/hStep + 2;
@@ -1027,10 +1030,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         .attr('y', 1)
         .attr('width', navWindowWidth)
         .attr('height', psGraphGlobalHeight-2)
-        // .attr('transform', 'translate('+siteNumber+','+25+')')
-        // .style('fill', 'transparent')
         .style('fill', 'rgba(0,0,0,0.1)')
-        // .style('stroke', '#00FFFF')
         .style('stroke', navWindowColor)
         .style('stroke-width', '2');
   });
@@ -1042,34 +1042,6 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   svg2
     .attr("width",  50 + seq_lg + 10 + resultsJSON.length*hStep + 10 + seq_lg + 50)
     .attr("height",  heightSVG + margin.top + margin.down + 100);
-  // Fonction de calcul de la statistique maximale dans les résultats
-  function maxStatJSON(jsonResultsList) {
-    var currentmax = jsonResultsList[0];
-    jsonResultsList.forEach(function(res) {
-      if (res > currentmax) {
-        currentmax = res;
-      }
-    });
-    if (currentmax >= 2) {
-      return 2;
-    } else {
-      return currentmax;
-    }
-    return currentmax;
-  }
-  function minStatJSON(jsonResultsList) {
-    var currentmin = jsonResultsList[0];
-    jsonResultsList.forEach(function(res) {
-      if (res < currentmin) {
-        currentmin = res;
-      }
-    });
-    if (currentmin <= 0) {
-      return currentmin;
-    } else {
-      return 0;
-    }
-  }
   // === Définition de l'échelle pour l'axe x ===
   var x = d3.scaleLinear()
     .domain([1, resultsJSON.length+1])
@@ -1121,7 +1093,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
           return psThresholdHighBgColor;
         } else if (d >= psThresholdLow) {
           return psThresholdLowBgColor;
-        } else if (d >= 0) {
+        } else if (d >= 0 ) {
           return psBelowThresholdBgColor;
         } else {
           return psMissingBgColor;
@@ -1343,6 +1315,35 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
 // Autres fonctions utilitaires
 // ----------------------------
 
+// Fonction de calcul de la statistique maximale dans les résultats
+function maxStatJSON(jsonResultsList) {
+    var currentmax = jsonResultsList[0];
+    jsonResultsList.forEach(function(res) {
+      if (res > currentmax) {
+        currentmax = res;
+      }
+    });
+    if (currentmax >= 2) {
+      return 2;
+    } else {
+      return currentmax;
+    }
+    return currentmax;
+  }
+  function minStatJSON(jsonResultsList) {
+    var currentmin = jsonResultsList[0];
+    jsonResultsList.forEach(function(res) {
+      if (res < currentmin) {
+        currentmin = res;
+      }
+    });
+    if (currentmin <= 0) {
+      return currentmin;
+    } else {
+      return 0;
+    }
+  }
+
 function updateBoundaries() {
   leftBoundary = $('#left-boundary').val();
   rightBoundary = $('#right-boundary').val();
@@ -1367,6 +1368,9 @@ function updateNodeColors(thisNode) {
 }
 
 function scrollAlignment(event) {
+  // console.log('scrollAlignment()' + globalI);
+  // globalI ++;
+
   // Get the site's number (mouse position in pixels) and navigate to this site in the large window
   // console.log('compactWindow.scrollLeft()', compactWindow.scrollLeft());
   var siteNumber = event.pageX + compactWindow.scrollLeft();
@@ -1383,7 +1387,9 @@ function scrollAlignment(event) {
   leftBoundary = parseInt($('#left-boundary').val());
   rightBoundary = parseInt($('#right-boundary').val());
   
-  updateNodeColors(selectedNode);
+  if (branchSite) {
+    updateNodeColors(selectedNode);
+  }
 }
 
 function updateScroll() {
@@ -2093,6 +2099,7 @@ $(document).ready(function() {
   // rightBoundary = $('#right-boundary').val();
   // Gestion de la modification des limites
   $('#left-boundary, #right-boundary').on('change', function(event) {
+    console.log('boundary change');
     // On a modifié un des seuils
     // Correction des valeurs en présence d'incohérences
     var leftB = parseFloat($('#left-boundary').val());
