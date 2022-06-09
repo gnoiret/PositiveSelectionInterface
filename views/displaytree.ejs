@@ -113,14 +113,14 @@
       <svg id="svg0"></svg>
     </div>
   </header>
-  <div id="content">
+  <main>
     <div id="tree-container" style="border:2px solid lightgrey; float: left; overflow-y: auto; width: 40%;">
       <svg id="svg1"></svg>
     </div>
     <div id="alignment-container" style="border:2px solid lightgrey; overflow-x: auto; overflow-y: auto;">
       <svg id="svg2"></svg>
     </div>
-  </div>
+  </main>
 </body>
 
 <script src="xmltree.js" charset="utf-8"></script>
@@ -1022,17 +1022,27 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     $('.navigation-window').remove();
     var siteNumber = - (60 + seq_lg - alignmentWindow.scrollLeft() - alignmentWindow.innerWidth()/2)/hStep;
 
-    var navWindowWidth = alignmentWindow.innerWidth()/hStep + 2;
+    // var navWindowWidth = alignmentWindow.innerWidth()/hStep + 2;
+    var navWindowWidth = alignmentWindow.innerWidth()/hStep;
+
+    var siteStart = Math.trunc(siteNumber - navWindowWidth/2) + 2;
+
+    console.log(siteStart);
     var navWindowRect = psGraphGlobal
       .append('rect')
         .attr('class', 'navigation-window')
-        .attr('x', siteNumber - navWindowWidth/2 + 2)
-        .attr('y', 1)
+        // .attr('x', siteNumber - navWindowWidth/2 + 2)
+        .attr('x', siteStart)
+        // .attr('y', 1)
+        .attr('y', 0)
         .attr('width', navWindowWidth)
-        .attr('height', psGraphGlobalHeight-2)
-        .style('fill', 'rgba(0,0,0,0.1)')
+        // .attr('height', psGraphGlobalHeight-2)
+        .attr('height', psGraphGlobalHeight)
+        // .style('fill', 'rgba(0,0,0,0.1)')
+        .style('fill', 'rgba(0,0,0,0.17)')
         .style('stroke', navWindowColor)
-        .style('stroke-width', '2');
+        // .style('stroke-width', '2');
+        .style('stroke-width', '0');
   });
   
   // ======================================================

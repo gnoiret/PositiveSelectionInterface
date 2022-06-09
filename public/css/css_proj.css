@@ -249,7 +249,7 @@ header {
   
   background: #FFF;
 }
-#content {
+main {
   margin-top: calc(80px + 62px);
 }
 
