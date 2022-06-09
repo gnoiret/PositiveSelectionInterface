@@ -309,12 +309,7 @@ def normalizeTree(tree:str):
 
 
 def createPhyloXML(fam,newick, resultsFile):
-    # print ("Loading results... ")
-    # resultsText =  loadResultsSites(args.resultsFile, 0, args.nostat, sep=args.sep)
-    # dict_results = loadResultsBranchSite(resultsFile, sep=args.sep)
-    # # print(dict_results)
-    # print ("OK")
-
+    newick = normalizeTree(newick)
     # Parse and return exactly one tree from the given file or handle
     # if not ':' in newick:
     #     nv_arbre = ""
@@ -328,9 +323,9 @@ def createPhyloXML(fam,newick, resultsFile):
     #         else:
     #             nv_arbre+=newick[i]
     #     newick = nv_arbre
-    
-    newick = normalizeTree(newick)
-    # print(f'newick:\n{newick}')
+
+    print(f'newick:\n{newick}')
+
     # Tree now has a <branch_name>:<number>:<length> syntax
     handle = StringIO(newick)
     # print('handle:', handle)
