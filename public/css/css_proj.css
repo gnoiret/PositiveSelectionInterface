@@ -242,3 +242,14 @@ div.demo {
   margin-top: 104px;
 }
 
+header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  
+  background: #FFF;
+}
+#content {
+  margin-top: calc(80px + 62px);
+}
+
