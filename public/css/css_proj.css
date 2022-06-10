@@ -130,7 +130,7 @@ input[type="checkbox"], input[type="radio"] {
 } */
 
 #submit:hover {
-    background-color: #dddddd;
+    /* background-color: #dddddd; */
 }
 
 
@@ -251,5 +251,18 @@ header {
 }
 main {
   margin-top: calc(80px + 62px);
+}
+
+/* Bootstrap 5 */
+
+.btn-primary {
+  color: var(--bs-gray);
+  background-color: var(--bs-white);
+  border-color: var(--bs-gray);
+}
+.btn-primary:hover {
+  color: var(--bs-white);
+  background-color: var(--bs-gray);
+  border-color: var(--bs-gray);
 }
 
