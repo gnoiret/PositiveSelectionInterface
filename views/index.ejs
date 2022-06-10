@@ -78,41 +78,30 @@
               <p class="filename"></p>
             </label>
           </div>
-          <div id="results-files-container" class="row mb-3">
-            <div class="row mb-2">
-              <label class="btn btn-primary btn-sm btn-file d-flex flex-column justify-content-center">
-                <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Results file</i>
-                <input id="results-file-input" type="file" name="file_r" clas="inputfile" style="display: none;" required />
-                <p class="filename"></p>
-              </label>
-              <!-- <input type="text" value="dN" /> -->
-            </div>
-            <!-- <div class="row mb-2">
-              <label class="btn btn-primary btn-sm btn-file d-flex flex-column justify-content-center">
-                <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Results file</i>
-                <input id="results-file-input" type="file" name="file_r" clas="inputfile" style="display: none;" required />
-                <p class="filename"></p>
-              </label>
-              <input type="text" value="dS" />
-            </div> -->
+          <div class="row mb-2">
+            <label class="btn btn-primary btn-sm btn-file d-flex flex-column justify-content-center">
+              <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Results file</i>
+              <input id="results-file-input" type="file" name="file_r" clas="inputfile" style="display: none;" required />
+              <p class="filename"></p>
+            </label>
           </div>
           
           <div id="statcol-field" class="row mb-3">
-            <label for="statcol">Global statistics column</label>
+            <label for="statcol">Statistics column</label>
             <input id="statcol" class="form-control" type="number" name="statcol" value="1" min="0" step="1" required />
           </div>
 
-          <div class="row mb-3">
-            <label for="nostat">Missing statistics value</label>
-            <input id="nostat" class="form-control" type="number" name="nostat" value="-1" step="1" required />
+          <div class="row mb-2">
+            <!-- <label for="nostat">Missing statistics value</label> -->
+            <input id="nostat" class="form-control" type="hidden" name="nostat" value="-1" step="1" required />
           </div>
 
           <!-- <div class="row mb-3">
             <input id="formula-concat" class="form-control" name="formula-concat" value="dN/dS" />
           </div> -->
 
-          <div class="row mb-3">
-            <button id="submit" class="btn btn-primary" type="submit">Display</button>
+          <div class="row">
+            <input id="submit" class="btn btn-primary" type="submit" value="Display" />
           </div>
         </form>
       </div>
