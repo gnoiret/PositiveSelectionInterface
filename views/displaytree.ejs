@@ -189,9 +189,6 @@ var compactWindow = $('#navigator-container');
 var resultsJSON = null;
 // var x;
 // var y;
-var boundariesOn = true;
-var leftBoundary = $('#left-boundary').val();
-var rightBoundary = $('#right-boundary').val();
 var resultsShown;
 // var nbSites;
 // var maxSeqLen = xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.maxSeqLen);
@@ -199,6 +196,12 @@ var maxSeqLen = 0;
 var updateNodesTimeout = null;
 var selectedNode = null;
 var globalI = 0;
+var leftBoundaryInput = $('#left-boundary');
+var rightBoundaryInput = $('#right-boundary');
+var boundariesOn = true;
+var leftBoundary = leftBoundaryInput.val();
+var rightBoundary = rightBoundaryInput.val();
+var firstLoad = 1;
 
 if (!isStorageSupported(myStorage)) {
   console.log("window.localStorage problem");
@@ -365,9 +368,7 @@ function updateLayout(cRoot,firstLoad=0) {
   } else {
     phylogeny_setloss(treeRoot,nodeWidth);
   }
-  // updateBoundaries();
   updateSvg(treeRoot,firstLoad);
-  // updateNodeColors();
   updateScroll();
 }
 
@@ -555,7 +556,6 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
           }
           return (false)
         });
-        // sel1.style("stroke-width", "10")
       }
     })
     .on('mouseout',function (d){
@@ -592,12 +592,15 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .enter()
     .append("g")
     .attr("class", "node");
+  
+  console.log('firstLoad', firstLoad);
   nodeEnter
     .append("g")
       .attr("class", "gsymbol")
       .append("path")
         .attr("class", "symbol")
         .style('stroke-width', '0')
+        .style('stroke', '#000')
         .on('mouseover', function(d) {
           showTooltip();
           if (d.data.branch_info) {
@@ -611,7 +614,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
           hideTooltip();
         })
         .on('click', function(d) {
-          // console.log('symbol clicked');
+          console.log('path.symbol clicked');
           // if (d.data.lastEvent && d.data.lastEvent.crossref) {
           //   // Si la balise crossref est presente on fait un lien vers l'url
           //   // qui requete l'identifiant dans la base de donnees selectionnee
@@ -622,17 +625,24 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
           //   }
           //   window.open(url);
           // }
-          // d3.select(this)
-          //   .style('stroke', '#000')
-          //   .style('stroke-width', '2');
           if (action == svgEvents.showBranchResults) {
             resultsJSON = JSON.parse(d.data.branch_info.results);
           }
           selectedNode = d3.select(this);
-          // updateLayout(treeRoot, firstLoad);
-          updateNodeColors(selectedNode);
-          // updateLayout(cladeRoot);
+          console.log('selectedNode', selectedNode);
         });
+  if (firstLoad) {
+    d3.selectAll('path.symbol')
+      .style('stroke-width', '0')
+      .style('stroke', '#888');
+  } else {
+    d3.selectAll('path.symbol')
+      .style('stroke-width', '0')
+      .style('stroke', '#000');
+    selectedNode
+      .style('stroke-width', '3')
+      .style('stroke', '#000');
+  }
   nodeEnter
     .append("text")
     .attr("class", "label")
@@ -648,7 +658,6 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       //   window.open(url);
       // }
       // console.log(d.data.branch_info.id, d.data.branch_info.results);
-      console.log('coucou');
     });
   nodeEnter
     .append("text")
@@ -1009,8 +1018,8 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       // console.log(e.type);
       scrollAlignment(e);
       compactWindow.off('mousemove mouseup');
-      // leftBoundary = $('#left-boundary').val();
-      // rightBoundary = $('#right-boundary').val();
+      // leftBoundary = leftBoundaryInput.val();
+      // rightBoundary = rightBoundaryInput.val();
     });
   });
 
@@ -1021,13 +1030,10 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     // console.log('scrolling alignment');
     $('.navigation-window').remove();
     var siteNumber = - (60 + seq_lg - alignmentWindow.scrollLeft() - alignmentWindow.innerWidth()/2)/hStep;
-
     // var navWindowWidth = alignmentWindow.innerWidth()/hStep + 2;
     var navWindowWidth = alignmentWindow.innerWidth()/hStep;
-
     var siteStart = Math.trunc(siteNumber - navWindowWidth/2) + 2;
-
-    console.log(siteStart);
+    var siteEnd = Math.trunc(siteNumber + navWindowWidth/2) + 2;
     var navWindowRect = psGraphGlobal
       .append('rect')
         .attr('class', 'navigation-window')
@@ -1043,6 +1049,11 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         .style('stroke', navWindowColor)
         // .style('stroke-width', '2');
         .style('stroke-width', '0');
+    
+    // console.log(siteStart, siteEnd);
+    leftBoundaryInput.val(siteStart);
+    rightBoundaryInput.val(siteEnd);
+    updateNodeColors(selectedNode);
   });
   
   // ======================================================
@@ -1312,12 +1323,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // ==============================================================
   // Fin modif : blocs de séquences
   // ==============================================================
-  
-  // $('#alignment-container').on('scroll', function (event) {
-  //   console.log('scrolling alignment container');
-  // });
-  // updateScroll();
-  // updateNodeColors();
+  firstLoad = 0;
 }
 // Fin de la fonction updateSvg
 // ----------------------------
@@ -1355,26 +1361,23 @@ function maxStatJSON(jsonResultsList) {
   }
 
 function updateBoundaries() {
-  leftBoundary = $('#left-boundary').val();
-  rightBoundary = $('#right-boundary').val();
+  leftBoundary = leftBoundaryInput.val();
+  rightBoundary = rightBoundaryInput.val();
 }
 
 function updateNodeColors(thisNode) {
   // The color of a node depends on the number of positive sites in its branch
   g.selectAll('path.symbol')
-    // .style('stroke-width', '0')
     .style('fill', function(d) {
       if (d.data.branch_info) {
-        var positiveRate = getPositiveRateJSON(d.data.branch_info.results, psThresholdHigh, leftBoundary, rightBoundary);
+        var positiveRate = getPositiveRateJSON(d.data.branch_info.results, psThresholdHigh, leftBoundary, rightBoundary).toFixed(3);
         if (positiveRate > 0) {
           return 'hsl(0, 100%, '+(100 - 2*positiveRate*100)+'%)';
         } else {
           return 'hsl(240, 100%, 50%)'; // blue
         }
       }
-    })
-    .style('stroke-width', '0');
-  selectedNode.style('stroke-width', '2');
+    });
 }
 
 function scrollAlignment(event) {
@@ -1392,18 +1395,14 @@ function scrollAlignment(event) {
   // console.log(leftSiteNumber, rightSiteNumber);
   alignmentWindow.scrollLeft(leftScroll, 0);
 
-  $('#left-boundary').val(leftSiteNumber>=0?leftSiteNumber:0);
-  $('#right-boundary').val(rightSiteNumber<=maxSeqLen?rightSiteNumber:maxSeqLen);
-  leftBoundary = parseInt($('#left-boundary').val());
-  rightBoundary = parseInt($('#right-boundary').val());
-  
-  if (branchSite) {
-    updateNodeColors(selectedNode);
-  }
+  leftBoundaryInput.val(leftSiteNumber>=0?leftSiteNumber:0);
+  rightBoundaryInput.val(rightSiteNumber<=maxSeqLen?rightSiteNumber:maxSeqLen);
+  leftBoundary = parseInt(leftBoundaryInput.val());
+  rightBoundary = parseInt(rightBoundaryInput.val());
 }
 
 function updateScroll() {
-  console.log('update scroll');
+  // console.log('update scroll');
   // Hack to keep the navigation window visible after a branch change
   alignmentWindow
     .scrollLeft(alignmentWindow.scrollLeft()+1)
@@ -1422,31 +1421,41 @@ function writeTooltip(text) { $('.tooltip').text(text); }
 // Get the rate of positive sites in a JSON-formatted results list
 function getPositiveRateJSON(textResultsList, upperThreshold, leftB, rightB) {
   var jsonResultsList = JSON.parse(textResultsList);
-  var positiveSites = [];
-  if (leftB && rightB) {
-    jsonResultsList.forEach((res, i) => {
-      var site = i;
-      var value = res;
-      if (value >= psThresholdHigh && site >= leftBoundary && site <= rightBoundary) {
-        positiveSites.push(site);
-
-      }
-    });
-  } else {
-    jsonResultsList.forEach((res, i) => {
-      var site = i;
-      var value = res;
-      if (value >= psThresholdHigh && site >= leftBoundary && site <= rightBoundary) {
-        positiveSites.push(site);
-      }
-    });
-  }
-  rightBoundary = $('#right-boundary').val();
-  leftBoundary = $('#left-boundary').val();
+  // var positiveSites = [];
+  var nbPos = 0;
+  jsonResultsList.forEach((value, site) => {
+    // var site = i;
+    // var value = res;
+    if (value >= psThresholdHigh && site >= leftB && site <= rightB) {
+      // positiveSites.push(site);
+      nbPos ++;
+    }
+  });
+  // if (leftB && rightB) {
+  //   jsonResultsList.forEach((res, i) => {
+  //     var site = i;
+  //     var value = res;
+  //     if (value >= psThresholdHigh && site >= leftB && site <= rightB) {
+  //       positiveSites.push(site);
+  //     }
+  //   });
+  // }
+  // else {
+  //   jsonResultsList.forEach((res, i) => {
+  //     var site = i;
+  //     var value = res;
+  //     if (value >= psThresholdHigh && site >= leftBoundary && site <= rightBoundary) {
+  //       positiveSites.push(site);
+  //     }
+  //   });
+  // }
+  leftBoundary = leftBoundaryInput.val();
+  rightBoundary = rightBoundaryInput.val();
   // console.log('rightBoundary', rightBoundary);
   // console.log('leftBoundary', leftBoundary);
   // console.log(positiveSites.length,'of',rightBoundary-leftBoundary,'positive sites:',positiveSites);
-  return positiveSites.length/(rightBoundary - leftBoundary);
+  // return positiveSites.length/(rightBoundary - leftBoundary);
+  return nbPos/(rightBoundary - leftBoundary);
 }
 
 // Fonction de test du support local.storage
@@ -2023,6 +2032,7 @@ $('#export').on('click', function(event, dropdownData) {
 
 // Actions à la fin du chargement de la page
 $(document).ready(function() {
+  rightBoundaryInput.val(maxSeqLen);
   // hideTooltip();
   // var tooltips = document.querySelectorAll('.tooltip span');
   var tooltips = document.querySelectorAll('.tooltip');
@@ -2105,15 +2115,15 @@ $(document).ready(function() {
       default:
     }
   });
-  // leftBoundary = $('#left-boundary').val();
-  // rightBoundary = $('#right-boundary').val();
+  // leftBoundary = leftBoundaryInput.val();
+  // rightBoundary = rightBoundaryInput.val();
   // Gestion de la modification des limites
   $('#left-boundary, #right-boundary').on('change', function(event) {
-    console.log('boundary change');
+    // console.log('boundary change');
     // On a modifié un des seuils
     // Correction des valeurs en présence d'incohérences
-    var leftB = parseFloat($('#left-boundary').val());
-    var rightB = parseFloat($('#right-boundary').val());
+    var leftB = parseFloat(leftBoundaryInput.val());
+    var rightB = parseFloat(rightBoundaryInput.val());
     // console.log('Thresholds:', psHighVal, '>=', psLowVal);
     if (rightB - 1 < leftB) {
       if (event.currentTarget.id == 'right-boundary') {
@@ -2121,13 +2131,13 @@ $(document).ready(function() {
         // ex : psHighVal = 0.95 | psLowVal = 1.0
         // On veut donc redecsendre le seuil inférieur en conséquence
         leftB = rightB - 1;
-        $('#left-boundary').val(leftB);
+        leftBoundaryInput.val(leftB);
       } else if (leftB + 1 > rightB) {
         // On a monté le seuil inférieur plus haut que le seuil supérieur
         // ex : psHighVal = 1.0 | psLowVal = 1.05
         // On veut donc remonter le seuil supérieur en conséquence
         rightB = leftB + 1;
-        $('#right-boundary').val(rightB);
+        rightBoundaryInput.val(rightB);
       }
     }
     // Réaffectation des variables globales
