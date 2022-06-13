@@ -255,7 +255,7 @@ main {
 
 /* Bootstrap 5 */
 
-.btn-primary {
+/* .btn-primary {
   color: var(--bs-gray);
   background-color: var(--bs-white);
   border-color: var(--bs-gray);
@@ -264,5 +264,19 @@ main {
   color: var(--bs-white);
   background-color: var(--bs-gray);
   border-color: var(--bs-gray);
+} */
+
+.btn-light:hover {
+  background-color: #ddd;
+  border-color: #ddd;
+}
+.form-check-input:checked {
+  background-color: var(--bs-gray);
+  border-color: var(--bs-gray);
+}
+:selected {
+  color: red;
+  background-color: red;
+  border-color: red;
 }
 
