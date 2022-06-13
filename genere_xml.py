@@ -234,12 +234,13 @@ def loadResultsBranchSite(resultsFile, sep='\t', skipMissingSites=False):
         
         # d: {sites: [1, 2, ...], 0: [0.1248, 0.12381, ...], 1: [0.131, 0.835, ...], ...}
 
-        position_header = 'sites'
+        # position_header = 'sites'
         d_cols_2 = dict(d_cols)
-
         for col_key in d_cols:
-            if col_key != position_header:
+            # if col_key != position_header:
+            if re.search(r'^[0-9]+$', col_key):
                 col_text = ''
+                # print(f'd_cols[{col_key}]', d_cols[col_key])
                 for i in range(len(d_cols[position_header])):
                     # col_text += f'{d_cols[position_header][i]}:{d_cols[col_key][i]}, '
                     # col_text: '1:0.1248 2:0.12381 ...'
