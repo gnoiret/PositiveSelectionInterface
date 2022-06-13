@@ -202,6 +202,8 @@ var boundariesOn = true;
 var leftBoundary = leftBoundaryInput.val();
 var rightBoundary = rightBoundaryInput.val();
 var firstLoad = 1;
+var alignmentWindowOnScroll = false;
+var compactWindowOnClick = false;
 
 if (!isStorageSupported(myStorage)) {
   console.log("window.localStorage problem");
@@ -1006,55 +1008,86 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       ;
   
   // Handle click-drag events on the small graph
-  compactWindow.off('mousedown mousemove mouseup');
-  compactWindow.on('mousedown', function(e) {
-    // console.log(e.type);
+  // compactWindow.off('mousedown mousemove mouseup');
+  // if (!compactWindowOnClick) {
+  document.getElementById(compactWindow.attr('id')).onmousedown = function(e) {
     scrollAlignment(e);
+    // console.log(e.type);
     compactWindow.on('mousemove', function (e) {
-      // console.log(e.type);
       scrollAlignment(e);
+      // console.log(e.type);
     });
     compactWindow.on('mouseup', function (e) {
-      // console.log(e.type);
       scrollAlignment(e);
+      // console.log(e.type);
       compactWindow.off('mousemove mouseup');
+      // compactWindowOnClick = false;
       // leftBoundary = leftBoundaryInput.val();
       // rightBoundary = rightBoundaryInput.val();
     });
-  });
+  };
+    // compactWindow.on('mousedown', function(e) {
+    //   scrollAlignment(e);
+    //   // console.log(e.type);
+    //   compactWindow.on('mousemove', function (e) {
+    //     scrollAlignment(e);
+    //     // console.log(e.type);
+    //   });
+    //   compactWindow.on('mouseup', function (e) {
+    //     scrollAlignment(e);
+    //     // console.log(e.type);
+    //     // compactWindow.off('mousemove mouseup');
+    //     // compactWindowOnClick = false;
+    //     // leftBoundary = leftBoundaryInput.val();
+    //     // rightBoundary = rightBoundaryInput.val();
+    //   });
+    // });
+  // }
+  // if (compactWindow.on('mousedown')) {
+  //   console.log('oui');
+  // } else {
+  //   console.log('non');
+  // }
 
-  alignmentWindow.on('scroll', function() {
-    // console.log('scrolling');
+  console.log('alignmentWindow.on("scroll")', alignmentWindow.on('scroll'));
+  // if (!alignmentWindow.on('scroll')) {
+    // alignmentWindow.on('scroll', function() {
+    document.getElementById(alignmentWindow.attr('id')).onscroll = function() {
+      globalI ++;
+      console.log(globalI, 'scrolling');
 
-    // Draw a rectangle surrounding the site that was clicked
-    // console.log('scrolling alignment');
-    $('.navigation-window').remove();
-    var siteNumber = - (60 + seq_lg - alignmentWindow.scrollLeft() - alignmentWindow.innerWidth()/2)/hStep;
-    // var navWindowWidth = alignmentWindow.innerWidth()/hStep + 2;
-    var navWindowWidth = alignmentWindow.innerWidth()/hStep;
-    var siteStart = Math.trunc(siteNumber - navWindowWidth/2) + 2;
-    var siteEnd = Math.trunc(siteNumber + navWindowWidth/2) + 2;
-    var navWindowRect = psGraphGlobal
-      .append('rect')
-        .attr('class', 'navigation-window')
-        // .attr('x', siteNumber - navWindowWidth/2 + 2)
-        .attr('x', siteStart)
-        // .attr('y', 1)
-        .attr('y', 0)
-        .attr('width', navWindowWidth)
-        // .attr('height', psGraphGlobalHeight-2)
-        .attr('height', psGraphGlobalHeight)
-        // .style('fill', 'rgba(0,0,0,0.1)')
-        .style('fill', 'rgba(0,0,0,0.17)')
-        .style('stroke', navWindowColor)
-        // .style('stroke-width', '2');
-        .style('stroke-width', '0');
-    
-    // console.log(siteStart, siteEnd);
-    leftBoundaryInput.val(siteStart);
-    rightBoundaryInput.val(siteEnd);
-    updateNodeColors(selectedNode);
-  });
+      // Draw a rectangle surrounding the site that was clicked
+      // console.log('scrolling alignment');
+      $('.navigation-window').remove();
+      var siteNumber = - (60 + seq_lg - alignmentWindow.scrollLeft() - alignmentWindow.innerWidth()/2)/hStep;
+      // var navWindowWidth = alignmentWindow.innerWidth()/hStep + 2;
+      var navWindowWidth = alignmentWindow.innerWidth()/hStep;
+      var siteStart = Math.trunc(siteNumber - navWindowWidth/2) + 2;
+      var siteEnd = Math.trunc(siteNumber + navWindowWidth/2) + 2;
+      var navWindowRect = psGraphGlobal
+        .append('rect')
+          .attr('class', 'navigation-window')
+          // .attr('x', siteNumber - navWindowWidth/2 + 2)
+          .attr('x', siteStart)
+          // .attr('y', 1)
+          .attr('y', 0)
+          .attr('width', navWindowWidth)
+          // .attr('height', psGraphGlobalHeight-2)
+          .attr('height', psGraphGlobalHeight)
+          // .style('fill', 'rgba(0,0,0,0.1)')
+          .style('fill', 'rgba(0,0,0,0.17)')
+          .style('stroke', navWindowColor)
+          // .style('stroke-width', '2');
+          .style('stroke-width', '0');
+      
+      // console.log(siteStart, siteEnd);
+      leftBoundaryInput.val(siteStart);
+      rightBoundaryInput.val(siteEnd);
+      updateNodeColors(selectedNode);
+    };
+    // });
+  // }
+  // alignmentWindowOnScroll = true;
   
   // ======================================================
   // | Début : graphe des résultats de sélection positive |
@@ -1381,17 +1414,17 @@ function updateNodeColors(thisNode) {
 }
 
 function scrollAlignment(event) {
-  // console.log('scrollAlignment()' + globalI);
   // globalI ++;
+  console.log(globalI, 'scrollAlignment()');
 
   // Get the site's number (mouse position in pixels) and navigate to this site in the large window
   // console.log('compactWindow.scrollLeft()', compactWindow.scrollLeft());
   var siteNumber = event.pageX + compactWindow.scrollLeft();
-  // console.log('Navigating to site', siteNumber);
   var leftScroll = 50 + seq_lg + 10 + siteNumber*hStep - alignmentWindow.innerWidth()/2;
   var rightScroll = 50 + seq_lg + 10 + siteNumber*hStep + alignmentWindow.innerWidth()/2;
   var leftSiteNumber = Math.trunc((leftScroll - (60 + seq_lg))/hStep)+2;
   var rightSiteNumber = Math.trunc((rightScroll - (60 + seq_lg))/hStep)+2;
+  // console.log('Navigating to site', siteNumber);
   // console.log(leftSiteNumber, rightSiteNumber);
   alignmentWindow.scrollLeft(leftScroll, 0);
 
