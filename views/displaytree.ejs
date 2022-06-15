@@ -136,8 +136,11 @@
 // ----------------------------------------------
 var recTree = <%- arbre %>;
 var pattern = <%- pattern %>;
+pattern = '';
 var branchSite = <%- branchSite %>;
 var logBranchLength = <%- logBranchLength %>;
+var isNuc = <%- isNuc %>;
+console.log('isNuc', isNuc);
 // Variables globales
 // ------------------
 var treeRoot;
@@ -477,9 +480,11 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       speciationLoss : "symbolCircle"
     }
   }
+  console.log('treeRoot', treeRoot);
   var nodes = treeRoot.descendants();
+  console.log('nodes', nodes);
   var links = treeRoot.links();
-  // console.log(nodes);
+  console.log('links', links);
 
   // Coloration du pattern si il existe
   if ((pattern != "none") && (pattern !== ' ') && (pattern !== undefined)) {
@@ -527,6 +532,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .enter()
     .append("path")
     .attr("class", "link");
+  // affichage des branches
   linkEnter
     .merge(link)  // fusionne les nouveaux elements avec les anciens
     .attr("fill","none")
@@ -595,7 +601,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     .append("g")
     .attr("class", "node");
   
-  console.log('firstLoad', firstLoad);
+  // console.log('firstLoad', firstLoad);
   nodeEnter
     .append("g")
       .attr("class", "gsymbol")
@@ -604,19 +610,20 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         .style('stroke-width', '0')
         .style('stroke', '#000')
         .on('mouseover', function(d) {
-          showTooltip();
-          if (d.data.branch_info) {
-            // writeTooltip(getPositiveSitesJSON(d.data.branch_info.results, psThresholdHigh).length);
-            writeTooltip(getPositiveRateJSON(d.data.branch_info.results, psThresholdHigh, leftBoundary, rightBoundary).toFixed(3));
-          } else {
-            writeTooltip('');
+          if (branchSite && selectedNode) {
+            showTooltip();
+            if (d.data.branch_info) {
+              writeTooltip(getPositiveRateJSON(d.data.branch_info.results, psThresholdHigh, leftBoundary, rightBoundary).toFixed(3));
+            } else {
+              writeTooltip('');
+            }
           }
         })
         .on('mouseout', function() {
           hideTooltip();
         })
         .on('click', function(d) {
-          console.log('path.symbol clicked');
+          // console.log('path.symbol clicked');
           // if (d.data.lastEvent && d.data.lastEvent.crossref) {
           //   // Si la balise crossref est presente on fait un lien vers l'url
           //   // qui requete l'identifiant dans la base de donnees selectionnee
@@ -631,7 +638,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
             resultsJSON = JSON.parse(d.data.branch_info.results);
           }
           selectedNode = d3.select(this);
-          console.log('selectedNode', selectedNode);
+          // console.log('selectedNode', selectedNode);
         });
   if (firstLoad) {
     d3.selectAll('path.symbol')
@@ -642,7 +649,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       .style('stroke-width', '0')
       .style('stroke', '#000');
     selectedNode
-      .style('stroke-width', '3')
+      .style('stroke-width', '2')
       .style('stroke', '#000');
   }
   nodeEnter
@@ -1049,12 +1056,11 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   //   console.log('non');
   // }
 
-  console.log('alignmentWindow.on("scroll")', alignmentWindow.on('scroll'));
   // if (!alignmentWindow.on('scroll')) {
     // alignmentWindow.on('scroll', function() {
     document.getElementById(alignmentWindow.attr('id')).onscroll = function() {
-      globalI ++;
-      console.log(globalI, 'scrolling');
+      // globalI ++;
+      // console.log(globalI, 'scrolling');
 
       // Draw a rectangle surrounding the site that was clicked
       // console.log('scrolling alignment');
@@ -1405,7 +1411,18 @@ function updateNodeColors(thisNode) {
       if (d.data.branch_info) {
         var positiveRate = getPositiveRateJSON(d.data.branch_info.results, psThresholdHigh, leftBoundary, rightBoundary).toFixed(3);
         if (positiveRate > 0) {
-          return 'hsl(0, 100%, '+(100 - 2*positiveRate*100)+'%)';
+          return 'hsl(0, 100%, '+(100 - 2*positiveRate*100 - 10)+'%)';
+        } else {
+          return 'hsl(240, 100%, 50%)'; // blue
+        }
+      }
+    });
+  g.selectAll('path.link')
+    .style('stroke', function(d) {
+      if (d.target.data.branch_info) {
+        var positiveRate = getPositiveRateJSON(d.target.data.branch_info.results, psThresholdHigh, leftBoundary, rightBoundary).toFixed(3);
+        if (positiveRate > 0) {
+          return 'hsl(0, 100%, '+(100 - 2*positiveRate*100 - 15)+'%)';
         } else {
           return 'hsl(240, 100%, 50%)'; // blue
         }
@@ -1415,7 +1432,7 @@ function updateNodeColors(thisNode) {
 
 function scrollAlignment(event) {
   // globalI ++;
-  console.log(globalI, 'scrollAlignment()');
+  // console.log(globalI, 'scrollAlignment()');
 
   // Get the site's number (mouse position in pixels) and navigate to this site in the large window
   // console.log('compactWindow.scrollLeft()', compactWindow.scrollLeft());
@@ -2070,8 +2087,8 @@ $(document).ready(function() {
   // var tooltips = document.querySelectorAll('.tooltip span');
   var tooltips = document.querySelectorAll('.tooltip');
   window.onmousemove = function (e) {
-      var x = (e.clientX + 20) + 'px';
-      var y = (e.clientY + 20 + window.scrollY) + 'px';
+      var x = (e.clientX + 16) + 'px';
+      var y = (e.clientY + 16 + window.scrollY) + 'px';
       for (var i = 0; i < tooltips.length; i++) {
           tooltips[i].style.top = y;
           tooltips[i].style.left = x;
