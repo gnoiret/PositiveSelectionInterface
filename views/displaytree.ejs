@@ -1089,7 +1089,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       // console.log(siteStart, siteEnd);
       leftBoundaryInput.val(siteStart);
       rightBoundaryInput.val(siteEnd);
-      updateNodeColors(selectedNode);
+      updateNodeColors();
     };
     // });
   // }
@@ -1404,8 +1404,8 @@ function updateBoundaries() {
   rightBoundary = rightBoundaryInput.val();
 }
 
-function updateNodeColors(thisNode) {
-  // The color of a node depends on the number of positive sites in its branch
+function updateNodeColors() {
+  // The color of a node depends on the number of positive sites
   g.selectAll('path.symbol')
     .style('fill', function(d) {
       if (d.data.branch_info) {
@@ -1417,6 +1417,7 @@ function updateNodeColors(thisNode) {
         }
       }
     });
+  // The color of a branch depends on the number of positive sites in its node
   g.selectAll('path.link')
     .style('stroke', function(d) {
       if (d.target.data.branch_info) {

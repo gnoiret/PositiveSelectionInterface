@@ -14,7 +14,7 @@ Positional arguments:
 """
 
 import argparse
-import json
+# import json
 from modulefinder import AddPackagePath
 import sys
 import re
@@ -23,7 +23,7 @@ import os
 from Bio import Phylo
 from io import StringIO
 # import time
-from ete3 import Phyloxml, phyloxml
+# from ete3 import Phyloxml, phyloxml
 
 from lxml import etree
 from xml.etree import ElementTree
@@ -57,9 +57,6 @@ parser.add_argument('-s', '--sep', dest='sep', action='store',\
     required=False,\
     default='\t',\
     help='Column separator')
-parser.add_argument('-b', '--branchsite', dest='isBranchsite', action='store_true',\
-    required=False,\
-    help='View site-branch data')
 parser.add_argument('-c', '--col', dest='statcol', action='store', type=int,\
     default=1,\
     help='Index of the results column to use')
@@ -67,10 +64,16 @@ parser.add_argument('-n', '--nostat', dest='nostat', action='store', type=float,
     default=-1.0,\
     help='Value to use in case there is no statistic associated\
     with a site in the sequence')
+parser.add_argument('-b', '--branchsite', dest='isBranchsite', action='store_true',\
+    required=False,\
+    help='View site-branch data')
 parser.add_argument('--skipmissing', dest='skipMissingSites', action='store_true',\
     required=False,\
     help='Prevent the addition of special values (-n, --nostat) for sites that are absent from the results file. \
         This results in sites being next to each other on the graph even though their positions are distant.')
+parser.add_argument('--isnucleic', dest='isNucleic', action='store_true',\
+    required=False,\
+    help='Specify this argument if the sequences are not to be treated as DNA/RNA')
 parser.add_argument('-o', '--output', dest='output', action='store',\
     help='Name of the output XML file (if not specified, the XML will have \
     the same name as the tree file)')
@@ -202,13 +205,9 @@ def loadResultsSites(resultsFile, statcol=1, nostat_value=-1.0, sep='\t', skipMi
                 pass
             i += 1
 
-    resultsText = ''
     resultsList = []
     for key, item in resultsDict.items():
-        # resultsText += f'{item}, '
         resultsList.append(item)
-    # resultsText = '['+resultsText[:-2]+']' # remove last space and comma
-    # return resultsText
     return resultsList
 
 
@@ -233,8 +232,8 @@ def loadResultsBranchSite(resultsFile, sep='\t', skipMissingSites=False):
             d_cols[column[0]] = column[1:]
         
         # d: {sites: [1, 2, ...], 0: [0.1248, 0.12381, ...], 1: [0.131, 0.835, ...], ...}
-
-        # position_header = 'sites'
+        
+        position_header = 'sites'
         d_cols_2 = dict(d_cols)
         for col_key in d_cols:
             # if col_key != position_header:
@@ -242,24 +241,11 @@ def loadResultsBranchSite(resultsFile, sep='\t', skipMissingSites=False):
                 col_text = ''
                 # print(f'd_cols[{col_key}]', d_cols[col_key])
                 for i in range(len(d_cols[position_header])):
-                    # col_text += f'{d_cols[position_header][i]}:{d_cols[col_key][i]}, '
-                    # col_text: '1:0.1248 2:0.12381 ...'
-                    
                     col_text += f'{d_cols[col_key][i]}, '
                     # col_text: '0.1248, 0.12381, ...'
-                    
                 col_text = '['+col_text[:-2]+']' # remove last space and comma
                 d_cols_2[col_key] = col_text
-                # d_cols_2: {1: '1:0.1248 2:0.12381 ...', ...}
                 # d_cols_2: {1: '[0.1248, 0.12381, ...]', ...}
-
-    # results_text = ''
-    # for col in d_cols_2:
-    #     if col != position_header:
-    #         results_text += d_cols_2[col]+'\n'
-    # results_text = results_text[:-1]
-    # print(results_text)
-    # return results_text
     return d_cols_2
 
 
@@ -309,7 +295,7 @@ def normalizeTree(tree:str):
 #
 
 
-def createPhyloXML(fam,newick, resultsFile):
+def createPhyloXML(fam,newick):
     newick = normalizeTree(newick)
     # Parse and return exactly one tree from the given file or handle
     # if not ':' in newick:
@@ -362,9 +348,10 @@ def createPhyloXML(fam,newick, resultsFile):
     subtree = tree.xpath("/phyloxml")
     nbfeuille = 0
     famspecies = {}
+    # branch_id = 0
 
     res_colnames = getColnames(args.resultsFile)[1:]
-    # print('res_colnames:', res_colnames)
+    print('res_colnames:', res_colnames)
     colname_index = 0
     for element in clade[0].iter('clade'):
         # print(element.tag)
@@ -407,10 +394,15 @@ def createPhyloXML(fam,newick, resultsFile):
                     leaf.set('defintiion', seqdefdico[cds])
 
             ## Ajout des séquences aux feuilles
-            leaf.set('dnaAlign', seq_alg) # ajout de la séquence en nucléotides
+            if args.isNucleic:
+                leaf.set('dnaAlign', seq_alg) # ajout de la séquence en nucléotides
             # leaf.set('aaAlign', translate.dna_to_prot(seq_alg)) # ajout de la séquence en acides aminés
             # leaf.set('aaAlign', dna_to_prot(seq_alg)) # ajout de la séquence en acides aminés
-            leaf.set('aaAlign', nucToAmino(seq_alg)) # ajout de la séquence en acides aminés
+            # print('args.isNucleic', args.isNucleic)
+            if args.isNucleic:
+                leaf.set('aaAlign', nucToAmino(seq_alg)) # ajout de la séquence traduite
+            else:
+                leaf.set('aaAlign', seq_alg) # ajout de la séquence brute
 
             if 'crossdico' in globals():
                 leaf.append(crossref)
@@ -419,22 +411,15 @@ def createPhyloXML(fam,newick, resultsFile):
         
         if args.isBranchsite:
             if element.find('branch_length') is not None:
+                branch_id = res_colnames[colname_index]
+                print('branch_id', branch_id)
                 branch_info = etree.Element('branch_info')
-                branch_info.set('id', str(res_colnames[colname_index]))
-                branch_info.set('results', str(dict_results[res_colnames[colname_index]]))
+                branch_info.set('id', str(branch_id))
+                branch_info.set('results', str(dict_results[str(branch_id)]))
+                print(str(branch_id), dict_results[str(branch_id)][:10])
                 element.append(branch_info)
                 colname_index += 1
-    
-    # res_colnames = getColnames(args.resultsFile)[1:]
-    # print(res_colnames)
-    # colname_index = 0
-    # for element in clade[0].iter('clade'):
-    #     if element.find('branch_length') is not None:
-    #         branch_info = etree.Element('branch_info')
-    #         branch_info.set('branch_id', str(res_colnames[colname_index]))
-    #         branch_info.set('branch_results', str('coucou'))
-    #         element.append(branch_info)
-    #         colname_index += 1
+                # branch_id += 1
     
     print ("Number of leaves : ")
     print (nbfeuille)
@@ -477,7 +462,7 @@ print ("Loading results... ")
 resultsList =  loadResultsSites(args.resultsFile, args.statcol, args.nostat, sep=args.sep, skipMissingSites=args.skipMissingSites)
 if args.isBranchsite:
     dict_results = loadResultsBranchSite(args.resultsFile, sep=args.sep)
-print ("OK")
+print("OK")
 
 #Creates empty phyloxml document
 # project = Phyloxml()   # a decommenter si on veut un fichier xml unique
@@ -504,7 +489,7 @@ for line in treefile:
     else:
         newick = tline[0]
         fam = ''
-    phyloxmltree = createPhyloXML(fam,newick, args.resultsFile)
+    phyloxmltree = createPhyloXML(fam,newick)
     xmloutputfile.write(phyloxmltree)
     print("Famille "+fam+" OK")
 
