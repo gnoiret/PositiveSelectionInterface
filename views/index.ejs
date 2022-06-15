@@ -4,45 +4,32 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-
-    <!-- <title><%= title %></title> -->
-
-    <!-- Bootstrap core CSS -->
-    <!-- <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet"> -->
-    <!-- Optional theme -->
-    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous"> -->
-    <!-- Font Awesome -->
-    <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet" /> -->
-    <!-- Custom CSS -->
-    <!-- <link rel="stylesheet" href="/css/css_proj.css"> -->
-
-    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
-    <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script> -->
-
+    <title><%= title %></title>
     <%- include('../partials/head') %>
-
   </head>
   <body>
     <header>
-
       <%- include('../partials/header') %>
-
       <div class="container-fluid">
         <h1 class="text-center">Web interface for positive selection</h1>
         </div>
       </div>
-      <nav>
-        <!-- <a href="test-arbre">test-arbre</a> -->
-      </nav>
     </header>
 
     <main>
       <!-- <div><h3>Tree</h3><p id="tree-file-content"></p></div>
       <div><h3>Alignment</h3><p id="alignment-file-content"></p></div>
       <div><h3>Results</h3><p id="results-file-content"></p></div> -->
-
+      
       <div class="form-mod">
         <form method="post" action="/upload_files" enctype="multipart/form-data">
+          <div class="row mb-3">
+            <div class="form-check form-switch">
+              <input id="isNuc" class="form-check-input" type="checkbox" name="isNuc" checked>
+              <label class="form-check-label" for="isNuc">Nucleic sequences</label>
+            </div>
+          </div>
+          
           <div class="row mb-3">
             <div class="form-check form-switch">
               <input id="branchSite" class="form-check-input" type="checkbox" name="branchSite">
@@ -96,10 +83,6 @@
             <input id="nostat" class="form-control" type="hidden" name="nostat" value="-1" step="1" required />
           </div>
 
-          <!-- <div class="row mb-3">
-            <input id="formula-concat" class="form-control" name="formula-concat" value="dN/dS" />
-          </div> -->
-
           <div class="row">
             <input id="submit" class="btn btn-light" type="submit" value="Display" />
           </div>
@@ -110,7 +93,6 @@
 
       <div class="container-fluid text-center">
         <h2 class="text-center"><span class="text-muted">An example of display...</span></h2>
-        <!-- <img src="public/ExempleAffichage.png" alt="exemple d'affichage" width="1050" height="500"/> -->
         <img src="media/ExempleAffichage.png" alt="exemple d'affichage" />
         <h2 class="text-center"><span class="text-muted">...and its various options</span></h2>
       </div>
@@ -192,7 +174,7 @@
 
   $(document).ready(function() {
     function updateForm() {
-      console.log('checked:', isChecked('branchSite'));
+      // console.log('checked:', isChecked('branchSite'));
       if (isChecked('branchSite')) {
         $('#statcol-field').hide();
       } else {
@@ -203,18 +185,18 @@
       return $('#'+checkboxId).is(':checked');
     }
     $('#branchSite').ready(function(e) {
-      console.log('branchSite ready');
+      // console.log('branchSite ready');
       updateForm();
     });
     $('#branchSite').change(function (e) {
-      console.log('branchSite updated');
+      // console.log('branchSite updated');
       updateForm();
     });
 
-    $('[id^="formula-select-"]').change(function(event) {
-      console.log(event);
-      $('#formula-concat').val($('#formula-select-1').val()+$('#formula-select-2').val()+$('#formula-select-3').val());
-    });
+    // $('[id^="formula-select-"]').change(function(event) {
+    //   // console.log(event);
+    //   $('#formula-concat').val($('#formula-select-1').val()+$('#formula-select-2').val()+$('#formula-select-3').val());
+    // });
 
     $('[id$="-file-input"]').each(function(i, elt) {
       if ($('#'+elt.id).val() != '') {
@@ -228,7 +210,7 @@
       var filename = e.target.files[0].name;
       console.log('File changed on input with id: ' + e.target.id);
       var selectedFile = document.getElementById(e.target.id).files[0];
-      var content = document.getElementById(e.target.id.split('-')[0]+'-file-content');
+      // var content = document.getElementById(e.target.id.split('-')[0]+'-file-content');
       var reader = new FileReader();
       reader.onload = function(event) {
         var lines = this.result.split('\n');
@@ -252,9 +234,9 @@
         } else {
           $("#"+e.target.id+" + .filename").html(warningIconHTML+'<br/>'+filename); 
         }
-        content.innerHTML = '';
+        // content.innerHTML = '';
         for (var i = 0; i < Math.min(lines.length, 4); i ++) {
-          content.innerHTML += lines[i].substring(0, 80)+'<br>';
+          // content.innerHTML += lines[i].substring(0, 80)+'<br>';
           console.log(lines[i].substring(0, 80));
         }
       };

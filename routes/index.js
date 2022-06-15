@@ -30,9 +30,9 @@ router.get('/', function(req, res) {
 // POST upload_files
 // -----------
 router.post("/upload_files", upload.fields([
-  {name: 'file_t', maxCount: 1}, 
-  {name: 'file_a', maxCount: 1}, 
-  {name: 'file_r', maxCount: 1}
+  {name: 'file_t'}, 
+  {name: 'file_a'}, 
+  {name: 'file_r'}
 ]), 
 (req, res) => {
   console.log('Successfully uploaded files');
@@ -66,12 +66,13 @@ router.post("/upload_files", upload.fields([
     + fname_r.split('-')[1]
     // +'.xml'
     ;
-  const full_path_xml = xml_dir + fname_xml;
-  const statcol = req.body.statcol;
-  const nostat = req.body.nostat;
+  var full_path_xml = xml_dir + fname_xml;
+  var statcol = req.body.statcol;
+  var nostat = req.body.nostat;
   var branchSite = req.body.branchSite;
   var logBranchLength = req.body.logBranchLength;
   var skipMissingSites = req.body.skipMissingSites;
+  var isNuc = req.body.isNuc;
 
   console.log('branchSite:', branchSite);
   if (branchSite != undefined) {
@@ -81,6 +82,7 @@ router.post("/upload_files", upload.fields([
     console.log('not branchSite');
     branchSite = false;
   }
+  
   console.log('logBranchLength:', logBranchLength);
   if (logBranchLength != undefined) {
     console.log('logBranchLength');
@@ -89,6 +91,7 @@ router.post("/upload_files", upload.fields([
     console.log('not logBranchLength');
     logBranchLength = false;
   }
+
   console.log('skipMissingSites:', skipMissingSites);
   if (skipMissingSites != undefined) {
     console.log('skipMissingSites');
@@ -96,6 +99,15 @@ router.post("/upload_files", upload.fields([
   } else {
     console.log('not skipMissingSites');
     skipMissingSites = false;
+  }
+
+  console.log('isNuc:', isNuc);
+  if (isNuc != undefined) {
+    console.log('isNuc');
+    isNuc = true;
+  } else {
+    console.log('not isNuc');
+    isNuc = false;
   }
 
   // console.log('Tree: ' + fname_t + '\n' +
@@ -116,26 +128,27 @@ router.post("/upload_files", upload.fields([
       +' -c '+statcol
       +' -n '+nostat
       +(branchSite?' -b ':'')
-      +(skipMissingSites?' --skipmissing ':''),
+      +(skipMissingSites?' --skipmissing ':'')
+      +(isNuc?' --isnucleic ':''),
   (error, stdout, stderr) => {
     if (error) {
       console.log(`error: ${error.message}`);
     } else {
       console.log('Deleting data files');
-      exec('rm'
-        +' '+upload_dir+fname_t
-        +' '+upload_dir+fname_a
-        +' '+upload_dir+fname_r,
-        (error, stdout, stderr) => {
-          if (error) {
-            console.log(`error: ${error.message}`);
-          }
-          if (stderr) {
-            console.log(`error: ${stderr}`);
-          }
-          console.log(`${stdout}`);
-        }
-      )
+      // exec('rm'
+      //   +' '+upload_dir+fname_t
+      //   +' '+upload_dir+fname_a
+      //   +' '+upload_dir+fname_r,
+      //   (error, stdout, stderr) => {
+      //     if (error) {
+      //       console.log(`error: ${error.message}`);
+      //     }
+      //     if (stderr) {
+      //       console.log(`error: ${stderr}`);
+      //     }
+      //     console.log(`${stdout}`);
+      //   }
+      // )
     }
     if (stderr) {
       console.log(`error: ${stderr}`);
@@ -165,21 +178,23 @@ router.post("/upload_files", upload.fields([
         var JSONtree = JSON.stringify(results);
         var JSONpattern = JSON.stringify("0:homSapCCDS34680"); // Séquence à mettre en valeur
         console.log('Rendering view');
-        res.render('displaytree.ejs', {arbre:JSONtree, pattern:JSONpattern, branchSite:branchSite, logBranchLength:logBranchLength});
+        res.render('displaytree.ejs',
+          {arbre:JSONtree, pattern:JSONpattern, branchSite:branchSite,
+            logBranchLength:logBranchLength, isNuc:isNuc});
 
         console.log('Deleting XML file');
-        exec('rm'
-          +' '+xml_dir+fname_xml,
-          (error, stdout, stderr) => {
-            if (error) {
-              console.log(`error: ${error.message}`);
-            }
-            if (stderr) {
-              console.log(`error: ${stderr}`);
-            }
-            console.log(`${stdout}`);
-          }
-        )
+        // exec('rm'
+        //   +' '+xml_dir+fname_xml,
+        //   (error, stdout, stderr) => {
+        //     if (error) {
+        //       console.log(`error: ${error.message}`);
+        //     }
+        //     if (stderr) {
+        //       console.log(`error: ${stderr}`);
+        //     }
+        //     console.log(`${stdout}`);
+        //   }
+        // )
       });
     });
   });
