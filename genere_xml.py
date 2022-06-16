@@ -311,7 +311,7 @@ def createPhyloXML(fam,newick):
     #             nv_arbre+=newick[i]
     #     newick = nv_arbre
 
-    print(f'newick:\n{newick}')
+    # print(f'newick:\n{newick}')
 
     # Tree now has a <branch_name>:<number>:<length> syntax
     handle = StringIO(newick)
@@ -351,7 +351,7 @@ def createPhyloXML(fam,newick):
     # branch_id = 0
 
     res_colnames = getColnames(args.resultsFile)[1:]
-    print('res_colnames:', res_colnames)
+    # print('res_colnames:', res_colnames)
     colname_index = 0
     for element in clade[0].iter('clade'):
         # print(element.tag)
