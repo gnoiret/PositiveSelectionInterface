@@ -207,6 +207,7 @@ var rightBoundary = rightBoundaryInput.val();
 var firstLoad = 1;
 var alignmentWindowOnScroll = false;
 var compactWindowOnClick = false;
+var blackWhite = true;
 
 if (!isStorageSupported(myStorage)) {
   console.log("window.localStorage problem");
@@ -452,7 +453,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     links : config.links || "shoulder",
     symbolSize : config.symbolSize || 128,
     lengthLinkLoss : config.lengthLinkLoss || 10,
-    linkStrokeSize : config.linkStrokeSize || 2,
+    linkStrokeSize : config.linkStrokeSize || 3,
     nodeWidth : config.nodeWidth || 30,
     nodeHeight : config.nodeHeight || 30,
     margin : config.margin || { top: 10, down: 20, left: 500  , right: 50},
@@ -638,19 +639,27 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
             resultsJSON = JSON.parse(d.data.branch_info.results);
           }
           selectedNode = d3.select(this);
-          // console.log('selectedNode', selectedNode);
         });
   if (firstLoad) {
     d3.selectAll('path.symbol')
       .style('stroke-width', '0')
-      .style('stroke', '#888');
+      .style('stroke', '#888')
+      .style('fill', '#000')
+      ;
   } else {
     d3.selectAll('path.symbol')
       .style('stroke-width', '0')
-      .style('stroke', '#000');
-    selectedNode
-      .style('stroke-width', '2')
-      .style('stroke', '#000');
+      .style('stroke', '#000')
+      .style('fill', '#000')
+      ;
+    if (selectedNode) {
+      // selected node color and outline
+      selectedNode
+        .style('stroke-width', '2')
+        .style('stroke', '#000')
+        // .style('fill', '#FFF')
+        ;
+    }
   }
   nodeEnter
     .append("text")
@@ -1410,11 +1419,12 @@ function updateNodeColors() {
     .style('fill', function(d) {
       if (d.data.branch_info) {
         var positiveRate = getPositiveRateJSON(d.data.branch_info.results, psThresholdHigh, leftBoundary, rightBoundary).toFixed(3);
-        if (positiveRate > 0) {
-          return 'hsl(0, 100%, '+(100 - 2*positiveRate*100 - 10)+'%)';
-        } else {
-          return 'hsl(240, 100%, 50%)'; // blue
-        }
+        // if (positiveRate > 0) {
+        //   return 'hsl(0, 100%, '+(100 - 2*positiveRate*100 - 15)+'%)';
+        // } else {
+        //   return 'hsl(240, 100%, 50%)'; // blue
+        // }
+        return 'hsl(0, 0%, '+(80-2*positiveRate*100)+'%)';
       }
     });
   // The color of a branch depends on the number of positive sites in its node
@@ -1422,13 +1432,20 @@ function updateNodeColors() {
     .style('stroke', function(d) {
       if (d.target.data.branch_info) {
         var positiveRate = getPositiveRateJSON(d.target.data.branch_info.results, psThresholdHigh, leftBoundary, rightBoundary).toFixed(3);
-        if (positiveRate > 0) {
-          return 'hsl(0, 100%, '+(100 - 2*positiveRate*100 - 15)+'%)';
-        } else {
-          return 'hsl(240, 100%, 50%)'; // blue
-        }
+        // if (positiveRate > 0) {
+        //   return 'hsl(0, 100%, '+(100 - 2*positiveRate*100 - 15)+'%)';
+        // } else {
+        //   return 'hsl(240, 100%, 50%)'; // blue
+        // }
+        return 'hsl(0, 0%, '+(80-2*positiveRate*100)+'%)';
       }
     });
+  // selected node color and outline
+  selectedNode
+    .style('stroke-width', '2')
+    .style('stroke', '#000')
+    .style('fill', '#FFF')
+    ;
 }
 
 function scrollAlignment(event) {
