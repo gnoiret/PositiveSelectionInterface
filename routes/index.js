@@ -69,13 +69,16 @@ router.post("/upload_files", upload.fields([
   var full_path_xml = xml_dir + fname_xml;
   var statcol = req.body.statcol;
   var nostat = req.body.nostat;
-  var branchSite = req.body.branchSite;
+  var resultsType = req.body.resultsType;
+  var branchSite;
   var logBranchLength = req.body.logBranchLength;
   var skipMissingSites = req.body.skipMissingSites;
   var isNuc = req.body.isNuc;
 
+  console.log('branchSiteMode ?', resultsType == 'branchSiteMode');
+
   console.log('branchSite:', branchSite);
-  if (branchSite != undefined) {
+  if (resultsType == 'branchSiteMode') {
     console.log('branchSite');
     branchSite = true;
   } else {

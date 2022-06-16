@@ -29,13 +29,6 @@
               <label class="form-check-label" for="isNuc">Nucleic sequences</label>
             </div>
           </div>
-          
-          <div class="row mb-3">
-            <div class="form-check form-switch">
-              <input id="branchSite" class="form-check-input" type="checkbox" name="branchSite">
-              <label class="form-check-label" for="branchSite">Branch-site</label>
-            </div>
-          </div>
 
           <div class="row mb-3">
             <div class="form-check form-switch">
@@ -49,6 +42,29 @@
               <input id="skipMissingSites" class="form-check-input" type="checkbox" name="skipMissingSites">
               <label class="form-check-label" for="skipMissingSites">Disregard site numbers</label>
             </div>
+          </div>
+          
+          <div class="row mb-3">
+            <!-- <div class="form-check form-switch">
+              <input id="branchSite" class="form-check-input" type="checkbox" name="branchSite">
+              <label class="form-check-label" for="branchSite">Branch-site</label>
+            </div> -->
+
+            <label class="form-check-label" for="">Results type</label>
+
+            <div class="d-flex input-group">
+              <input type="radio" class="btn-check" name="resultsType" id="siteMode" value="siteMode" checked>
+              <label class="btn btn-outline-secondary flex-fill" for="siteMode">Site</label>
+
+              <input type="radio" class="btn-check" name="resultsType" id="branchSiteMode" value="branchSiteMode">
+              <label class="btn btn-outline-secondary flex-fill" for="branchSiteMode">Branch-site</label>
+            </div>
+
+            <!-- <input type="radio" class="btn-check" name="options" id="option3" autocomplete="off" disabled>
+            <label class="btn btn-secondary" for="option3">Disabled</label>
+
+            <input type="radio" class="btn-check" name="options" id="option4" autocomplete="off">
+            <label class="btn btn-secondary" for="option4">Radio</label> -->
           </div>
 
           <div class="row mb-2">
@@ -65,7 +81,7 @@
               <p class="filename"></p>
             </label>
           </div>
-          <div class="row mb-2">
+          <div class="row mb-3">
             <label class="btn btn-light btn-sm btn-file d-flex flex-column justify-content-center">
               <i class="fa fa-upload fa-2x" aria-hidden="true"><br>Results file</i>
               <input id="results-file-input" type="file" name="file_r" clas="inputfile" style="display: none;" required />
@@ -174,8 +190,8 @@
 
   $(document).ready(function() {
     function updateForm() {
-      // console.log('checked:', isChecked('branchSite'));
-      if (isChecked('branchSite')) {
+      console.log('checked:', isChecked('branchSiteMode'));
+      if (isChecked('branchSiteMode')) {
         $('#statcol-field').hide();
       } else {
         $('#statcol-field').show();
@@ -184,11 +200,11 @@
     function isChecked(checkboxId) {
       return $('#'+checkboxId).is(':checked');
     }
-    $('#branchSite').ready(function(e) {
+    $('#branchSiteMode').ready(function(e) {
       // console.log('branchSite ready');
       updateForm();
     });
-    $('#branchSite').change(function (e) {
+    $('#siteMode, #branchSiteMode').change(function (e) {
       // console.log('branchSite updated');
       updateForm();
     });
