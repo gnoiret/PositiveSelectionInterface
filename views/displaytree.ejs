@@ -104,6 +104,10 @@
           <input id="right-boundary" type="number" step="1" placeholder="Right boundary" value="10000" style="width: 5em;"/>
         </div>
       </button>
+      <div>
+        <input id="automatic-boundaries" type="checkbox" name="automatic-boundaries" checked />
+        <label for="automatic-boundaries">Atomatic boundaries</label>
+      </div>
       <!-- Bouton de chargement des résultats globaux -->
       <!-- <button id="reload-global-results" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Reload global results" data-toggle="tooltip" data-placement="top" title="Reload default results">
         <span>Reload global results</span>
@@ -207,7 +211,9 @@ var rightBoundary = rightBoundaryInput.val();
 var firstLoad = 1;
 var alignmentWindowOnScroll = false;
 var compactWindowOnClick = false;
-var blackWhite = true;
+var blackWhite = false;
+var automaticBoundaries = $('#automatic-boundaries').is(':checked');
+var resultsLength = 0;
 
 if (!isStorageSupported(myStorage)) {
   console.log("window.localStorage problem");
@@ -635,10 +641,10 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
           //   }
           //   window.open(url);
           // }
-          if (action == svgEvents.showBranchResults) {
+          if (action == svgEvents.showBranchResults && d.data.branch_info) {
             resultsJSON = JSON.parse(d.data.branch_info.results);
+            selectedNode = d3.select(this);
           }
-          selectedNode = d3.select(this);
         });
   if (firstLoad) {
     d3.selectAll('path.symbol')
@@ -1096,8 +1102,10 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
           .style('stroke-width', '0');
       
       // console.log(siteStart, siteEnd);
-      leftBoundaryInput.val(siteStart);
-      rightBoundaryInput.val(siteEnd);
+      if (automaticBoundaries) {
+        leftBoundaryInput.val(siteStart);
+        rightBoundaryInput.val(siteEnd);
+      }
       updateNodeColors();
     };
     // });
@@ -1413,18 +1421,35 @@ function updateBoundaries() {
   rightBoundary = rightBoundaryInput.val();
 }
 
+function colorByRate(rate) {
+  if (blackWhite) {
+    return 'hsl(0, 0%, '+(80-2*rate*100)+'%)';
+  } else {
+    if (rate > 0) {
+      return 'hsl(0, 100%, '+(85 - 2*rate*100)+'%)';
+    } else {
+      // return 'hsl(240, 100%, 50%)'; // blue
+      return 'hsl(0, 0%, '+(80-2*rate*100)+'%)';
+    }
+  }
+}
+
 function updateNodeColors() {
   // The color of a node depends on the number of positive sites
   g.selectAll('path.symbol')
     .style('fill', function(d) {
       if (d.data.branch_info) {
         var positiveRate = getPositiveRateJSON(d.data.branch_info.results, psThresholdHigh, leftBoundary, rightBoundary).toFixed(3);
-        // if (positiveRate > 0) {
-        //   return 'hsl(0, 100%, '+(100 - 2*positiveRate*100 - 15)+'%)';
+        return colorByRate(positiveRate);
+        // if (blackWhite) {
+        //   return 'hsl(0, 0%, '+(80-2*positiveRate*100)+'%)';
         // } else {
-        //   return 'hsl(240, 100%, 50%)'; // blue
+        //   if (positiveRate > 0) {
+        //     return 'hsl(0, 100%, '+(100 - 2*positiveRate*100 - 15)+'%)';
+        //   } else {
+        //     return 'hsl(240, 100%, 50%)'; // blue
+        //   }
         // }
-        return 'hsl(0, 0%, '+(80-2*positiveRate*100)+'%)';
       }
     });
   // The color of a branch depends on the number of positive sites in its node
@@ -1432,12 +1457,16 @@ function updateNodeColors() {
     .style('stroke', function(d) {
       if (d.target.data.branch_info) {
         var positiveRate = getPositiveRateJSON(d.target.data.branch_info.results, psThresholdHigh, leftBoundary, rightBoundary).toFixed(3);
-        // if (positiveRate > 0) {
-        //   return 'hsl(0, 100%, '+(100 - 2*positiveRate*100 - 15)+'%)';
+        return colorByRate(positiveRate);
+        // if (blackWhite) {
+        //   return 'hsl(0, 0%, '+(80-2*positiveRate*100)+'%)';
         // } else {
-        //   return 'hsl(240, 100%, 50%)'; // blue
+        //   if (positiveRate > 0) {
+        //     return 'hsl(0, 100%, '+(100 - 2*positiveRate*100 - 15)+'%)';
+        //   } else {
+        //     return 'hsl(240, 100%, 50%)'; // blue
+        //   }
         // }
-        return 'hsl(0, 0%, '+(80-2*positiveRate*100)+'%)';
       }
     });
   // selected node color and outline
@@ -1463,10 +1492,12 @@ function scrollAlignment(event) {
   // console.log(leftSiteNumber, rightSiteNumber);
   alignmentWindow.scrollLeft(leftScroll, 0);
 
-  leftBoundaryInput.val(leftSiteNumber>=0?leftSiteNumber:0);
-  rightBoundaryInput.val(rightSiteNumber<=maxSeqLen?rightSiteNumber:maxSeqLen);
-  leftBoundary = parseInt(leftBoundaryInput.val());
-  rightBoundary = parseInt(rightBoundaryInput.val());
+  if (automaticBoundaries) {
+    leftBoundaryInput.val(leftSiteNumber >= 0 ? leftSiteNumber : 0);
+    rightBoundaryInput.val(rightSiteNumber <= maxSeqLen ? rightSiteNumber : maxSeqLen);
+    leftBoundary = parseInt(leftBoundaryInput.val());
+    rightBoundary = parseInt(rightBoundaryInput.val());
+  }
 }
 
 function updateScroll() {
@@ -2100,6 +2131,16 @@ $('#export').on('click', function(event, dropdownData) {
 
 // Actions à la fin du chargement de la page
 $(document).ready(function() {
+  $('input#automatic-boundaries').change(function (e) {
+    console.log('this', this);
+    console.log($(this).is(':checked'));
+    if ($(this).is(':checked')) {
+      automaticBoundaries = true;
+    } else {
+      automaticBoundaries = false;
+    }
+    console.log('automaticBoundaries', automaticBoundaries);
+  });
   rightBoundaryInput.val(maxSeqLen);
   // hideTooltip();
   // var tooltips = document.querySelectorAll('.tooltip span');
