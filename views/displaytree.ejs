@@ -95,17 +95,17 @@
       <button class="btn btn-sm btn-outline-secondary">
         <div class="input-group">
           <label for="left-boundary">Left boundary</label>
-          <input id="left-boundary" type="number" step="1" placeholder="Left boundary" value="0" style="width: 5em;"/>
+          <input id="left-boundary" type="number" step="1" placeholder="Left boundary" style="width: 5em;"/>
         </div>
       </button>
       <button class="btn btn-sm btn-outline-secondary">
         <div class="input-group">
           <label for="right-boundary">Right boundary</label>
-          <input id="right-boundary" type="number" step="1" placeholder="Right boundary" value="10000" style="width: 5em;"/>
+          <input id="right-boundary" type="number" step="1" placeholder="Right boundary" style="width: 5em;"/>
         </div>
       </button>
       <div>
-        <input id="automatic-boundaries" type="checkbox" name="automatic-boundaries" checked />
+        <input id="automatic-boundaries" type="checkbox" name="automatic-boundaries" />
         <label for="automatic-boundaries">Atomatic boundaries</label>
       </div>
       <!-- Bouton de chargement des résultats globaux -->
@@ -215,6 +215,9 @@ var blackWhite = false;
 var automaticBoundaries = $('#automatic-boundaries').is(':checked');
 var resultsLength = 0;
 var siteOffset = 1;
+var nbBranches = 0;
+var nbLeaves = 0;
+var nbSites = 0;
 
 if (!isStorageSupported(myStorage)) {
   console.log("window.localStorage problem");
@@ -388,6 +391,8 @@ function updateLayout(cRoot,firstLoad=0) {
 // Fonction principale : mise a jour du svg
 // ----------------------------------------
 function updateSvg(treeRoot,firstLoad ,config = {}) {
+  // console.log('firstLoad', firstLoad);
+
   // Suppression de l'ancien affichage de l'alignement et du graphe
   d3.selectAll('#ps-graph, #sequences-container').remove();
 
@@ -930,6 +935,22 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       }
       return name
     });
+  
+  // Get tree characteristics (do this only once)
+  if (firstLoad) {
+    nbBranches = g.selectAll('path.symbol').size();
+    g.selectAll('path.symbol').each(function(elem) {
+      if (elem.data.lastEvent.aaAlign) {
+        console.log('elem.data.lastEvent.aaAlign.length', elem.data.lastEvent.aaAlign.length);
+        nbLeaves ++;
+        if (elem.data.lastEvent.aaAlign.length > nbSites) {
+          nbSites = elem.data.lastEvent.aaAlign.length;
+        }
+      }
+    });
+    leftBoundaryInput.val(0);
+    rightBoundaryInput.val(nbSites);
+  }
 
   // // The color of a node depends on the number of positive sites in its branch
   // g.selectAll('path.symbol').attr('fill', function(d) {
@@ -1106,6 +1127,9 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       if (automaticBoundaries) {
         leftBoundaryInput.val(siteStart);
         rightBoundaryInput.val(siteEnd);
+      } else {
+        leftBoundaryInput.val(0);
+        rightBoundaryInput.val(nbSites);
       }
       updateNodeColors();
     };
@@ -2146,9 +2170,6 @@ $(document).ready(function() {
     }
     console.log('automaticBoundaries', automaticBoundaries);
   });
-  rightBoundaryInput.val(maxSeqLen);
-  // hideTooltip();
-  // var tooltips = document.querySelectorAll('.tooltip span');
   var tooltips = document.querySelectorAll('.tooltip');
   window.onmousemove = function (e) {
       var x = (e.clientX + 16) + 'px';
