@@ -237,13 +237,16 @@ def loadResultsBranchSite(resultsFile, sep='\t', skipMissingSites=False):
         d_cols_2 = dict(d_cols)
         for col_key in d_cols:
             # if col_key != position_header:
+            ## For every branch
             if re.search(r'^[0-9]+$', col_key):
                 col_text = ''
                 # print(f'd_cols[{col_key}]', d_cols[col_key])
+                ## Add each result to the text
                 for i in range(len(d_cols[position_header])):
                     col_text += f'{d_cols[col_key][i]}, '
                     # col_text: '0.1248, 0.12381, ...'
-                col_text = '['+col_text[:-2]+']' # remove last space and comma
+                ## Add brackets for JSON format
+                col_text = '['+col_text[:-2]+']' # [:-2] to remove last space and comma
                 d_cols_2[col_key] = col_text
                 # d_cols_2: {1: '[0.1248, 0.12381, ...]', ...}
     return d_cols_2
