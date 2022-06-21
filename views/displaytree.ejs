@@ -91,22 +91,27 @@
           <input id="ps-threshold-high" type="number" min="0.0" step="0.05" placeholder="PS Threshold" value="1.0" style="width: 5em;"/>
         </div>
       </button>
-      <!-- Champs Borne gauche et droite -->
-      <button class="btn btn-sm btn-outline-secondary">
-        <div class="input-group">
-          <label for="left-boundary">Left boundary</label>
-          <input id="left-boundary" type="number" step="1" placeholder="Left boundary" style="width: 5em;"/>
+      <div class="branch-site-options">
+        <!-- Champs Borne gauche et droite -->
+        <button class="btn btn-sm btn-outline-secondary">
+          <div class="input-group">
+            <label for="left-boundary">Left boundary</label>
+            <input id="left-boundary" type="number" step="1" placeholder="Left boundary" style="width: 5em;"/>
+          </div>
+        </button>
+        <button class="btn btn-sm btn-outline-secondary">
+          <div class="input-group">
+            <label for="right-boundary">Right boundary</label>
+            <input id="right-boundary" type="number" step="1" placeholder="Right boundary" style="width: 5em;"/>
+          </div>
+        </button>
+        <div>
+          <input id="automatic-boundaries" type="checkbox" name="automatic-boundaries" />
+          <label for="automatic-boundaries">Atomatic boundaries</label>
         </div>
-      </button>
-      <button class="btn btn-sm btn-outline-secondary">
-        <div class="input-group">
-          <label for="right-boundary">Right boundary</label>
-          <input id="right-boundary" type="number" step="1" placeholder="Right boundary" style="width: 5em;"/>
-        </div>
-      </button>
-      <div>
-        <input id="automatic-boundaries" type="checkbox" name="automatic-boundaries" />
-        <label for="automatic-boundaries">Atomatic boundaries</label>
+        <button id="reset-boundaries" class="btn btn-sm btn-outline-secondary">
+          <span>Reset boundaries</span>
+        </button>
       </div>
       <!-- Bouton de chargement des résultats globaux -->
       <!-- <button id="reload-global-results" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Reload global results" data-toggle="tooltip" data-placement="top" title="Reload default results">
@@ -144,7 +149,7 @@ pattern = '';
 var branchSite = <%- branchSite %>;
 var logBranchLength = <%- logBranchLength %>;
 var isNuc = <%- isNuc %>;
-console.log('isNuc', isNuc);
+// console.log('isNuc', isNuc);
 // Variables globales
 // ------------------
 var treeRoot;
@@ -246,7 +251,7 @@ function  main_display() {
       patterns[indexPatt].push(buf[1]);
     }
     else {
-      console.log("PATTERN ERROR : "+buf);
+      // console.log("PATTERN ERROR : "+buf);
     }
   });
   // Test si l'arbre est du type
@@ -493,11 +498,13 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       speciationLoss : "symbolCircle"
     }
   }
-  console.log('treeRoot', treeRoot);
+
   var nodes = treeRoot.descendants();
-  console.log('nodes', nodes);
   var links = treeRoot.links();
-  console.log('links', links);
+
+  // console.log('treeRoot', treeRoot);
+  // console.log('nodes', nodes);
+  // console.log('links', links);
 
   // Coloration du pattern si il existe
   if ((pattern != "none") && (pattern !== ' ') && (pattern !== undefined)) {
@@ -941,7 +948,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     nbBranches = g.selectAll('path.symbol').size();
     g.selectAll('path.symbol').each(function(elem) {
       if (elem.data.lastEvent.aaAlign) {
-        console.log('elem.data.lastEvent.aaAlign.length', elem.data.lastEvent.aaAlign.length);
+        // console.log('elem.data.lastEvent.aaAlign.length', elem.data.lastEvent.aaAlign.length);
         nbLeaves ++;
         if (elem.data.lastEvent.aaAlign.length > nbSites) {
           nbSites = elem.data.lastEvent.aaAlign.length;
@@ -1102,40 +1109,31 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       // Draw a rectangle surrounding the site that was clicked
       // console.log('scrolling alignment');
       $('.navigation-window').remove();
-      var siteNumber = - (60 + seq_lg - alignmentWindow.scrollLeft() - alignmentWindow.innerWidth()/2)/hStep;
-      // var navWindowWidth = alignmentWindow.innerWidth()/hStep + 2;
+      var siteNumber = - Math.trunc((60 + seq_lg - alignmentWindow.scrollLeft() - alignmentWindow.innerWidth()/2)/hStep) - 2;
       var navWindowWidth = alignmentWindow.innerWidth()/hStep;
-      var siteStart = Math.trunc(siteNumber - navWindowWidth/2) + 2;
-      var siteEnd = Math.trunc(siteNumber + navWindowWidth/2) + 2;
+      var siteStart = Math.trunc(siteNumber - navWindowWidth/2) + 5;
+      var siteEnd = Math.trunc(siteNumber + navWindowWidth/2) + 5;
+      // console.log(siteNumber, siteStart, siteEnd);
+      // var siteStart = Math.trunc(siteNumber - navWindowWidth/2);
+      // var siteEnd = Math.trunc(siteNumber + navWindowWidth/2);
       var navWindowRect = psGraphGlobal
         .append('rect')
           .attr('class', 'navigation-window')
-          // .attr('x', siteNumber - navWindowWidth/2 + 2)
           .attr('x', siteStart)
-          // .attr('y', 1)
           .attr('y', 0)
           .attr('width', navWindowWidth)
-          // .attr('height', psGraphGlobalHeight-2)
           .attr('height', psGraphGlobalHeight)
-          // .style('fill', 'rgba(0,0,0,0.1)')
           .style('fill', 'rgba(0,0,0,0.17)')
           .style('stroke', navWindowColor)
-          // .style('stroke-width', '2');
           .style('stroke-width', '0');
       
       // console.log(siteStart, siteEnd);
       if (automaticBoundaries) {
         leftBoundaryInput.val(siteStart);
         rightBoundaryInput.val(siteEnd);
-      } else {
-        leftBoundaryInput.val(0);
-        rightBoundaryInput.val(nbSites);
       }
       updateNodeColors();
     };
-    // });
-  // }
-  // alignmentWindowOnScroll = true;
   
   // ======================================================
   // | Début : graphe des résultats de sélection positive |
@@ -1411,6 +1409,12 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
 
 // Autres fonctions utilitaires
 // ----------------------------
+
+function resetBoundaries() {
+  leftBoundaryInput.val(0);
+  rightBoundaryInput.val(nbSites);
+  updateNodeColors();
+}
 
 // Fonction de calcul de la statistique maximale dans les résultats
 function maxStatJSON(jsonResultsList) {
@@ -2130,7 +2134,8 @@ $('#moreHeigth').on('click', function(event, dropdownData) {
   updateLayout(cladeRoot);
 });
 $('#lessHeigth').on('click', function(event, dropdownData) {
-  if (nodeHeight - modStepY >= 15 ) {
+  // if (nodeHeight - modStepY >= 15 ) {
+  if (true) {
     nodeHeight -= modStepY;
     updateLayout(cladeRoot);
   }
@@ -2158,17 +2163,20 @@ $('#export').on('click', function(event, dropdownData) {
   }
 });
 
-// Actions à la fin du chargement de la page
+// The page has loaded
 $(document).ready(function() {
+  $('#reset-boundaries').on('click', function() {
+    resetBoundaries();
+  });
   $('input#automatic-boundaries').change(function (e) {
-    console.log('this', this);
-    console.log($(this).is(':checked'));
+    // console.log('this', this);
+    // console.log($(this).is(':checked'));
     if ($(this).is(':checked')) {
       automaticBoundaries = true;
     } else {
       automaticBoundaries = false;
     }
-    console.log('automaticBoundaries', automaticBoundaries);
+    // console.log('automaticBoundaries', automaticBoundaries);
   });
   var tooltips = document.querySelectorAll('.tooltip');
   window.onmousemove = function (e) {
