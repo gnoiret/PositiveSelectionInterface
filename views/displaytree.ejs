@@ -9,114 +9,106 @@
 
 <body>
   <header>
+    <%- include('../partials/header') %>
     <nav id="main-nav" class="navbar navbar-default navbar-fixed-top">
-      <%- include('../partials/header') %>
-      <!-- Bouton Action -->
-      <div id="action" class="dropdown">
-        <button class="btn dropdown-toggle btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Choose action on node">
-          On click
-        </button>
-        <ul class="dropdown-menu" aria-labelledby="action">
-          <li><a id="branch-res" class="dropdown-item" href="#">View Branch Results</a></li>
-          <li><a id="switch" class="dropdown-item" href="#">Switch children</a></li>
-          <li><a id="collapse" class="dropdown-item" href="#">Collapse/Expand</a></li>
-          <li><a id="subtree" class="dropdown-item" href="#">Sub Tree/Upper Tree</a></li>
-        </ul>
-      </div>
-      <!-- Bouton Collapse -->
-      <!-- <button type="button" class="btn btn-default btn-sm" aria-label="Collapse" data-toggle="tooltip" data-placement="top" title="Collapse the tree" id="globalcollapse">
-        <span>Compact tree</span>
-      </button> -->
-      <!-- Bouton Expand -->
-      <button id="globalexpand" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Expand" data-toggle="tooltip" data-placement="top" title="Expand the tree (takes time on big trees!)">
-        <span>Expand tree</span>
-      </button>
-      <div class="btn-group" role="group" aria-label="Tree size buttons">
-        <div class="btn-group" role="group" aria-label="Width buttons">
-          <!-- Bouton Reduce width -->
+      <!-- <div class="d-flex w-100 justify-content-start"> -->
+        <!-- Bouton Action -->
+        <div id="action" class="dropdown">
+          <button class="btn dropdown-toggle btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Choose action on node">
+            On click
           </button>
-          <button id="lessWidth" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Less width" data-toggle="tooltip" data-placement="top" title="Reduce tree width">
-            <span>Width -</span>
-            <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
-          </button>
-          <!-- Bouton Increase width -->
-          <button id="moreWidth" class="btn btn-sm btn-outline-secondary" type="button" aria-label="More width" data-toggle="tooltip" data-placement="top" title="Increase tree width">
-            <span>Width +</span>
-            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+          <ul class="dropdown-menu" aria-labelledby="action">
+            <li><a id="branch-res" class="dropdown-item" href="#">View Branch Results</a></li>
+            <li><a id="switch" class="dropdown-item" href="#">Switch children</a></li>
+            <li><a id="collapse" class="dropdown-item" href="#">Collapse/Expand</a></li>
+            <li><a id="subtree" class="dropdown-item" href="#">Sub Tree/Upper Tree</a></li>
+          </ul>
+        </div>
+        <!-- Bouton Collapse -->
+        <!-- <button type="button" class="btn btn-default btn-sm" aria-label="Collapse" data-toggle="tooltip" data-placement="top" title="Collapse the tree" id="globalcollapse">
+          <span>Compact tree</span>
+        </button> -->
+        <!-- Bouton Expand -->
+        <div class="btn-group" role="group" aria-label="">
+          <button id="globalexpand" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Expand" data-toggle="tooltip" data-placement="top" title="Expand the tree (takes time on big trees!)">
+            <span>Expand tree</span>
           </button>
         </div>
-        <div class="btn-group" role="group" aria-label="Height buttons">
-          <!-- Bouton Reduce height -->
-          <button id="lessHeigth" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Left Align" data-toggle="tooltip" data-placement="top" title="Reduce tree height">
-            <span>Height -</span>
-            <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+        <div class="btn-group" role="group" aria-label="Tree size buttons">
+          <div class="btn-group" role="group" aria-label="Width buttons">
+            <!-- Bouton Reduce width -->
+            </button>
+            <button id="lessWidth" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Less width" data-toggle="tooltip" data-placement="top" title="Reduce tree width">
+              <span>Width -</span>
+              <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+            </button>
+            <!-- Bouton Increase width -->
+            <button id="moreWidth" class="btn btn-sm btn-outline-secondary" type="button" aria-label="More width" data-toggle="tooltip" data-placement="top" title="Increase tree width">
+              <span>Width +</span>
+              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            </button>
+          </div>
+          <div class="btn-group" role="group" aria-label="Height buttons">
+            <!-- Bouton Reduce height -->
+            <button id="lessHeigth" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Left Align" data-toggle="tooltip" data-placement="top" title="Reduce tree height">
+              <span>Height -</span>
+              <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+            </button>
+            <!-- Bouton Increase height -->
+            <button id="moreHeigth" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Left Align" data-toggle="tooltip" data-placement="top" title="Increase tree height">
+              <span>Height +</span>
+              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+        <!-- Bouton Alignement -->
+        <div id="alignment-type" class="dropdown">
+          <button class="btn dropdown-toggle btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Choose alignment type">
+            Alignment type
           </button>
-          <!-- Bouton Increase height -->
-          <button id="moreHeigth" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Left Align" data-toggle="tooltip" data-placement="top" title="Increase tree height">
-            <span>Height +</span>
-            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+          <ul class="dropdown-menu" aria-labelledby="alignment-type">
+            <li><a id="aminoacid" class="dropdown-item" href="#">Amino Acids</a></li>
+            <li><a id="nucleotid" class="dropdown-item" href="#">Codons</a></li>
+          </ul>
+        </div>
+        <!-- Bouton Export -->
+        <div id="export" class="dropdown">
+          <button class="btn dropdown-toggle btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Choose alignment type">
+            Export
           </button>
+          <ul class="dropdown-menu" aria-labelledby="export">
+            <li><a id="tree" class="dropdown-item" href="#">Tree</a></li>
+            <li><a id="selecp" class="dropdown-item" href="#">Alignment</a></li>
+          </ul>
         </div>
-      </div>
-      <!-- Bouton Alignement -->
-      <div id="alignment-type" class="dropdown">
-        <button class="btn dropdown-toggle btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Choose alignment type">
-          Alignment type
-        </button>
-        <ul class="dropdown-menu" aria-labelledby="alignment-type">
-          <li><a id="aminoacid" class="dropdown-item" href="#">Amino Acids</a></li>
-          <li><a id="nucleotid" class="dropdown-item" href="#">Codons</a></li>
-        </ul>
-      </div>
-      <!-- Bouton Export -->
-      <div id="export" class="dropdown">
-        <button class="btn dropdown-toggle btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Choose alignment type">
-          Export
-        </button>
-        <ul class="dropdown-menu" aria-labelledby="export">
-          <li><a id="tree" class="dropdown-item" href="#">Tree</a></li>
-          <li><a id="selecp" class="dropdown-item" href="#">Alignment</a></li>
-        </ul>
-      </div>
-      <!-- Champs Seuils sup. et inf. -->
-      <button class="btn btn-sm btn-outline-secondary">
-        <div class="input-group">
-          <label for="ps-threshold-low">Lower threshold</label>
-          <input id="ps-threshold-low" type="number" min="0.0" step="0.05" placeholder="PS Threshold" value="0.9" style="width: 5em;"/>
-        </div>
-      </button>
-      <button class="btn btn-sm btn-outline-secondary">
-        <div class="input-group">
-          <label for="ps-threshold-high">Upper threshold</label>
-          <input id="ps-threshold-high" type="number" min="0.0" step="0.05" placeholder="PS Threshold" value="1.0" style="width: 5em;"/>
-        </div>
-      </button>
-      <div class="branch-site-options">
-        <!-- Champs Borne gauche et droite -->
+        <!-- Champs Seuils sup. et inf. -->
         <button class="btn btn-sm btn-outline-secondary">
-          <div class="input-group">
-            <label for="left-boundary">Left boundary</label>
-            <input id="left-boundary" type="number" step="1" placeholder="Left boundary" style="width: 5em;"/>
+          <div class="input-group align-items-center">
+            <label for="ps-threshold-low">Thresholds</label>
+            <input id="ps-threshold-low" type="number" min="0.0" step="0.05" placeholder="PS Threshold" value="0.9" style="width: 5em;"/>
+            <input id="ps-threshold-high" type="number" min="0.0" step="0.05" placeholder="PS Threshold" value="1.0" style="width: 5em;"/>
           </div>
         </button>
-        <button class="btn btn-sm btn-outline-secondary">
-          <div class="input-group">
-            <label for="right-boundary">Right boundary</label>
-            <input id="right-boundary" type="number" step="1" placeholder="Right boundary" style="width: 5em;"/>
+        <!-- Bornes gauche et droite -->
+        <div class="btn-group" role="group" aria-label="">
+          <div class="btn btn-sm btn-outline-secondary d-flex align-items-center">
+            <input id="automatic-boundaries" type="checkbox" name="automatic-boundaries" />
+            <label for="automatic-boundaries">Automatic boundaries</label>
           </div>
-        </button>
-        <div>
-          <input id="automatic-boundaries" type="checkbox" name="automatic-boundaries" />
-          <label for="automatic-boundaries">Atomatic boundaries</label>
+          <button class="btn btn-sm btn-outline-secondary">
+            <div class="input-group align-items-center">
+              <label for="left-boundary">Boundaries</label>
+              <input id="left-boundary" type="number" step="1" placeholder="Left boundary" style="width: 5em;"/>
+              <input id="right-boundary" type="number" step="1" placeholder="Right boundary" style="width: 5em;"/>
+            </div>
+          </button>
+          <div class="btn-group" role="group" aria-label="">
+            <button id="reset-boundaries" class="btn btn-sm btn-outline-secondary">
+              <span>Reset boundaries</span>
+            </button>
+          </div>
         </div>
-        <button id="reset-boundaries" class="btn btn-sm btn-outline-secondary">
-          <span>Reset boundaries</span>
-        </button>
-      </div>
-      <!-- Bouton de chargement des résultats globaux -->
-      <!-- <button id="reload-global-results" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Reload global results" data-toggle="tooltip" data-placement="top" title="Reload default results">
-        <span>Reload global results</span>
-      </button> -->
+      <!-- </div> -->
     </nav>
     <div id="navigator-container" style="border:2px solid lightgrey; overflow-y: hidden; width: 100%; height: 80px;">
       <svg id="svg0"></svg>
@@ -676,7 +668,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       selectedNode
         .style('stroke-width', '2')
         .style('stroke', '#000')
-        // .style('fill', '#FFF')
+        .style('fill', '#FFF')
         ;
     }
   }
@@ -1463,7 +1455,11 @@ function colorByRate(rate) {
   }
 }
 
-function updateNodeColors() {
+function updateNodeColors(eventType='') {
+  globalI ++;
+  if (globalI%(Math.ceil(nbBranches/100))) {
+    console.log(nbBranches, Math.ceil(nbBranches/100), globalI);
+  }
   // The color of a node depends on the number of positive sites
   g.selectAll('path.symbol')
     .style('fill', function(d) {
@@ -1505,7 +1501,7 @@ function updateNodeColors() {
     selectedNode
       .style('stroke-width', '2')
       .style('stroke', '#000')
-      // .style('fill', '#FFF')
+      .style('fill', '#FFF')
       ;
   }
 }
@@ -2202,23 +2198,10 @@ $(document).ready(function() {
       $('a#nucleotid').css('color', '#000000');
       break;
   }
-  $('div.demo').css({
-    'margin-top': $('header').outerHeight(),
-  });
+  $('main').css('margin-top', $('header').outerHeight());
   // Gestion du redimensionnement de la fenêtre
-  $(window).ready(function() {
-    $('#svg-container').css({
-      'margin-top': $('nav').outerHeight(),
-      'width': $(window).width(),
-      'height': $(window).height() - $('nav').outerHeight() - 30,
-    });
-  });
-  $(window).resize(function() {
-    $('#svg-container').css({
-      'margin-top': $('nav').outerHeight(),
-      'width': $(window).width(),
-      'height': $(window).height() - $('nav').outerHeight() - 1200,
-    });
+  $(window).on('ready resize', function() {
+    $('main').css('margin-top', $('header').outerHeight());
   });
   // Gestion du bouton pour le type d'alignement
   $('#alignment-type').on('click', function(event, dropdownData) {
@@ -2262,23 +2245,18 @@ $(document).ready(function() {
   // rightBoundary = rightBoundaryInput.val();
   // Gestion de la modification des limites
   $('#left-boundary, #right-boundary').on('change', function(event) {
-    // console.log('boundary change');
-    // On a modifié un des seuils
-    // Correction des valeurs en présence d'incohérences
+    // Bounaries changed
+    // Correct values
     var leftB = parseFloat(leftBoundaryInput.val());
     var rightB = parseFloat(rightBoundaryInput.val());
     // console.log('Thresholds:', psHighVal, '>=', psLowVal);
     if (rightB - 1 < leftB) {
       if (event.currentTarget.id == 'right-boundary') {
-        // On a descendu le seuil supérieur plus bas que le seuil inférieur
-        // ex : psHighVal = 0.95 | psLowVal = 1.0
-        // On veut donc redecsendre le seuil inférieur en conséquence
+        // Left boundary > right boundary
         leftB = rightB - 1;
         leftBoundaryInput.val(leftB);
-      } else if (leftB + 1 > rightB) {
-        // On a monté le seuil inférieur plus haut que le seuil supérieur
-        // ex : psHighVal = 1.0 | psLowVal = 1.05
-        // On veut donc remonter le seuil supérieur en conséquence
+      } else {
+        // Right boundary < left boundary
         rightB = leftB + 1;
         rightBoundaryInput.val(rightB);
       }
