@@ -632,7 +632,9 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
           }
         })
         .on('mouseout', function() {
-          hideTooltip();
+          if (selectedNode) {
+            hideTooltip();
+          }
         })
         .on('click', function(d) {
           // console.log('path.symbol clicked');
@@ -1756,7 +1758,7 @@ function phylo(n) {
   if (n && n.data.branch_length != null) {
     var p = n.parent;
     if (logBranchLength) {
-      dist = Math.log(parseFloat(n.data.branch_length)+1.15) + phylo(p);
+      dist = Math.log(parseFloat(n.data.branch_length)+1.05) + phylo(p);
     } else {
       dist = parseFloat(n.data.branch_length) + phylo(p);
     }
