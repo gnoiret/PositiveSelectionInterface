@@ -44,6 +44,7 @@ from lxml.etree import XMLParser, parse
 
 parser = argparse.ArgumentParser(description='Generate an XML file from \
     a tree, an alignment and statistics.')
+## Files
 parser.add_argument('-t', '--tree', dest='treeFile', action='store',\
     required=True,\
     help='File containing a tree in Newick format')
@@ -53,6 +54,10 @@ parser.add_argument('-a', '--align', dest='alignmentFile', action='store',\
 parser.add_argument('-r', '--results', dest='resultsFile', action='store',\
     required=True,\
     help='File containing the results')
+parser.add_argument('-o', '--output', dest='output', action='store',\
+    help='Name of the output XML file (if not specified, the XML will have \
+    the same name as the tree file)')
+## Other parameters
 parser.add_argument('-s', '--sep', dest='sep', action='store',\
     required=False,\
     default='\t',\
@@ -64,9 +69,11 @@ parser.add_argument('-n', '--nostat', dest='nostat', action='store', type=float,
     default=-1.0,\
     help='Value to use in case there is no statistic associated\
     with a site in the sequence')
+## Mode
 parser.add_argument('-b', '--branchsite', dest='isBranchsite', action='store_true',\
     required=False,\
     help='View site-branch data')
+## Toggles
 parser.add_argument('--skipmissing', dest='skipMissingSites', action='store_true',\
     required=False,\
     help='Prevent the addition of special values (-n, --nostat) for sites that are absent from the results file. \
@@ -74,9 +81,6 @@ parser.add_argument('--skipmissing', dest='skipMissingSites', action='store_true
 parser.add_argument('--isnucleic', dest='isNucleic', action='store_true',\
     required=False,\
     help='Specify this argument if the sequences are not to be treated as DNA/RNA')
-parser.add_argument('-o', '--output', dest='output', action='store',\
-    help='Name of the output XML file (if not specified, the XML will have \
-    the same name as the tree file)')
 args = parser.parse_args()
 
 
