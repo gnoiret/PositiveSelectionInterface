@@ -312,13 +312,17 @@ def createPhyloXML(fam,newick):
     #             nv_arbre+=newick[i]
     #     newick = nv_arbre
 
-    # print(f'newick:\n{newick}')
+    print(f'newick:\n{newick}')
 
     # Tree now has a <branch_name>:<number>:<length> syntax
     handle = StringIO(newick)
     # print('handle:', handle)
     trees = Phylo.read(handle, 'newick')
-    # print('trees:', trees)
+
+    ## Branch IDs match the order in which <clade> tags are closed in the PhyloXML tree
+    ## The first ID being 0
+
+    print('trees:', trees)
     # Clade(branch_length=0.0642909)
 
     # Write a sequence of Tree objects to the given file or handle
@@ -349,10 +353,8 @@ def createPhyloXML(fam,newick):
     subtree = tree.xpath("/phyloxml")
     nbfeuille = 0
     famspecies = {}
-    # branch_id = 0
 
     res_colnames = getColnames(args.resultsFile)[1:]
-    # print('res_colnames:', res_colnames)
     colname_index = 0
     for element in clade[0].iter('clade'):
         # print(element.tag)
@@ -410,17 +412,15 @@ def createPhyloXML(fam,newick):
             evrec.append(leaf)
             element.append(evrec)
         
-        if args.isBranchsite:
-            if element.find('branch_length') is not None:
-                branch_id = res_colnames[colname_index]
-                print('branch_id', branch_id)
-                branch_info = etree.Element('branch_info')
-                branch_info.set('id', str(branch_id))
-                branch_info.set('results', str(dict_results[str(branch_id)]))
-                print(str(branch_id), dict_results[str(branch_id)][:10])
-                element.append(branch_info)
-                colname_index += 1
-                # branch_id += 1
+        if args.isBranchsite and element.find('branch_length') is not None:
+            branch_id = res_colnames[colname_index]
+            branch_info = etree.Element('branch_info')
+            branch_info.set('id', str(branch_id))
+            branch_info.set('results', str(dict_results[str(branch_id)]))
+            print(str(branch_id), dict_results[str(branch_id)][:10])
+            element.append(branch_info)
+            colname_index += 1
+    
     
     print ("Number of leaves : ")
     print (nbfeuille)
