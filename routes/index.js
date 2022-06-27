@@ -138,20 +138,20 @@ router.post("/upload_files", upload.fields([
       console.log(`error: ${error.message}`);
     } else {
       console.log('Deleting data files');
-      exec('rm'
-        +' '+upload_dir+fname_t
-        +' '+upload_dir+fname_a
-        +' '+upload_dir+fname_r,
-        (error, stdout, stderr) => {
-          if (error) {
-            console.log(`error: ${error.message}`);
-          }
-          if (stderr) {
-            console.log(`error: ${stderr}`);
-          }
-          console.log(`${stdout}`);
-        }
-      )
+      // exec('rm'
+      //   +' '+upload_dir+fname_t
+      //   +' '+upload_dir+fname_a
+      //   +' '+upload_dir+fname_r,
+      //   (error, stdout, stderr) => {
+      //     if (error) {
+      //       console.log(`error: ${error.message}`);
+      //     }
+      //     if (stderr) {
+      //       console.log(`error: ${stderr}`);
+      //     }
+      //     console.log(`${stdout}`);
+      //   }
+      // )
     }
     if (stderr) {
       console.log(`error: ${stderr}`);
@@ -186,18 +186,18 @@ router.post("/upload_files", upload.fields([
             logBranchLength:logBranchLength, isNuc:isNuc});
 
         console.log('Deleting XML file');
-        exec('rm'
-          +' '+xml_dir+fname_xml,
-          (error, stdout, stderr) => {
-            if (error) {
-              console.log(`error: ${error.message}`);
-            }
-            if (stderr) {
-              console.log(`error: ${stderr}`);
-            }
-            console.log(`${stdout}`);
-          }
-        )
+        // exec('rm'
+        //   +' '+xml_dir+fname_xml,
+        //   (error, stdout, stderr) => {
+        //     if (error) {
+        //       console.log(`error: ${error.message}`);
+        //     }
+        //     if (stderr) {
+        //       console.log(`error: ${stderr}`);
+        //     }
+        //     console.log(`${stdout}`);
+        //   }
+        // )
       });
     });
   });
