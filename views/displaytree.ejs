@@ -406,7 +406,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // console.log('results:', results);
   if (!resultsJSON && branchSite) {
     showTooltip();
-    writeTooltip('Please click on a node to display branch data');
+    writeTooltip('Please click a node to display branch data');
     resultsJSON = new Array(maxSeqLen).fill(-1);
     // console.log('Results undefined, branch-site');
     // resultsJSON = JSON.parse(xmlparser.flatTree(recTree.phyloxml.phylogeny.global_results.results));
@@ -931,6 +931,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       var name = "";
       if (options.includes("intname")) {
         if (d.data.confidence) {
+          // Display confidence below branches
           var name = d.data.confidence._text;
         }
       }
@@ -1758,7 +1759,7 @@ function phylo(n) {
   if (n && n.data.branch_length != null) {
     var p = n.parent;
     if (logBranchLength) {
-      dist = Math.log(parseFloat(n.data.branch_length)+1.05) + phylo(p);
+      dist = Math.log(parseFloat(n.data.branch_length)+1.1) + phylo(p);
     } else {
       dist = parseFloat(n.data.branch_length) + phylo(p);
     }
