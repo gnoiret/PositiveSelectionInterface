@@ -218,26 +218,75 @@ def loadResultsSites(resultsFile, statcol=1, nostat_value=-1.0, sep='\t', skipMi
 def loadResultsBranchSite(resultsFile, sep='\t', skipMissingSites=False):
     """Loads site-branch results."""
 
-    d_cols = {}
-    column_lists = []
+    col_lists = []
     with open(resultsFile, 'r') as f:
-        headers = f.readline().strip().split(sep)
-        for header in headers:
-            column_lists.append([header])
+        col_headers = f.readline().strip().split(sep)
+        # for header in col_headers:
+        #     col_lists.append([header])
+        # print('col_headers', col_headers)
+        # print('col_lists', col_lists)
 
+        for header in col_headers:
+            col_lists.append([])
+
+        site_i = 0
         for line in f:
+            # print('site', site_i)
+            # line: '1\t0.25866598\t0.66856214\t0.19517522\t...\n'
             line = line.strip().split(sep)
-            for i in range(len(line)):
-                column_lists[i].append(line[i])
-        
-        # column_lists: [[sites, 1, 2, ...], [0, 0.1248, 0.12381, ...], [1, 0.131, 0.835, ...], ...]
+            # print(line)
+            # line: ['1', '0.25866598', '0.66856214', '0.19517522', ...]
+            # print(site_i, line[0], line[0] == str(site_i))
+            col_lists[0].append(str(site_i))
+            # if line[0] == str(site_i):
+            while line[0] != str(site_i):
+                for i in range(1, len(line)):
+                    # print(col_lists[i], line[i])
+                    col_lists[i].append('-1')
+                site_i += 1
+                # print('ok')
+            for i in range(1, len(line)):
+                # print(i)
+                # print(col_lists[i], line[i])
+                col_lists[i].append(line[i])
+            site_i += 1
+            # else:
+            #     # print('?')
+            #     for i in range(1, len(line)):
+            #         # print(col_lists[i], line[i])
+            #         col_lists[i].append('-1')
+            #     site_i += 1
 
-        for column in column_lists:
-            d_cols[column[0]] = column[1:]
+        sites_column = col_lists.pop(0)
+        col_headers.pop(0)
+
+        # print('col: col_headers[i] col_lists[i][:3]')
+        d_cols = {}
+        for i in range(len(col_lists)):
+            # print('col:', col_headers[i], col_lists[i][:3])
+            d_cols[col_headers[i]] = col_lists[i]
+        
+        ## col_lists: [['0.00885554', '0.25866598', '0.03920189'], ...]
+        ## d_cols {'38': ['0.00885554', '0.25866598', '0.03920189'], ...}
+        
+        for key in d_cols:
+            print(key, d_cols[key][:3])
+
+        # for column in column_lists:
+        #     d_cols[column[0]] = column[1:]
+
+        # column_lists: [[29, 0.1248, 0.12381, ...], [0, 0.1248, 0.12381, ...], [1, 0.131, 0.835, ...], ...]
+        # for i in range(len(column_lists)):
+        #     # 
+        #     pass
         
         # d: {sites: [1, 2, ...], 0: [0.1248, 0.12381, ...], 1: [0.131, 0.835, ...], ...}
+
+        # d_cols = {}
+        # for i in range(len(col_lists)):
+        #     d_cols[col_headers[i]] = col_lists[i]
+        # print('d_cols', [(key, d_cols[key][0]) for key in d_cols])
         
-        position_header = 'sites'
         d_cols_2 = dict(d_cols)
         for col_key in d_cols:
             # if col_key != position_header:
@@ -246,7 +295,7 @@ def loadResultsBranchSite(resultsFile, sep='\t', skipMissingSites=False):
                 col_text = ''
                 # print(f'd_cols[{col_key}]', d_cols[col_key])
                 ## Add each result to the text
-                for i in range(len(d_cols[position_header])):
+                for i in range(len(d_cols['0'])):
                     col_text += f'{d_cols[col_key][i]}, '
                     # col_text: '0.1248, 0.12381, ...'
                 ## Add brackets for JSON format
@@ -312,7 +361,7 @@ def createPhyloXML(fam,newick):
     #             nv_arbre+=newick[i]
     #     newick = nv_arbre
 
-    print(f'newick:\n{newick}')
+    # print(f'newick:\n{newick}')
 
     # Tree now has a <branch_name>:<number>:<length> syntax
     handle = StringIO(newick)
@@ -322,7 +371,7 @@ def createPhyloXML(fam,newick):
     ## Branch IDs match the order in which <clade> tags are closed in the PhyloXML tree
     ## The first ID being 0
 
-    print('trees:', trees)
+    # print('trees:', trees)
     # Clade(branch_length=0.0642909)
 
     # Write a sequence of Tree objects to the given file or handle
