@@ -322,23 +322,25 @@ def cleanTree(tree:str):
     return new_tree
 
 
-count = -1
+current_branch = -1
 def createPhyloXML(fam,newick):
     newick = cleanTree(newick)
 
-    # Parse and return exactly one tree from the given file or handle
-    # if not ':' in newick:
-    #     nv_arbre = ""
-    #     for i in range(len(newick)):
-    #         if (newick[i]==',' and newick[i-1]!=')') or (newick[i]==')' and newick[i-1]!=')'):
-    #             nv_arbre+=":0.7"
-    #             nv_arbre+=newick[i]
-    #         elif (newick[i]==',' and newick[i-1]==')') or (newick[i]==')' and newick[i-1]==')'):
-    #             nv_arbre+=":0.4"
-    #             nv_arbre+=newick[i]
-    #         else:
-    #             nv_arbre+=newick[i]
-    #     newick = nv_arbre
+    # # Parse and return exactly one tree from the given file or handle
+    if not ':' in newick:
+        nv_arbre = ""
+        for i in range(len(newick)):
+            # if (newick[i]==',' and newick[i-1]!=')') or (newick[i]==')' and newick[i-1]!=')'):
+            if (newick[i] in ',)' and newick[i-1] != ')'):
+                nv_arbre += ":0.4"
+                nv_arbre += newick[i]
+            # elif (newick[i]==',' and newick[i-1]==')') or (newick[i]==')' and newick[i-1]==')'):
+            elif (newick[i] in ',)' and newick[i-1] == ')'):
+                nv_arbre += ":0.2"
+                nv_arbre += newick[i]
+            else:
+                nv_arbre += newick[i]
+        newick = nv_arbre
 
     print(f'newick:\n{newick}')
 
@@ -365,23 +367,19 @@ def createPhyloXML(fam,newick):
     p = XMLParser(huge_tree=True)
     # text = text.replace("phy:", "")
 
-    # text = re.sub("b'([^']*)'", "\\1", text)
-    # text = re.sub('branch_length_attr="[^"]+"', "", text)
+    text = re.sub("b'([^']*)'", "\\1", text)
+    text = re.sub('branch_length_attr="[^"]+"', "", text)
     header = "<phyloxml>"
 
     text = re.sub('<phyloxml[^>]+>', header, text)
     text = text.replace('Phyloxml', 'phyloxml')
 
-    # print('text', text.replace(' </clade>', '<coucou>1</coucou>\n </clade>'))
-    # global count
-    def count_repl(mobj): # --> mobj is of type re.Match
-        global count
-        count += 1 # --> count the substitutions
-        return f"<closing_order>{count}</closing_order></clade>" # --> return the replacement string
-    # text = "The original text" # --> source string
-    new_text = re.sub(r"</clade>", repl=count_repl, string=text) # count and replace the matching occurrences in one pass.
-    text = new_text
-    # print('text', text)
+    def count_repl(match):
+        global current_branch
+        current_branch += 1
+        return f'<closing_order>{current_branch}</closing_order></clade>'
+    text = re.sub(r"</clade>", repl=count_repl, string=text)
+    print('text', text)
 
     tree = etree.fromstring(text, parser=p)
     treename = etree.Element("name")
@@ -455,17 +453,18 @@ def createPhyloXML(fam,newick):
         for element in tree.iter('clade'):
             branch_id = element.find('closing_order').text
             try:
+                ## Look for the column with header <branch_id> in the results
                 branch_info = etree.Element('branch_info')
                 branch_info.set('id', branch_id)
                 branch_info.set('results', str(dict_results[branch_id]))
                 element.append(branch_info)
                 # print(branch_id, dict_results[branch_id][:20])
             except KeyError:
-                print(f'branch {branch_id} not found, adding fake column')
+                ## If there is no matching column is results, add one with negative results
+                print(f'branch {branch_id} not found, adding placeholder column')
                 branch_info = etree.Element('branch_info')
                 branch_info.set('id', branch_id)
                 dummy_col = json.loads(dict_results['0'])
-                # print('len(dummy_col)', len(dummy_col))
                 dummy_col = [-1.0 for _ in range(len(dummy_col))]
                 col_str = json.dumps(dummy_col)
                 branch_info.set('results', col_str)
@@ -477,9 +476,6 @@ def createPhyloXML(fam,newick):
     nbspecies = len(famspecies)
     print ("Number of species : ")
     print (nbspecies)
-    
-    print ("Number of branches : ")
-    print (len(dict_results))
 
     ## Ajout des résultats
     globalResultsElement = etree.Element('global_results')
