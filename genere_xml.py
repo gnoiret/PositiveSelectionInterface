@@ -14,7 +14,7 @@ Positional arguments:
 """
 
 import argparse
-# import json
+import json
 from modulefinder import AddPackagePath
 import sys
 import re
@@ -158,7 +158,7 @@ def nucToAmino(nuc_seq:str):
 
 
 def loadAlignment(alignmentFile):
-    """Loads a FASTA alignment."""
+    '''Loads a FASTA alignment.'''
 
     alignmentDict = {}
     maxSeqIdLength = 0
@@ -179,7 +179,7 @@ def loadAlignment(alignmentFile):
 
 
 def loadResultsSites(resultsFile, statcol=1, nostat_value=-1.0, sep='\t', skipMissingSites=False):
-    """Loads site results from column with index <statcol>."""
+    '''Loads site results from column with index <statcol>.'''
 
     resultsDict = {}
     with open(resultsFile, 'r') as f:
@@ -195,10 +195,10 @@ def loadResultsSites(resultsFile, statcol=1, nostat_value=-1.0, sep='\t', skipMi
                 else:
                     if i == -1:
                         i = site
-                    while i < site: # in case there is no statistic for
+                    while i < site and i < MAX_SITE: # in case there is no statistic for
                                     # a site, give it a default value
                         if not skipMissingSites:
-                            print(f'Site {i} missing (current line: site {site})')
+                            # print(f'Site {i} missing ({site})')
                             resultsDict[i] = nostat_value
                         else:
                             print(f'Site {i} skipped')
@@ -215,31 +215,24 @@ def loadResultsSites(resultsFile, statcol=1, nostat_value=-1.0, sep='\t', skipMi
     return resultsList
 
 
-def loadResultsBranchSite(resultsFile, sep='\t', skipMissingSites=False):
-    """Loads site-branch results."""
+def loadResultsBranchSite(resultsFile, sep='\t'):
+    '''Loads branch-site results.'''
 
     col_lists = []
     with open(resultsFile, 'r') as f:
         col_headers = f.readline().strip().split(sep)
-        # for header in col_headers:
-        #     col_lists.append([header])
-        # print('col_headers', col_headers)
-        # print('col_lists', col_lists)
 
-        for header in col_headers:
+        for _ in col_headers:
             col_lists.append([])
 
         site_i = 0
         for line in f:
-            # print('site', site_i)
-            # line: '1\t0.25866598\t0.66856214\t0.19517522\t...\n'
+            ## line: '1\t0.25866598\t0.66856214\t0.19517522\t...\n'
             line = line.strip().split(sep)
-            # print(line)
-            # line: ['1', '0.25866598', '0.66856214', '0.19517522', ...]
-            # print(site_i, line[0], line[0] == str(site_i))
+            ## line: ['1', '0.25866598', '0.66856214', '0.19517522', ...]
             col_lists[0].append(str(site_i))
-            # if line[0] == str(site_i):
-            while line[0] != str(site_i):
+            while line[0] != str(site_i) and site_i < MAX_SITE:
+                # print(f'Site {site_i} missing ({line[0]})')
                 for i in range(1, len(line)):
                     # print(col_lists[i], line[i])
                     col_lists[i].append('-1')
@@ -250,14 +243,9 @@ def loadResultsBranchSite(resultsFile, sep='\t', skipMissingSites=False):
                 # print(col_lists[i], line[i])
                 col_lists[i].append(line[i])
             site_i += 1
-            # else:
-            #     # print('?')
-            #     for i in range(1, len(line)):
-            #         # print(col_lists[i], line[i])
-            #         col_lists[i].append('-1')
-            #     site_i += 1
 
-        sites_column = col_lists.pop(0)
+        ## Delete sites column
+        col_lists.pop(0)
         col_headers.pop(0)
 
         # print('col: col_headers[i] col_lists[i][:3]')
@@ -269,27 +257,11 @@ def loadResultsBranchSite(resultsFile, sep='\t', skipMissingSites=False):
         ## col_lists: [['0.00885554', '0.25866598', '0.03920189'], ...]
         ## d_cols {'38': ['0.00885554', '0.25866598', '0.03920189'], ...}
         
-        for key in d_cols:
-            print(key, d_cols[key][:3])
-
-        # for column in column_lists:
-        #     d_cols[column[0]] = column[1:]
-
-        # column_lists: [[29, 0.1248, 0.12381, ...], [0, 0.1248, 0.12381, ...], [1, 0.131, 0.835, ...], ...]
-        # for i in range(len(column_lists)):
-        #     # 
-        #     pass
-        
-        # d: {sites: [1, 2, ...], 0: [0.1248, 0.12381, ...], 1: [0.131, 0.835, ...], ...}
-
-        # d_cols = {}
-        # for i in range(len(col_lists)):
-        #     d_cols[col_headers[i]] = col_lists[i]
-        # print('d_cols', [(key, d_cols[key][0]) for key in d_cols])
+        # for key in d_cols:
+        #     print(key, d_cols[key][:3])
         
         d_cols_2 = dict(d_cols)
         for col_key in d_cols:
-            # if col_key != position_header:
             ## For every branch
             if re.search(r'^[0-9]+$', col_key):
                 col_text = ''
@@ -302,19 +274,24 @@ def loadResultsBranchSite(resultsFile, sep='\t', skipMissingSites=False):
                 col_text = '['+col_text[:-2]+']' # [:-2] to remove last space and comma
                 d_cols_2[col_key] = col_text
                 # d_cols_2: {1: '[0.1248, 0.12381, ...]', ...}
+        
+        print(len(col_lists), len(d_cols), len(d_cols_2))
+        nb_branches = len(col_lists)
+        print(nb_branches, 'columns found in results')
+
     return d_cols_2
 
 
 def getColnames(file, sep='\t'):
-    '''Returns a list of header items in a file.'''
+    '''Returns a list of headers from a file.'''
 
     with open(file, 'r') as f:
-        header_items =  f.readline().rstrip().split(sep)
-    return header_items
+        headers =  f.readline().rstrip().split(sep)
+    return headers
 
 
 def cleanTree(tree:str):
-    '''Adds branch numbers following a <name>:<number>:<length> syntax.'''
+    '''Adds branch numbers to a tree.'''
 
     # print(tree)
     tree = re.sub(r'([\),])([0-9]+):', r'\1:', tree)
@@ -345,8 +322,10 @@ def cleanTree(tree:str):
     return new_tree
 
 
+count = -1
 def createPhyloXML(fam,newick):
     newick = cleanTree(newick)
+
     # Parse and return exactly one tree from the given file or handle
     # if not ':' in newick:
     #     nv_arbre = ""
@@ -361,7 +340,7 @@ def createPhyloXML(fam,newick):
     #             nv_arbre+=newick[i]
     #     newick = nv_arbre
 
-    # print(f'newick:\n{newick}')
+    print(f'newick:\n{newick}')
 
     # Tree now has a <branch_name>:<number>:<length> syntax
     handle = StringIO(newick)
@@ -392,6 +371,18 @@ def createPhyloXML(fam,newick):
 
     text = re.sub('<phyloxml[^>]+>', header, text)
     text = text.replace('Phyloxml', 'phyloxml')
+
+    # print('text', text.replace(' </clade>', '<coucou>1</coucou>\n </clade>'))
+    # global count
+    def count_repl(mobj): # --> mobj is of type re.Match
+        global count
+        count += 1 # --> count the substitutions
+        return f"<closing_order>{count}</closing_order></clade>" # --> return the replacement string
+    # text = "The original text" # --> source string
+    new_text = re.sub(r"</clade>", repl=count_repl, string=text) # count and replace the matching occurrences in one pass.
+    text = new_text
+    # print('text', text)
+
     tree = etree.fromstring(text, parser=p)
     treename = etree.Element("name")
     treename.text = fam
@@ -403,8 +394,6 @@ def createPhyloXML(fam,newick):
     nbfeuille = 0
     famspecies = {}
 
-    res_colnames = getColnames(args.resultsFile)[1:]
-    colname_index = 0
     for element in clade[0].iter('clade'):
         # print(element.tag)
         # look for a <name> element in the current <clade> element
@@ -460,22 +449,37 @@ def createPhyloXML(fam,newick):
                 leaf.append(crossref)
             evrec.append(leaf)
             element.append(evrec)
-        
-        if args.isBranchsite and element.find('branch_length') is not None:
-            branch_id = res_colnames[colname_index]
-            branch_info = etree.Element('branch_info')
-            branch_info.set('id', str(branch_id))
-            branch_info.set('results', str(dict_results[str(branch_id)]))
-            print(str(branch_id), dict_results[str(branch_id)][:10])
-            element.append(branch_info)
-            colname_index += 1
     
+    ## Match branch IDs and branch results, then add branch info
+    if args.isBranchsite:
+        for element in tree.iter('clade'):
+            branch_id = element.find('closing_order').text
+            try:
+                branch_info = etree.Element('branch_info')
+                branch_info.set('id', branch_id)
+                branch_info.set('results', str(dict_results[branch_id]))
+                element.append(branch_info)
+                # print(branch_id, dict_results[branch_id][:20])
+            except KeyError:
+                print(f'branch {branch_id} not found, adding fake column')
+                branch_info = etree.Element('branch_info')
+                branch_info.set('id', branch_id)
+                dummy_col = json.loads(dict_results['0'])
+                # print('len(dummy_col)', len(dummy_col))
+                dummy_col = [-1.0 for _ in range(len(dummy_col))]
+                col_str = json.dumps(dummy_col)
+                branch_info.set('results', col_str)
+                element.append(branch_info)
+                # print(branch_id, col_str[:20])
     
     print ("Number of leaves : ")
     print (nbfeuille)
     nbspecies = len(famspecies)
     print ("Number of species : ")
     print (nbspecies)
+    
+    print ("Number of branches : ")
+    print (len(dict_results))
 
     ## Ajout des résultats
     globalResultsElement = etree.Element('global_results')
@@ -498,7 +502,7 @@ def createPhyloXML(fam,newick):
     cleantext = "\n".join([ll.rstrip() for ll in text.splitlines() if ll.strip()])
     return cleantext
 
-
+MAX_SITE = 100000
 sys.setrecursionlimit(15000)
 # print(sys.getrecursionlimit())
 
