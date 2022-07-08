@@ -9,7 +9,7 @@ This interface was developed to visualize data pertaining to positive selection 
 However, it can be used for a broader range of purposes. As long as the data
 contains a Newick-formatted tree file, a FASTA alignment file and a results file
 organised in columns (with site numbers as the first one), the Python script used to generate
-the .XML file used by the interface will work.
+the XML file used by the interface will work.
 
 # Usage
 
@@ -19,16 +19,21 @@ On the homepage, upload your three files on the required fields:
 
 - Newick-formatted tree
 - FASTA alignment
-- statistical results
+- Statistical results
 
 ![Image formulaire](image.png)
 
 ### Other fields
 
-If your data requires specific parameters, you are free to change several options: 
+If your data requires specific parameters, you are free to change several options:
 
-- which column to use for the results
-- which value should be given to sites that do not have one in the results file
+- A toggle to choose whether your sequences should be treated as nucleotidic (and translated 
+into proteins) or not
+
+- A toggle for the logarithmic transformation of branch lengths (can be useful 
+to create space in the tree if some branches are really short)
+
+- Which column to use for the results (site mode)
 
 Once you are done, just click the *Display* button and the visualization will be available.
 
@@ -38,15 +43,18 @@ Once you are done, just click the *Display* button and the visualization will be
 
 The layout is as follows:
 
-- tree on the left
-- results graph and alignment on the right
+- Tree on the left
+- Results histogram and alignment on the right
 
 ![Image données](image.png)
 
 Parameters include:
 
-- which sequence type to display (proteic / nucleic)
-- upper and lower thresholds
-    - if you only want one threshold to display, you may "merge" them by increasing the lower threshold or decreasing the upper threshold
+- Which sequence type to display (amino acids / nucleotides)
 
-(etc.)
+- Upper and lower thresholds
+    - All computations are currently based on the upper threshold
+
+- In branch-site mode, boundaries used to compute branch colors
+    - "Automatic boundaries" updates them when the alignment is scrolled
+    - "Reset boundaries" replaces the current values to account for the whole sequence
