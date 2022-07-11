@@ -78,9 +78,9 @@ parser.add_argument('--skipmissing', dest='skipMissingSites', action='store_true
     required=False,\
     help='Prevent the addition of special values (-n, --nostat) for sites that are absent from the results file. \
         This results in sites being next to each other on the graph even though their positions are distant.')
-parser.add_argument('--isnucleic', dest='isNucleic', action='store_true',\
+parser.add_argument('--codons', dest='codonsToggle', action='store_true',\
     required=False,\
-    help='Specify this argument if the sequences are not to be treated as DNA/RNA')
+    help='Specify this argument if the sequences contain codons and should be translated into proteins')
 args = parser.parse_args()
 
 
@@ -433,12 +433,12 @@ def createPhyloXML(fam,newick):
                     leaf.set('defintiion', seqdefdico[cds])
 
             ## Ajout des séquences aux feuilles
-            if args.isNucleic:
+            if args.codonsToggle:
                 leaf.set('dnaAlign', seq_alg) # ajout de la séquence en nucléotides
             # leaf.set('aaAlign', translate.dna_to_prot(seq_alg)) # ajout de la séquence en acides aminés
             # leaf.set('aaAlign', dna_to_prot(seq_alg)) # ajout de la séquence en acides aminés
-            # print('args.isNucleic', args.isNucleic)
-            if args.isNucleic:
+            # print('args.codonsToggle', args.codonsToggle)
+            if args.codonsToggle:
                 leaf.set('aaAlign', nucToAmino(seq_alg)) # ajout de la séquence traduite
             else:
                 leaf.set('aaAlign', seq_alg) # ajout de la séquence brute

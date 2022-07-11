@@ -132,7 +132,7 @@ router.post("/upload_files", upload.fields([
       +' -n '+nostat
       +(branchSite?' -b ':'')
       +(skipMissingSites?' --skipmissing ':'')
-      +(isNuc?' --isnucleic ':''),
+      +(isNuc?' --codons ':''),
   (error, stdout, stderr) => {
     if (error) {
       console.log(`error: ${error.message}`);

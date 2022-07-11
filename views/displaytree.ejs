@@ -68,8 +68,8 @@
             Alignment type
           </button>
           <ul class="dropdown-menu" aria-labelledby="alignment-type">
-            <li><a id="aminoacid" class="dropdown-item" href="#">Amino Acids</a></li>
-            <li><a id="nucleotid" class="dropdown-item" href="#">Codons</a></li>
+            <li><a id="aminoacid-display" class="dropdown-item" href="#">Amino Acids</a></li>
+            <li><a id="codons-display" class="dropdown-item" href="#">Codons</a></li>
           </ul>
         </div>
         <!-- Bouton Export -->
@@ -91,7 +91,7 @@
           </div>
         </button>
         <!-- Bornes gauche et droite -->
-        <div class="btn-group" role="group" aria-label="">
+        <div id="boundaries-group" class="btn-group" role="group" aria-label="">
           <div class="btn btn-sm btn-outline-secondary d-flex align-items-center">
             <input id="automatic-boundaries" type="checkbox" name="automatic-boundaries" />
             <label for="automatic-boundaries">Automatic boundaries</label>
@@ -1235,7 +1235,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // | Début : blocs de séquences |
   // ==============================
   seq_dataset = [];
-  var leaves_sequences = leaves.filter(function(d) {return(d.data.lastEvent.dnaAlign)});
+  var leaves_sequences = leaves.filter(function(d) {return (isNuc ? d.data.lastEvent.dnaAlign : d.data.lastEvent.aaAlign);});
     leaves_sequences.forEach (function (d,i) {
       var leaf_name = d.data.lastEvent.name;
       var dna_sequence = d.data.lastEvent.dnaAlign;
@@ -1501,7 +1501,7 @@ function updateNodeColors(eventType='') {
       }
     });
   // selected node color and outline
-  if (action == svgEvents.showBranchResults) {
+  if (action == svgEvents.showBranchResults && selectedNode) {
     selectedNode
       .style('stroke-width', '2')
       .style('stroke', '#000')
@@ -2165,6 +2165,13 @@ $('#export').on('click', function(event, dropdownData) {
 
 // The page has loaded
 $(document).ready(function() {
+  if (!isNuc) {
+    $('#codons-display').hide();
+    $('#aminoacid-display').text('Default');
+  }
+  if (!branchSite) {
+    $('#left-boundary, #right-boundary').prop('disabled', true);
+  }
   $('#reset-boundaries').on('click', function() {
     resetBoundaries();
   });
@@ -2190,16 +2197,16 @@ $(document).ready(function() {
   $('button#reload-global-results').click(reloadGlobalResults);
   switch (displaySeqType) {
     case 'AA':
-      $('a#aminoacid').css('color', '#FF0000');
-      $('a#nucleotid').css('color', '#000000');
+      $('a#aminoacid-display').css('color', '#FF0000');
+      $('a#codons-display').css('color', '#000000');
       break;
     case 'Nuc':
-      $('a#aminoacid').css('color', '#000000');
-      $('a#nucleotid').css('color', '#FF0000');
+      $('a#aminoacid-display').css('color', '#000000');
+      $('a#codons-display').css('color', '#FF0000');
       break;
     default:
-      $('a#aminoacid').css('color', '#000000');
-      $('a#nucleotid').css('color', '#000000');
+      $('a#aminoacid-display').css('color', '#000000');
+      $('a#codons-display').css('color', '#000000');
       break;
   }
   $('main').css('margin-top', $('header').outerHeight());
@@ -2220,8 +2227,8 @@ $(document).ready(function() {
           $(".aa-sequence").css("display", "none");
           $(".dna-sequence").css("display", "block");
           $("#toggle-seqtype").html("Current display: "+displaySeqType);
-          $("#nucleotid").css('color', '#FF0000');
-          $("#aminoacid").css('color', '#000000');
+          $("#codons-display").css('color', '#FF0000');
+          $("#aminoacid-display").css('color', '#000000');
           updateLayout(cladeRoot);
           // console.log('alignmentWindow.scrollLeft():', alignmentWindow.scrollLeft());
           alignmentWindow.scrollLeft(alignmentWindow.scrollLeft()*3);
@@ -2234,8 +2241,8 @@ $(document).ready(function() {
           // console.log("Displaying amino acids");
           $(".dna-sequence").css("display", "none");
           $(".aa-sequence").css("display", "block");
-          $("#nucleotid").css('color', '#000000');
-          $("#aminoacid").css('color', '#FF0000');
+          $("#codons-display").css('color', '#000000');
+          $("#aminoacid-display").css('color', '#FF0000');
           // console.log('alignmentWindow.scrollLeft():', alignmentWindow.scrollLeft());
           alignmentWindow.scrollLeft(alignmentWindow.scrollLeft()/3);
           // console.log('alignmentWindow.scrollLeft():', alignmentWindow.scrollLeft());
