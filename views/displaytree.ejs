@@ -25,16 +25,20 @@
             <li><a id="subtree" class="dropdown-item" href="#">Sub Tree/Upper Tree</a></li>
           </ul>
         </div>
+        
         <!-- Bouton Collapse -->
         <!-- <button type="button" class="btn btn-default btn-sm" aria-label="Collapse" data-toggle="tooltip" data-placement="top" title="Collapse the tree" id="globalcollapse">
           <span>Compact tree</span>
         </button> -->
+        
         <!-- Bouton Expand -->
         <div class="btn-group" role="group" aria-label="">
           <button id="globalexpand" class="btn btn-sm btn-outline-secondary" type="button" aria-label="Expand" data-toggle="tooltip" data-placement="top" title="Expand the tree (takes time on big trees!)">
             <span>Expand tree</span>
           </button>
         </div>
+      
+        <!-- Boutons Width / Height -->
         <div class="btn-group" role="group" aria-label="Tree size buttons">
           <div class="btn-group" role="group" aria-label="Width buttons">
             <!-- Bouton Reduce width -->
@@ -62,6 +66,7 @@
             </button>
           </div>
         </div>
+        
         <!-- Bouton Alignement -->
         <div id="alignment-type" class="dropdown">
           <button class="btn dropdown-toggle btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Choose alignment type">
@@ -72,6 +77,7 @@
             <li><a id="codons-display" class="dropdown-item" href="#">Codons</a></li>
           </ul>
         </div>
+        
         <!-- Bouton Export -->
         <div id="export" class="dropdown">
           <button class="btn dropdown-toggle btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Choose alignment type">
@@ -82,20 +88,28 @@
             <li><a id="selecp" class="dropdown-item" href="#">Alignment</a></li>
           </ul>
         </div>
+        
         <!-- Champs Seuils sup. et inf. -->
-        <button class="btn btn-sm btn-outline-secondary">
-          <div class="input-group align-items-center">
-            <label for="ps-threshold-low">Thresholds</label>
-            <input id="ps-threshold-low" type="number" min="0.0" step="0.05" placeholder="PS Threshold" value="0.9" style="width: 5em;"/>
-            <input id="ps-threshold-high" type="number" min="0.0" step="0.05" placeholder="PS Threshold" value="1.0" style="width: 5em;"/>
+        <div id="thresholds-group" class="btn-group" role="group" aria-label="">
+          <button class="btn btn-sm btn-outline-secondary">
+            <div class="input-group align-items-center">
+              <label for="ps-threshold-low">Thresholds</label>
+              <input id="ps-threshold-low" type="number" min="0.0" step="0.05" placeholder="PS Threshold" value="0.9" style="width: 5em;"/>
+              <input id="ps-threshold-high" type="number" min="0.0" step="0.05" placeholder="PS Threshold" value="1.0" style="width: 5em;"/>
+            </div>
+          </button>
+          <div>
+            <div class="input-group">
+              <input type="radio" class="btn-check" name="selectedThreshold" id="lowerSelected" value="lowerSelected">
+              <label class="btn btn-outline-secondary" for="lowerSelected" style="margin-left: 0.5rem;"><</label>
+              <input type="radio" class="btn-check" name="selectedThreshold" id="upperSelected" value="upperSelected" checked>
+              <label class="btn btn-outline-secondary" for="upperSelected" style="margin-left: -0.25rem;">></label>
+            </div>
           </div>
-        </button>
+        </div>
+
         <!-- Bornes gauche et droite -->
         <div id="boundaries-group" class="btn-group" role="group" aria-label="">
-          <div class="btn btn-sm btn-outline-secondary d-flex align-items-center">
-            <input id="automatic-boundaries" type="checkbox" name="automatic-boundaries" />
-            <label for="automatic-boundaries">Automatic boundaries</label>
-          </div>
           <button class="btn btn-sm btn-outline-secondary">
             <div class="input-group align-items-center">
               <label for="left-boundary">Boundaries</label>
@@ -103,9 +117,13 @@
               <input id="right-boundary" type="number" step="1" placeholder="Right boundary" style="width: 5em;"/>
             </div>
           </button>
+          <div class="btn btn-sm btn-outline-secondary d-flex align-items-center">
+            <input id="automatic-boundaries" type="checkbox" name="automatic-boundaries" />
+            <label for="automatic-boundaries">Update on scroll</label>
+          </div>
           <div class="btn-group" role="group" aria-label="">
             <button id="reset-boundaries" class="btn btn-sm btn-outline-secondary">
-              <span>Reset boundaries</span>
+              <span>Reset</span>
             </button>
           </div>
         </div>
@@ -178,7 +196,7 @@ var psThresholdLow = $('#ps-threshold-low').val() || 0.9;
 // var psThresholdsChanged = false;
 // var psThresholdHighBgColor = "#FC6565";
 var psThresholdHighBgColor = "#FF0000";
-var psThresholdLowBgColor = "#FFFF00";
+var psThresholdLowBgColor = "#00FF00";
 // var psBelowThresholdBgColor = "#6FDCF7";
 // var psBelowThresholdBgColor = "#000000";
 var psBelowThresholdBgColor = "#DDDDDD";
@@ -216,6 +234,7 @@ var siteOffset = 0;
 var nbBranches = 0;
 var nbLeaves = 0;
 var nbSites = 0;
+var upperThresholdMode = true;
 
 if (!isStorageSupported(myStorage)) {
   console.log("window.localStorage problem");
@@ -559,7 +578,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       }
       if (d.target.data.deadSpecies)
         {
-          return "#fff";
+          return "#ffffff";
         }
       else {
         return "#0e2e2e";
@@ -621,12 +640,12 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       .append("path")
         .attr("class", "symbol")
         .style('stroke-width', '0')
-        .style('stroke', '#000')
+        .style('stroke', '#000000')
         .on('mouseover', function(d) {
           if (branchSite && selectedNode) {
             showTooltip();
             if (d.data.branch_info) {
-              writeTooltip(getPositiveRateJSON(d.data.branch_info.results, psThresholdHigh, leftBoundary, rightBoundary).toFixed(3));
+              writeTooltip(getPositiveRateJSON(d.data.branch_info.results, leftBoundary, rightBoundary).toFixed(3));
             } else {
               writeTooltip('');
             }
@@ -657,21 +676,21 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   if (firstLoad) {
     d3.selectAll('path.symbol')
       .style('stroke-width', '0')
-      .style('stroke', '#888')
-      .style('fill', '#000')
+      .style('stroke', '#888888')
+      .style('fill', '#000000')
       ;
   } else {
     d3.selectAll('path.symbol')
       .style('stroke-width', '0')
-      .style('stroke', '#000')
-      .style('fill', '#000')
+      .style('stroke', '#000000')
+      .style('fill', '#000000')
       ;
     if (selectedNode) {
       // selected node color and outline
       selectedNode
         .style('stroke-width', '2')
-        .style('stroke', '#000')
-        .style('fill', '#FFF')
+        .style('stroke', '#000000')
+        .style('fill', '#FFFFFF')
         ;
     }
   }
@@ -958,7 +977,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // // The color of a node depends on the number of positive sites in its branch
   // g.selectAll('path.symbol').attr('fill', function(d) {
   //   if (d.data.branch_info) {
-  //     var positiveRate = getPositiveRateJSON(d.data.branch_info.results, psThresholdHigh, leftBoundary, rightBoundary);
+  //     var positiveRate = getPositiveRateJSON(d.data.branch_info.results, leftBoundary, rightBoundary);
   //     if (positiveRate > 0) {
   //       return 'hsl(0, 100%, '+(100 - 2*positiveRate*100 - 10)+'%)';
   //     } else {
@@ -968,7 +987,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   // })
   // allNodes.attr('fill', function(d) {
   //   if (d.data.branch_info) {
-  //     var positiveRate = getPositiveRateJSON(d.data.branch_info.results, psThresholdHigh, leftBoundary, rightBoundary);
+  //     var positiveRate = getPositiveRateJSON(d.data.branch_info.results, leftBoundary, rightBoundary);
   //     if (positiveRate > 0) {
   //       return 'hsl(0, 100%, '+(100 - 2*positiveRate*100 - 10)+'%)';
   //     } else {
@@ -1014,45 +1033,21 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   var globalRects = psGraphGlobal
     .selectAll('.ps-rects-global')
     .data(function() {
-      // console.log('compact graph: attaching resultsJSON', resultsJSON);
       return resultsJSON;
     });
   globalRects.exit().remove();
   // Affichage des rectangles
   var i = 0;
   globalRects.enter()
-    // .append('a')
-    // .attr('xlink:href', function(d) {
-    //   return '#ps-rect-'+d.site;
-    // })
     .append('rect')
       .attr('class', 'ps-rects-global')
-      // .attr('title', function(d) {
-      //   return d.site+'-global';
-      // })
       .attr('width', function(d) { return 1; })
       .attr('height', function(d) { return psGraphGlobalHeight; })
-      // .attr('x', function(d) { return xPsGraphGlobal(d.site + siteOffset); })
-      // .attr('x', function(d) { return d.site + siteOffset; })
       .attr('x', function(d) { i ++; return i - siteOffset; })
-      // .attr('y', function(d) { return yPsGraphGlobal(d.stat); })
       .attr('y', function(d) { return 0; })
       .style('fill', function(d) {
-        if (d >= psThresholdHigh) {
-          return psThresholdHighBgColor;
-        } else if (d >= psThresholdLow) {
-          return psThresholdLowBgColor;
-        } else if (d >= 0) {
-          return psBelowThresholdBgColor;
-        } else {
-          // console.log(d);
-          return psMissingBgColor;
-        }
-        // return 'transparent';
-      })
-      // .style('stroke', '#000000')
-      // .style('stroke-width', 0+'px')
-      ;
+        return getColorFromResult(d);
+      });
   
   // Handle click-drag events on the small graph
   // compactWindow.off('mousedown mousemove mouseup');
@@ -1185,15 +1180,7 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
       .attr('x', function(d) { i ++; return x(i - siteOffset); })
       .attr('y', function(d) { return y(d); })
       .style('fill', function(d) {
-        if (d >= psThresholdHigh) {
-          return psThresholdHighBgColor;
-        } else if (d >= psThresholdLow) {
-          return psThresholdLowBgColor;
-        } else if (d >= 0 ) {
-          return psBelowThresholdBgColor;
-        } else {
-          return psMissingBgColor;
-        }
+        return getColorFromResult(d);
       })
       .style('stroke', '#000000')
       .style('stroke-width', '0')
@@ -1299,89 +1286,30 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
         return displaySeqType == 'Nuc' ? 'block' : 'none';
       });
 
-  // Alignement : ajout des rectangles (version séquence entière)
+  // Alignement : ajout des rectangles
   var aaSequence = d3.select('.aa-sequence');
   var dnaSequence = d3.select('.dna-sequence');
-  // console.log('First site ID', resultsJSON[0].site);
   var targetSequence = displaySeqType == 'AA' ? aaSequence : dnaSequence;
   for (i = 0; i < resultsJSON.length; i ++) {
-    // if (displaySeqType == 'AA') {
-      // Ajout d'un rectangle coloré par AA
+      // Ajout d'un rectangle coloré par site
       targetSequence.append('rect')
         .attr('x', function(d) {return (i - siteOffset)*hStep;})
         .attr('width', hStep)
         .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
         .attr('height', maxYSeq - minYSeq + hStepBase*2)
         .style('fill', () => {
-          if (resultsJSON[i] >= psThresholdHigh) {
-            return psThresholdHighBgColor;
-          } else if (resultsJSON[i] >= psThresholdLow) {
-            return psThresholdLowBgColor;
-          } else if (resultsJSON[i] >= 0) {
-            return psBelowThresholdBgColor;
-          } else {
-            return psMissingBgColor;
-          }
+          return getColorFromResult(resultsJSON[i]);
+          // if (resultsJSON[i] >= psThresholdHigh) {
+          //   return psThresholdHighBgColor;
+          // } else if (resultsJSON[i] >= psThresholdLow) {
+          //   return psThresholdLowBgColor;
+          // } else if (resultsJSON[i] >= 0) {
+          //   return psBelowThresholdBgColor;
+          // } else {
+          //   return psMissingBgColor;
+          // }
         });
-    // } else {
-    //   // Ajout d'un rectangle coloré par codon
-    //   dnaSequence.append('rect')
-    //     .attr('x', function(d) {return i*hStep;})
-    //     .attr('width', hStep)
-    //     .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
-    //     .attr('height', maxYSeq - minYSeq + hStepBase*2)
-    //     .style('fill', () => {
-    //       if (resultsJSON[i] >= psThresholdHigh) {
-    //         return psThresholdHighBgColor;
-    //       } else if (resultsJSON[i] >= psThresholdLow) {
-    //         return psThresholdLowBgColor;
-    //       } else if (resultsJSON[i] >= 0) {
-    //         return psBelowThresholdBgColor;
-    //       } else {
-    //         return psMissingBgColor;
-    //       }
-    //     });
-    // }
   }
-  // for (i = resultsJSON[0].site; i < resultsJSON.length; i ++) {
-  //   if (displaySeqType == 'AA') {
-  //     // Ajout d'un rectangle coloré par AA
-  //     aaSequence.append('rect')
-  //       .attr('x', function(d) {return i*hStep;})
-  //       .attr('width', hStep)
-  //       .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
-  //       .attr('height', maxYSeq - minYSeq + hStepBase*2)
-  //       .style('fill', () => {
-  //         if (resultsJSON[i].stat >= psThresholdHigh) {
-  //           return psThresholdHighBgColor;
-  //         } else if (resultsJSON[i].stat >= psThresholdLow) {
-  //           return psThresholdLowBgColor;
-  //         } else if (resultsJSON[i].stat >= 0) {
-  //           return psBelowThresholdBgColor;
-  //         } else {
-  //           return psMissingBgColor;
-  //         }
-  //       });
-  //   } else {
-  //     // Ajout d'un rectangle coloré par codon
-  //     dnaSequence.append('rect')
-  //       .attr('x', function(d) {return i*hStep;})
-  //       .attr('width', hStep)
-  //       .attr('y', function(d) {return minYSeq - d.y - hStepBase;})
-  //       .attr('height', maxYSeq - minYSeq + hStepBase*2)
-  //       .style('fill', () => {
-  //         if (resultsJSON[i].stat >= psThresholdHigh) {
-  //           return psThresholdHighBgColor;
-  //         } else if (resultsJSON[i].stat >= psThresholdLow) {
-  //           return psThresholdLowBgColor;
-  //         } else if (resultsJSON[i].stat >= 0) {
-  //           return psBelowThresholdBgColor;
-  //         } else {
-  //           return psMissingBgColor;
-  //         }
-  //       });
-  //   }
-  // }
   
   // Alignement : ajout des AA / codons (version séquence entière)
   seqTextAA.append('text')
@@ -1405,6 +1333,32 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
 
 // Autres fonctions utilitaires
 // ----------------------------
+
+function getColorFromResult(res) {
+  if (upperThresholdMode) {
+    if (res >= psThresholdHigh) {
+      return psThresholdHighBgColor;
+    } else if (res >= psThresholdLow) {
+      return psThresholdLowBgColor;
+    } else if (res >= 0) {
+      return psBelowThresholdBgColor;
+    } else {
+      return psMissingBgColor;
+    }
+  } else {
+    if (res >= 0) {
+      if (res <= psThresholdLow) {
+        return psThresholdHighBgColor;
+      } else if (res <= psThresholdHigh) {
+        return psThresholdLowBgColor;
+      } else {
+        return psBelowThresholdBgColor;
+      }
+    } else {
+      return psMissingBgColor;
+    }
+  }
+}
 
 function resetBoundaries() {
   leftBoundaryInput.val(0);
@@ -1459,7 +1413,7 @@ function colorByRate(rate) {
   }
 }
 
-function updateNodeColors(eventType='') {
+function updateNodeColors() {
   globalI ++;
   if (globalI%(Math.ceil(nbBranches/100))) {
     console.log(nbBranches, Math.ceil(nbBranches/100), globalI);
@@ -1468,7 +1422,7 @@ function updateNodeColors(eventType='') {
   g.selectAll('path.symbol')
     .style('fill', function(d) {
       if (d.data.branch_info) {
-        var positiveRate = getPositiveRateJSON(d.data.branch_info.results, psThresholdHigh, leftBoundary, rightBoundary).toFixed(3);
+        var positiveRate = getPositiveRateJSON(d.data.branch_info.results, leftBoundary, rightBoundary).toFixed(3);
 
         return colorByRate(positiveRate);
         // if (blackWhite) {
@@ -1486,7 +1440,7 @@ function updateNodeColors(eventType='') {
   g.selectAll('path.link')
     .style('stroke', function(d) {
       if (d.target.data.branch_info) {
-        var positiveRate = getPositiveRateJSON(d.target.data.branch_info.results, psThresholdHigh, leftBoundary, rightBoundary).toFixed(3);
+        var positiveRate = getPositiveRateJSON(d.target.data.branch_info.results, leftBoundary, rightBoundary).toFixed(3);
 
         return colorByRate(positiveRate);
         // if (blackWhite) {
@@ -1504,8 +1458,8 @@ function updateNodeColors(eventType='') {
   if (action == svgEvents.showBranchResults && selectedNode) {
     selectedNode
       .style('stroke-width', '2')
-      .style('stroke', '#000')
-      .style('fill', '#FFF')
+      .style('stroke', '#000000')
+      .style('fill', '#FFFFFF')
       ;
   }
 }
@@ -1550,44 +1504,24 @@ function hideTooltip() { $('.tooltip').hide(); }
 function showTooltip() { $('.tooltip').show(); }
 function writeTooltip(text) { $('.tooltip').text(text); }
 
-// Get the rate of positive sites in a JSON-formatted results list
-function getPositiveRateJSON(textResultsList, upperThreshold, leftB, rightB) {
+// Get the rate of positive sites within the indicated boundaries
+function getPositiveRateJSON(textResultsList, leftB, rightB) {
   var jsonResultsList = JSON.parse(textResultsList);
-  // var positiveSites = [];
   var nbPos = 0;
   jsonResultsList.forEach((value, site) => {
-    // var site = i;
-    // var value = res;
-    if (value >= psThresholdHigh && site >= leftB && site <= rightB) {
-      // positiveSites.push(site);
-      nbPos ++;
+    if (upperThresholdMode) {
+      if (value >= psThresholdHigh && site >= leftB && site <= rightB) {
+        nbPos ++;
+      }
+    } else {
+      if (value >= 0 && value <= psThresholdLow && site >= leftB && site <= rightB) {
+        nbPos ++;
+      }
     }
   });
-  // if (leftB && rightB) {
-  //   jsonResultsList.forEach((res, i) => {
-  //     var site = i;
-  //     var value = res;
-  //     if (value >= psThresholdHigh && site >= leftB && site <= rightB) {
-  //       positiveSites.push(site);
-  //     }
-  //   });
-  // }
-  // else {
-  //   jsonResultsList.forEach((res, i) => {
-  //     var site = i;
-  //     var value = res;
-  //     if (value >= psThresholdHigh && site >= leftBoundary && site <= rightBoundary) {
-  //       positiveSites.push(site);
-  //     }
-  //   });
-  // }
   leftBoundary = leftBoundaryInput.val();
   rightBoundary = rightBoundaryInput.val();
-  // console.log('rightBoundary', rightBoundary);
-  // console.log('leftBoundary', leftBoundary);
-  // console.log(positiveSites.length,'of',rightBoundary-leftBoundary,'positive sites:',positiveSites);
-  // return positiveSites.length/(rightBoundary - leftBoundary);
-  return nbPos/(rightBoundary - leftBoundary);
+  return nbPos/(rightBoundary - leftBoundary + 1);
 }
 
 // Fonction de test du support local.storage
@@ -2165,6 +2099,15 @@ $('#export').on('click', function(event, dropdownData) {
 
 // The page has loaded
 $(document).ready(function() {
+  $('#upperSelected').change(function() {
+    upperThresholdMode = true;
+    updateLayout(cladeRoot);
+  });
+  $('#lowerSelected').change(function() {
+    upperThresholdMode = false;
+    updateLayout(cladeRoot);
+  });
+
   if (!isNuc) {
     $('#codons-display').hide();
     $('#aminoacid-display').text('Default');
