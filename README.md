@@ -1,7 +1,7 @@
 # Master 1 Bioinformatics Internship
 ## Université Claude Bernard Lyon 1
 
-Improvement of an interface for positive selection
+*Improvement of a web interface for the visualization of branch-site positive selection*
 
 # Introduction
 
@@ -52,9 +52,10 @@ Parameters include:
 
 - Which sequence type to display (amino acids / nucleotides)
 
-- Upper and lower thresholds
-    - All computations are currently based on the upper threshold
+- Choosing between thresholds for computations
+    - "<" will look at values below the lower threshold
+    - ">" will consider values above the upper threshold
 
-- In branch-site mode, boundaries used to compute branch colors
-    - "Automatic boundaries" updates them when the alignment is scrolled
-    - "Reset boundaries" replaces the current values to account for the whole sequence
+- In branch-site mode, boundaries that are used to compute branch colors
+    - If you want colors to reflect the local aspect of branches, you may enable the "Update on scroll" option
+    - "Reset" replaces the current values to account for the whole sequence
