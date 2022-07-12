@@ -1,7 +1,8 @@
 # Master 1 Bioinformatics Internship
-## Université Claude Bernard Lyon 1
 
-*Improvement of a web interface for the visualization of branch-site positive selection*
+## Improvement of a web interface for the visualization of branch-site positive selection
+
+### Université Claude Bernard Lyon 1
 
 # Introduction
 
