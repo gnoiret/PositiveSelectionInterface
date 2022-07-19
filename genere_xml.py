@@ -1,6 +1,3 @@
-# Part of this  code is taken from https://groups.google.com/forum/#!topic/etetoolkit/cYTHHsL21KY
-# written by Jaime Huerta-Cepas
-
 """
 Ecrit un  arbre au format XML .
 Usage:
@@ -15,32 +12,18 @@ Positional arguments:
 
 import argparse
 import json
-from modulefinder import AddPackagePath
 import sys
 import re
 import random
 import os
 from Bio import Phylo
 from io import StringIO
-# import time
-# from ete3 import Phyloxml, phyloxml
 
 from lxml import etree
 from xml.etree import ElementTree
 from xml.dom import minidom
 
-from lxml.etree import XMLParser, parse
-
-# from docopt import docopt
-# import sqlite3
-# import zlib
-# import base64
-
-# args = docopt(__doc__)
-# tree = args["<treeFile>"]
-# alignment = args["<alignmentFile>"]
-# results = args["<resultsFile>"]
-# arguments = docopt(__doc__, version='1.0.0rc2')
+from lxml.etree import XMLParser
 
 parser = argparse.ArgumentParser(description='Generate an XML file from \
     a tree, an alignment and statistics.')
@@ -195,18 +178,14 @@ def loadResultsSites(resultsFile, statcol=1, nostat_value=-1.0, sep='\t', skipMi
                 else:
                     if i == -1:
                         i = site
-                    while i < site and i < MAX_SITE: # in case there is no statistic for
-                                    # a site, give it a default value
+                    while i < site and i < MAX_SITE:
+                        # in case there is no statistic for
+                        # a site, give it a default value
                         if not skipMissingSites:
                             # print(f'Site {i} missing ({site})')
                             resultsDict[i] = nostat_value
-                        else:
-                            print(f'Site {i} skipped')
                         i += 1
                     resultsDict[i] = res
-            else: # other line (e.g. header)
-                # print(line)
-                pass
             i += 1
 
     resultsList = []
@@ -227,20 +206,16 @@ def loadResultsBranchSite(resultsFile, sep='\t'):
 
         site_i = 0
         for line in f:
-            ## line: '1\t0.25866598\t0.66856214\t0.19517522\t...\n'
+            ## line: '0\t0.25866598\t0.66856214\t0.19517522\t...\n'
             line = line.strip().split(sep)
-            ## line: ['1', '0.25866598', '0.66856214', '0.19517522', ...]
+            ## line: ['0', '0.25866598', '0.66856214', '0.19517522', ...]
             col_lists[0].append(str(site_i))
             while line[0] != str(site_i) and site_i < MAX_SITE:
                 # print(f'Site {site_i} missing ({line[0]})')
                 for i in range(1, len(line)):
-                    # print(col_lists[i], line[i])
                     col_lists[i].append('-1')
                 site_i += 1
-                # print('ok')
             for i in range(1, len(line)):
-                # print(i)
-                # print(col_lists[i], line[i])
                 col_lists[i].append(line[i])
             site_i += 1
 
@@ -248,36 +223,29 @@ def loadResultsBranchSite(resultsFile, sep='\t'):
         col_lists.pop(0)
         col_headers.pop(0)
 
-        # print('col: col_headers[i] col_lists[i][:3]')
         d_cols = {}
         for i in range(len(col_lists)):
-            # print('col:', col_headers[i], col_lists[i][:3])
             d_cols[col_headers[i]] = col_lists[i]
         
         ## col_lists: [['0.00885554', '0.25866598', '0.03920189'], ...]
         ## d_cols {'38': ['0.00885554', '0.25866598', '0.03920189'], ...}
-        
-        # for key in d_cols:
-        #     print(key, d_cols[key][:3])
         
         d_cols_2 = dict(d_cols)
         for col_key in d_cols:
             ## For every branch
             if re.search(r'^[0-9]+$', col_key):
                 col_text = ''
-                # print(f'd_cols[{col_key}]', d_cols[col_key])
                 ## Add each result to the text
                 for i in range(len(d_cols['0'])):
                     col_text += f'{d_cols[col_key][i]}, '
-                    # col_text: '0.1248, 0.12381, ...'
+                    ## col_text: '0.1248, 0.12381, ...'
                 ## Add brackets for JSON format
                 col_text = '['+col_text[:-2]+']' # [:-2] to remove last space and comma
                 d_cols_2[col_key] = col_text
-                # d_cols_2: {1: '[0.1248, 0.12381, ...]', ...}
+                ## d_cols_2: {1: '[0.1248, 0.12381, ...]', ...}
         
-        print(len(col_lists), len(d_cols), len(d_cols_2))
         nb_branches = len(col_lists)
-        print(nb_branches, 'columns found in results')
+        print(nb_branches, 'branches found in results')
 
     return d_cols_2
 
@@ -293,11 +261,8 @@ def getColnames(file, sep='\t'):
 def cleanTree(tree:str):
     '''Adds branch numbers to a tree.'''
 
-    # print(tree)
     tree = re.sub(r'([\),])([0-9]+):', r'\1:', tree)
     tree = re.sub(r'([\),])(:[0-9]+):', r'\1:', tree)
-    # print(tree)
-    # Tree without additional information other than branch lengths
     
     new_tree = ''
     branch_id = 0
@@ -305,10 +270,6 @@ def cleanTree(tree:str):
         for i in range(len(tree)):
             if tree[i] in ':':
                 new_tree += ':' + str(branch_id) + tree[i]
-                # while re.match(r'[0-9\.:]', tree[i]):
-                #     new_tree += tree[i]
-                #     i += 1
-                #  + str(branch_id) + tree[i]
                 branch_id += 1
             else:
                 new_tree += tree[i]
@@ -322,19 +283,16 @@ def cleanTree(tree:str):
     return new_tree
 
 
-current_branch = -1
 def createPhyloXML(fam,newick):
     newick = cleanTree(newick)
 
-    # # Parse and return exactly one tree from the given file or handle
+    # Parse and return exactly one tree from the given file or handle
     if not ':' in newick:
         nv_arbre = ""
         for i in range(len(newick)):
-            # if (newick[i]==',' and newick[i-1]!=')') or (newick[i]==')' and newick[i-1]!=')'):
             if (newick[i] in ',)' and newick[i-1] != ')'):
                 nv_arbre += ":0.4"
                 nv_arbre += newick[i]
-            # elif (newick[i]==',' and newick[i-1]==')') or (newick[i]==')' and newick[i-1]==')'):
             elif (newick[i] in ',)' and newick[i-1] == ')'):
                 nv_arbre += ":0.2"
                 nv_arbre += newick[i]
@@ -342,30 +300,23 @@ def createPhyloXML(fam,newick):
                 nv_arbre += newick[i]
         newick = nv_arbre
 
-    print(f'newick:\n{newick}')
-
-    # Tree now has a <branch_name>:<number>:<length> syntax
     handle = StringIO(newick)
-    # print('handle:', handle)
     trees = Phylo.read(handle, 'newick')
 
-    ## Branch IDs match the order in which <clade> tags are closed in the PhyloXML tree
-    ## The first ID being 0
-
-    # print('trees:', trees)
-    # Clade(branch_length=0.0642909)
+    ## Branch IDs match the order in which <clade></clade> tags are closed in the PhyloXML tree,
+    ## the first ID being 0.
 
     # Write a sequence of Tree objects to the given file or handle
     rd = str(random.randint(0,1000))
     Phylo.write([trees], 'tmpfile-'+rd+'.xml', 'phyloxml')
     file = open('tmpfile-'+rd+'.xml', 'r')
-    # Copie tous les objets dans une variable et supprime le fichier créé
+    # Copies all objects in a variable and removes the created file
     text = file.read()
     file.close()
     os.remove('tmpfile-'+rd+'.xml')
-    #
+    
     p = XMLParser(huge_tree=True)
-    # text = text.replace("phy:", "")
+    text = text.replace("phy:", "")
 
     text = re.sub("b'([^']*)'", "\\1", text)
     text = re.sub('branch_length_attr="[^"]+"', "", text)
@@ -379,7 +330,6 @@ def createPhyloXML(fam,newick):
         current_branch += 1
         return f'<closing_order>{current_branch}</closing_order></clade>'
     text = re.sub(r"</clade>", repl=count_repl, string=text)
-    print('text', text)
 
     tree = etree.fromstring(text, parser=p)
     treename = etree.Element("name")
@@ -393,10 +343,8 @@ def createPhyloXML(fam,newick):
     famspecies = {}
 
     for element in clade[0].iter('clade'):
-        # print(element.tag)
         # look for a <name> element in the current <clade> element
         enom = element.find('name')
-        # print(enom)
         if (enom is not None):
             # if there is a <name> element, it means we're in a leaf
             nbfeuille = nbfeuille + 1
@@ -407,14 +355,13 @@ def createPhyloXML(fam,newick):
                 sp = "undefined"
             famspecies[sp] = 1
 
-            ## Affectation de la séquence pour l'ID en cours
+            ## Find sequence for current leaf name
             seq_alg = alignmentDict.get(cds)
             if not seq_alg:
                 print ("undefined alignment for "+ cds)
                 seq_alg = ""
 
             evrec = etree.Element("eventsRec")
-            # branches = etree.Element("branchStats")
             leaf = etree.Element("leaf")
             if 'crossdico' in globals():
                 crossref = etree.Element("crossref")
@@ -432,16 +379,12 @@ def createPhyloXML(fam,newick):
                 if cds in seqdefdico:
                     leaf.set('defintiion', seqdefdico[cds])
 
-            ## Ajout des séquences aux feuilles
+            ## Add sequence to leaf
             if args.codonsToggle:
-                leaf.set('dnaAlign', seq_alg) # ajout de la séquence en nucléotides
-            # leaf.set('aaAlign', translate.dna_to_prot(seq_alg)) # ajout de la séquence en acides aminés
-            # leaf.set('aaAlign', dna_to_prot(seq_alg)) # ajout de la séquence en acides aminés
-            # print('args.codonsToggle', args.codonsToggle)
-            if args.codonsToggle:
-                leaf.set('aaAlign', nucToAmino(seq_alg)) # ajout de la séquence traduite
+                leaf.set('dnaAlign', seq_alg) # coding sequence
+                leaf.set('aaAlign', nucToAmino(seq_alg)) # translated sequence
             else:
-                leaf.set('aaAlign', seq_alg) # ajout de la séquence brute
+                leaf.set('aaAlign', seq_alg) # raw sequence (any type)
 
             if 'crossdico' in globals():
                 leaf.append(crossref)
@@ -458,10 +401,9 @@ def createPhyloXML(fam,newick):
                 branch_info.set('id', branch_id)
                 branch_info.set('results', str(dict_results[branch_id]))
                 element.append(branch_info)
-                # print(branch_id, dict_results[branch_id][:20])
             except KeyError:
                 ## If there is no matching column is results, add one with negative results
-                print(f'branch {branch_id} not found, adding placeholder column')
+                print(f'Branch ID {branch_id} not found, adding placeholder')
                 branch_info = etree.Element('branch_info')
                 branch_info.set('id', branch_id)
                 dummy_col = json.loads(dict_results['0'])
@@ -469,7 +411,6 @@ def createPhyloXML(fam,newick):
                 col_str = json.dumps(dummy_col)
                 branch_info.set('results', col_str)
                 element.append(branch_info)
-                # print(branch_id, col_str[:20])
     
     print ("Number of leaves : ")
     print (nbfeuille)
@@ -477,11 +418,9 @@ def createPhyloXML(fam,newick):
     print ("Number of species : ")
     print (nbspecies)
 
-    ## Ajout des résultats
+    ## Add global results to tree
     globalResultsElement = etree.Element('global_results')
-    # globalResultsElement.set('results', resultsText)
     globalResultsElement.set('results', str(resultsList))
-    # globalResultsElement.text = resultsText
 
     LengthMaxSeqID = etree.Element('maxSeqIdLength')
     LengthMaxSeqID.text = str(maxSeqIdLength)
@@ -492,7 +431,7 @@ def createPhyloXML(fam,newick):
     e=subtree[0].find('phylogeny')
     e.append(treesize)
     e.append(LengthMaxSeqID)
-    e.append(globalResultsElement) # ajout de la balise contenant les résultats
+    e.append(globalResultsElement) # add the tag containing results
     text =  minidom.parseString(ElementTree.tostring(subtree[0])).toprettyxml()
     # remove blank lines
     cleantext = "\n".join([ll.rstrip() for ll in text.splitlines() if ll.strip()])
@@ -500,7 +439,6 @@ def createPhyloXML(fam,newick):
 
 MAX_SITE = 100000
 sys.setrecursionlimit(15000)
-# print(sys.getrecursionlimit())
 
 print ("Loading alignment... ")
 loadedAlignment = loadAlignment(args.alignmentFile)
@@ -508,14 +446,13 @@ alignmentDict, maxSeqIdLength = loadedAlignment[0], loadedAlignment[1]
 print ("OK")
 
 print ("Loading results... ")
-# resultsText =  loadResultsSites(args.resultsFile, args.statcol, args.nostat, sep=args.sep)
 resultsList =  loadResultsSites(args.resultsFile, args.statcol, args.nostat, sep=args.sep, skipMissingSites=args.skipMissingSites)
 if args.isBranchsite:
     dict_results = loadResultsBranchSite(args.resultsFile, sep=args.sep)
 print("OK")
 
-#Creates empty phyloxml document
-# project = Phyloxml()   # a decommenter si on veut un fichier xml unique
+# Creates empty phyloxml document
+# project = Phyloxml()  # uncomment to have a unique xml file
 
 # Loads Species name dico
 dico = loadDico(args.alignmentFile)
@@ -539,6 +476,7 @@ for line in treefile:
     else:
         newick = tline[0]
         fam = ''
+    current_branch = -1
     phyloxmltree = createPhyloXML(fam,newick)
     xmloutputfile.write(phyloxmltree)
     print("Famille "+fam+" OK")
