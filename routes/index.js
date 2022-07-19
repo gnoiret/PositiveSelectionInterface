@@ -36,10 +36,10 @@ router.post("/upload_files", upload.fields([
 ]), 
 (req, res) => {
   console.log('Successfully uploaded files');
-  console.log(req.body);
-  console.log(req.files);
+  // console.log(req.body);
+  // console.log(req.files);
   
-  var currentTimestampMs = Date.now();
+  var currentTimestampMs = Date.now(); // Date.now() is the current timestamp in milliseconds
   var fname_t = currentTimestampMs+'-t'+req.files.file_t[0].filename.substring(0, 3);
   var fname_a = currentTimestampMs+'-a'+req.files.file_a[0].filename.substring(0, 3);
   var fname_r = currentTimestampMs+'-r'+req.files.file_r[0].filename.substring(0, 3);
@@ -58,14 +58,11 @@ router.post("/upload_files", upload.fields([
       console.log('ERROR:', err);
     }
   });
-  // Date.now() is the current timestamp in milliseconds
+
   var fname_xml = currentTimestampMs
-    // +'-xml-'
-    + fname_t.split('-')[1]
-    + fname_a.split('-')[1]
-    + fname_r.split('-')[1]
-    // +'.xml'
-    ;
+    + '-'+fname_t.split('-')[1]
+    + '-'+fname_a.split('-')[1]
+    + '-'+fname_r.split('-')[1];
   var full_path_xml = xml_dir + fname_xml;
   var statcol = req.body.statcol;
   var nostat = req.body.nostat;
@@ -113,15 +110,12 @@ router.post("/upload_files", upload.fields([
     isNuc = false;
   }
 
-  // console.log('Tree: ' + fname_t + '\n' +
-  // 'Alignment: ' + fname_a + '\n' +
-  // 'Results: ' + fname_r + '\n' +
-  // 'XML: ' + fname_xml);
+  console.log('Tree: ' + fname_t + '\n' +
+  'Alignment: ' + fname_a + '\n' +
+  'Results: ' + fname_r + '\n' +
+  'XML: ' + fname_xml);
 
-  // console.log(req.files);
-  // console.log('req.files.length: '+req.files.length);
-
-  // Faire tourner genere_xml.py avec exec()
+  // Generate XML file from data
   console.log('Generating XML tree');
   exec('python3 genere_xml.py'
       +' -t '+upload_dir+fname_t
@@ -137,21 +131,21 @@ router.post("/upload_files", upload.fields([
     if (error) {
       console.log(`error: ${error.message}`);
     } else {
-      console.log('Deleting data files');
-      exec('rm'
-        +' '+upload_dir+fname_t
-        +' '+upload_dir+fname_a
-        +' '+upload_dir+fname_r,
-        (error, stdout, stderr) => {
-          if (error) {
-            console.log(`error: ${error.message}`);
-          }
-          if (stderr) {
-            console.log(`error: ${stderr}`);
-          }
-          console.log(`${stdout}`);
-        }
-      )
+      // console.log('Deleting data files');
+      // exec('rm'
+      //   +' '+upload_dir+fname_t
+      //   +' '+upload_dir+fname_a
+      //   +' '+upload_dir+fname_r,
+      //   (error, stdout, stderr) => {
+      //     if (error) {
+      //       console.log(`error: ${error.message}`);
+      //     }
+      //     if (stderr) {
+      //       console.log(`error: ${stderr}`);
+      //     }
+      //     console.log(`${stdout}`);
+      //   }
+      // )
     }
     if (stderr) {
       console.log(`error: ${stderr}`);
@@ -185,19 +179,19 @@ router.post("/upload_files", upload.fields([
           {arbre:JSONtree, pattern:JSONpattern, branchSite:branchSite,
             logBranchLength:logBranchLength, isNuc:isNuc});
 
-        console.log('Deleting XML file');
-        exec('rm'
-          +' '+xml_dir+fname_xml,
-          (error, stdout, stderr) => {
-            if (error) {
-              console.log(`error: ${error.message}`);
-            }
-            if (stderr) {
-              console.log(`error: ${stderr}`);
-            }
-            console.log(`${stdout}`);
-          }
-        )
+        // console.log('Deleting XML file');
+        // exec('rm'
+        //   +' '+xml_dir+fname_xml,
+        //   (error, stdout, stderr) => {
+        //     if (error) {
+        //       console.log(`error: ${error.message}`);
+        //     }
+        //     if (stderr) {
+        //       console.log(`error: ${stderr}`);
+        //     }
+        //     console.log(`${stdout}`);
+        //   }
+        // )
       });
     });
   });
