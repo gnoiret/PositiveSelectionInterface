@@ -129,7 +129,7 @@
         </div>
       <!-- </div> -->
     </nav>
-    <div id="navigator-container" style="border:2px solid lightgrey; overflow-y: hidden; width: 100%; height: 80px;">
+    <div id="navigator-container" style="border:2px solid lightgrey; overflow-y: hidden; width: 100%;">
       <svg id="svg0"></svg>
     </div>
   </header>
@@ -974,30 +974,6 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
     rightBoundaryInput.val(nbSites);
   }
 
-  // // The color of a node depends on the number of positive sites in its branch
-  // g.selectAll('path.symbol').attr('fill', function(d) {
-  //   if (d.data.branch_info) {
-  //     var positiveRate = getPositiveRateJSON(d.data.branch_info.results, leftBoundary, rightBoundary);
-  //     if (positiveRate > 0) {
-  //       return 'hsl(0, 100%, '+(100 - 2*positiveRate*100 - 10)+'%)';
-  //     } else {
-  //       return 'hsl(240, 100%, 50%)'; // blue
-  //     }
-  //   }
-  // })
-  // allNodes.attr('fill', function(d) {
-  //   if (d.data.branch_info) {
-  //     var positiveRate = getPositiveRateJSON(d.data.branch_info.results, leftBoundary, rightBoundary);
-  //     if (positiveRate > 0) {
-  //       return 'hsl(0, 100%, '+(100 - 2*positiveRate*100 - 10)+'%)';
-  //     } else {
-  //       return 'hsl(240, 100%, 50%)'; // blue
-  //     }
-  //   }
-  // })
-
-
-
   // =======================
   // Selection des feuilles
   // =======================
@@ -1006,10 +982,10 @@ function updateSvg(treeRoot,firstLoad ,config = {}) {
   });
   
   var widthSVG0 = resultsJSON.length;
-  var heightSVG0 = 80;
+  var heightSVG0 = 60;
   var psGraphGlobalWidth = resultsJSON.length;
-  var psGraphGlobalHeight = 50;
-  var psGraphGlobalMargins = {top:15, right:0, bottom:15, left:0};
+  var psGraphGlobalHeight = 60;
+  var psGraphGlobalMargins = {top:0, right:0, bottom:0, left:0};
   var svg0 = d3.select('#svg0');
   svg0
     .attr('width', widthSVG0 + 15)
