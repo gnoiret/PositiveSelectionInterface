@@ -12,6 +12,15 @@ contains a Newick-formatted tree file, a FASTA alignment file and a results file
 organised in columns (with site numbers as the first one), the Python script used to generate
 the XML file used by the interface will work.
 
+## Prerequisites for a local installation
+
+- Python
+    - biopython
+    - lxml
+
+- Node.js
+    - npm
+
 # Usage
 
 ## Uploading your files
